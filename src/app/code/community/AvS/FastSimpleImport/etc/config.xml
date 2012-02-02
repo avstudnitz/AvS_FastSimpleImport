@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<AvS_FastSimpleImport>
+			<version>0.1.0</version>
+		</AvS_FastSimpleImport>
+	</modules>
+
+	<global>
+		<models>
+            <fastsimpleimport>
+                <class>AvS_FastSimpleImport_Model</class>
+            </fastsimpleimport>
+        </models>
+	</global>
+</config>

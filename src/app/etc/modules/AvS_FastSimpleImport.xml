@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<AvS_FastSimpleImport>
+			<active>true</active>
+			<codePool>community</codePool>
+		</AvS_FastSimpleImport>
+	</modules>
+</config>
