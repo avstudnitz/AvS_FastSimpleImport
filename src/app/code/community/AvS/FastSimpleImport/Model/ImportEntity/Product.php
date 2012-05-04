@@ -34,33 +34,6 @@ class AvS_FastSimpleImport_Model_ImportEntity_Product extends Mage_ImportExport_
     }
 
     /**
-     * Returns an object for upload a media files
-     *
-     * @return Mage_ImportExport_Model_Import_Uploader
-     */
-    protected function _getUploader()
-    {
-        if (is_null($this->_fileUploader)) {
-            $this->_fileUploader    = new Mage_ImportExport_Model_Import_Uploader();
-
-            $this->_fileUploader->init();
-
-            $tmpDir     = Mage::getConfig()->getOptions()->getMediaDir() . DS . 'promo_import' . DS . 'images';
-            $destDir    = Mage::getConfig()->getOptions()->getMediaDir() . DS . 'catalog' . DS . 'product';
-            if (!is_writable($destDir)) {
-                @mkdir($destDir, 0777, true);
-            }
-            if (!$this->_fileUploader->setTmpDir($tmpDir)) {
-                Mage::throwException("File directory '{$tmpDir}' is not readable.");
-            }
-            if (!$this->_fileUploader->setDestDir($destDir)) {
-                Mage::throwException("File directory '{$destDir}' is not writable.");
-            }
-        }
-        return $this->_fileUploader;
-    }
-
-    /**
      * Initialize categories text-path to ID hash.
      *
      * @return Mage_ImportExport_Model_Import_Entity_Product
