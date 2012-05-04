@@ -100,7 +100,11 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
     {
         $colNames = array();
         foreach($this->_array as $row) {
-            $colNames = array_merge($colNames, array_keys($row));
+            foreach (array_keys($row) as $key) {
+                if (!is_numeric($key) && !isset($colNames[$key])) {
+                    $colNames[$key] = $key;
+                }
+            }
         }
         return $colNames;
     }
