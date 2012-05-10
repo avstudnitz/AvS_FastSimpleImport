@@ -17,14 +17,15 @@ ini_set('max_execution_time', 600);
 $data = array();
 
 
-for ($i = 1; $i <= 10000; $i++) {
+for ($i = 1; $i <= 100; $i++) {
 
     $randomString = getUniqueCode(20);
     $data[] = array(
-        'sku' => $randomString,
+        'sku' => $i,
         '_type' => 'simple',
         '_attribute_set' => 'Default',
         '_product_websites' => 'base',
+        // '_category' => rand(1, 3),
         'name' => $randomString,
         'price' => 0.99,
         'special_price' => 0.90,
@@ -49,6 +50,8 @@ for ($i = 1; $i <= 10000; $i++) {
 $time = microtime(true);
 Mage::getSingleton('fastsimpleimport/import')
     ->processProductImport($data);
+//Mage::getSingleton('fastsimpleimport/import')
+//    ->reindexImportedProducts();
 
 echo 'Elapsed time: ' . (microtime(true) - $time) . 's';
 ?>
