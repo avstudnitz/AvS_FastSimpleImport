@@ -13,7 +13,7 @@ class AvS_FastSimpleImport_Model_ImportEntity_Product extends Mage_ImportExport_
      * Source model setter.
      *
      * @param array $source
-     * @return Mage_ImportExport_Model_Import_Entity_Abstract
+     * @return AvS_FastSimpleImport_Model_ImportEntity_Product
      */
     public function setArraySource($source)
     {

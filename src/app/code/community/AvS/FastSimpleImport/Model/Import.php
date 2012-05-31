@@ -93,6 +93,14 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     }
 
     /**
+     * @return Mage_ImportExport_Model_Import_Entity_Abstract
+     */
+    protected function getEntityAdapter()
+    {
+        return $this->_entityAdapter;
+    }
+
+    /**
      * Validates source file and returns validation result.
      *
      * @param array $sourceData Source Data
@@ -107,4 +115,21 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         return $result;
     }
 
+    /**
+     * Partially reindex newly created and updated products
+     *
+     * @todo update search index on new products
+     * @todo ensure that  the Stock Option "Display Out of Stock Products" is set to "Yes".
+     */
+    public function reindexImportedProducts()
+    {
+        foreach($this->getEntityAdapter()->getNewSku() as $sku => $productData) {
+            $productId = $productData['entity_id'];
+            $product = Mage::getModel('catalog/product')->load($productId)
+                ->setForceReindexRequired(true)
+                ->setIsChangedCategories(true);
+
+            Mage::getSingleton('index/indexer')->processEntityAction($product, Mage_Catalog_Model_Product::ENTITY, Mage_Index_Model_Event::TYPE_SAVE);
+        }
+    }
 }
