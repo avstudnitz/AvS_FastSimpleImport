@@ -122,8 +122,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     /**
      * Partially reindex newly created and updated products
      *
-     * @todo update search index on new products
-     * @todo ensure that the Stock Option "Display Out of Stock Products" is set to "Yes".
+     * @todo handle deleted products
      */
     public function reindexImportedProducts()
     {
@@ -133,6 +132,14 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
             ->addAttributeToFilter('sku', array('in' => $skus));
 
         foreach($productCollection as $product) {
+            /** @var $product Mage_Catalog_Model_Product */
+
+            /** @var $stockItem Mage_CatalogInventory_Model_Stock_Item */
+            $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product->getId());
+            $stockItem->setForceReindexRequired(true);
+
+            Mage::getSingleton('index/indexer')->processEntityAction($stockItem, Mage_CatalogInventory_Model_Stock_Item::ENTITY, Mage_Index_Model_Event::TYPE_SAVE);
+
             $product
                 ->setForceReindexRequired(true)
                 ->setIsChangedCategories(true);
