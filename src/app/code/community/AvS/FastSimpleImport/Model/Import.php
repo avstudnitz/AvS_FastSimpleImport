@@ -123,13 +123,17 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      * Partially reindex newly created and updated products
      *
      * @todo update search index on new products
-     * @todo ensure that  the Stock Option "Display Out of Stock Products" is set to "Yes".
+     * @todo ensure that the Stock Option "Display Out of Stock Products" is set to "Yes".
      */
     public function reindexImportedProducts()
     {
-        foreach($this->getEntityAdapter()->getNewSku() as $sku => $productData) {
-            $productId = $productData['entity_id'];
-            $product = Mage::getModel('catalog/product')->load($productId)
+        $skus = array_keys($this->getEntityAdapter()->getNewSku());
+        $productCollection = Mage::getModel('catalog/product')
+            ->getCollection()
+            ->addAttributeToFilter('sku', array('in' => $skus));
+
+        foreach($productCollection as $product) {
+            $product
                 ->setForceReindexRequired(true)
                 ->setIsChangedCategories(true);
 
