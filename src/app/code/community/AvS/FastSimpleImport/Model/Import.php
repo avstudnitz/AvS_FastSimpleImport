@@ -13,15 +13,17 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      * Import products
      *
      * @param array $data
-     * @param string $behavior
+     * @param string|null $behavior
      * @return void
      */
-    public function processProductImport($data, $behavior = self::BEHAVIOR_REPLACE)
+    public function processProductImport($data, $behavior = null)
     {
+        if (is_null($behavior)) $behavior = self::BEHAVIOR_REPLACE;
+
         $this->setEntity('catalog_product');
 
         /** @var $entityAdapter AvS_FastSimpleImport_Model_ImportEntity_Product */
-        $entityAdapter = Mage::getModel('fastsimpleimport/importEntity_product');
+        $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_product');
         $entityAdapter->setBehavior($behavior);
         $this->setEntityAdapter($entityAdapter);
         $validationResult = $this->validateSource($data);
@@ -48,12 +50,14 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      * @param string $behavior
      * @return void
      */
-    public function processCustomerImport($data, $behavior = self::BEHAVIOR_REPLACE)
+    public function processCustomerImport($data, $behavior = null)
     {
+        if (is_null($behavior)) $behavior = self::BEHAVIOR_REPLACE;
+
         $this->setEntity('customer');
 
         /** @var $entityAdapter AvS_FastSimpleImport_Model_ImportEntity_Customer */
-        $entityAdapter = Mage::getModel('fastsimpleimport/importEntity_customer');
+        $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_customer');
         $entityAdapter->setBehavior($behavior);
         $this->setEntityAdapter($entityAdapter);
         $validationResult = $this->validateSource($data);

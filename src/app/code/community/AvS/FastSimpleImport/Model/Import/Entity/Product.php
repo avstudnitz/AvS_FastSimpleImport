@@ -7,7 +7,7 @@
  * @package    AvS_FastSimpleImport
  * @author     Andreas von Studnitz <avs@avs-webentwicklung.de>
  */
-class AvS_FastSimpleImport_Model_ImportEntity_Product extends Mage_ImportExport_Model_Import_Entity_Product
+class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport_Model_Import_Entity_Product
 {
     /**
      * Source model setter.
