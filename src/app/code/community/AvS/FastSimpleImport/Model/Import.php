@@ -14,7 +14,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      *
      * @param array $data
      * @param string|null $behavior
-     * @return void
+     * @return AvS_FastSimpleImport_Model_Import
      */
     public function processProductImport($data, $behavior = null)
     {
@@ -41,6 +41,8 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
             $this->importSource();
             $this->invalidateIndex();
         }
+
+        return $this;
     }
 
     /**
@@ -48,7 +50,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      *
      * @param array $data
      * @param string $behavior
-     * @return void
+     * @return AvS_FastSimpleImport_Model_Import
      */
     public function processCustomerImport($data, $behavior = null)
     {
@@ -74,6 +76,8 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
             }
             $this->importSource();
         }
+
+        return $this;
     }
 
     /**
@@ -123,6 +127,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      * Partially reindex newly created and updated products
      *
      * @todo handle deleted products
+     * @return AvS_FastSimpleImport_Model_Import
      */
     public function reindexImportedProducts()
     {
@@ -130,6 +135,8 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $productCollection = Mage::getModel('catalog/product')
             ->getCollection()
             ->addAttributeToFilter('sku', array('in' => $skus));
+
+        print_r($skus);
 
         foreach($productCollection as $product) {
             /** @var $product Mage_Catalog_Model_Product */
@@ -146,5 +153,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 
             Mage::getSingleton('index/indexer')->processEntityAction($product, Mage_Catalog_Model_Product::ENTITY, Mage_Index_Model_Event::TYPE_SAVE);
         }
+
+        return $this;
     }
 }
