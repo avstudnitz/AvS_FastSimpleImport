@@ -20,7 +20,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     {
         if (is_null($behavior)) $behavior = self::BEHAVIOR_REPLACE;
 
-        $this->setEntity('catalog_product');
+        $this->setEntity(Mage_Catalog_Model_Product::ENTITY);
 
         /** @var $entityAdapter AvS_FastSimpleImport_Model_ImportEntity_Product */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_product');
@@ -123,37 +123,21 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         return $result;
     }
 
+    public function prepareDeletedProductsReindex()
+    {
+        $skus = array();
+        //foreach($this->getEntityAdapter()->getVali)
+    }
+
     /**
      * Partially reindex newly created and updated products
      *
      * @todo handle deleted products
      * @return AvS_FastSimpleImport_Model_Import
      */
-    public function reindexImportedProducts()
+    public function reindexUpdatedProducts()
     {
-        $skus = array_keys($this->getEntityAdapter()->getNewSku());
-        $productCollection = Mage::getModel('catalog/product')
-            ->getCollection()
-            ->addAttributeToFilter('sku', array('in' => $skus));
-
-        print_r($skus);
-
-        foreach($productCollection as $product) {
-            /** @var $product Mage_Catalog_Model_Product */
-
-            /** @var $stockItem Mage_CatalogInventory_Model_Stock_Item */
-            $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product->getId());
-            $stockItem->setForceReindexRequired(true);
-
-            Mage::getSingleton('index/indexer')->processEntityAction($stockItem, Mage_CatalogInventory_Model_Stock_Item::ENTITY, Mage_Index_Model_Event::TYPE_SAVE);
-
-            $product
-                ->setForceReindexRequired(true)
-                ->setIsChangedCategories(true);
-
-            Mage::getSingleton('index/indexer')->processEntityAction($product, Mage_Catalog_Model_Product::ENTITY, Mage_Index_Model_Event::TYPE_SAVE);
-        }
-
+        $this->getEntityAdapter()->reindexUpdatedProducts();
         return $this;
     }
 }
