@@ -38,6 +38,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
                 }
                 Mage::throwException($message);
             }
+            $this->prepareDeletedProductsReindex();
             $this->importSource();
             $this->invalidateIndex();
         }
@@ -125,8 +126,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 
     public function prepareDeletedProductsReindex()
     {
-        $skus = array();
-        //foreach($this->getEntityAdapter()->getVali)
+        $this->getEntityAdapter()->prepareDeletedProductsReindex();
     }
 
     /**

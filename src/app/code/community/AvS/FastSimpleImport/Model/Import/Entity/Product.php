@@ -62,6 +62,51 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         return $this;
     }
 
+    public function prepareDeletedProductsReindex()
+    {
+        if ($this->getBehavior() != Mage_ImportExport_Model_Import::BEHAVIOR_DELETE) return;
+
+        $skus = $this->_getDeletedProductsSkus();
+
+        $productCollection = Mage::getModel('catalog/product')
+            ->getCollection()
+            ->addAttributeToFilter('sku', array('in' => $skus));
+
+        foreach($productCollection as $product) {
+            /** @var $product Mage_Catalog_Model_Product */
+
+            $product
+                ->setForceReindexRequired(true)
+                ->setIsChangedCategories(true);
+
+            Mage::getSingleton('index/indexer')->logEvent(
+                $product,
+                Mage_Catalog_Model_Product::ENTITY,
+                Mage_Index_Model_Event::TYPE_DELETE
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Archive SKUs of products which are to be deleted
+     *
+     * @return array
+     */
+    protected function _getDeletedProductsSkus()
+    {
+        $skus = array();
+        foreach ($this->_validatedRows as $rowIndex => $rowValidated) {
+            if (!$rowValidated) continue;
+            $this->getSource()->seek($rowIndex);
+            $rowData = $this->getSource()->current();
+            $skus[] = $rowData['sku'];
+        }
+        return $skus;
+    }
+
+
     /**
      * Partially reindex newly created and updated products
      *
@@ -82,13 +127,21 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product->getId());
             $stockItem->setForceReindexRequired(true);
 
-            Mage::getSingleton('index/indexer')->processEntityAction($stockItem, Mage_CatalogInventory_Model_Stock_Item::ENTITY, Mage_Index_Model_Event::TYPE_SAVE);
+            Mage::getSingleton('index/indexer')->processEntityAction(
+                $stockItem,
+                Mage_CatalogInventory_Model_Stock_Item::ENTITY,
+                Mage_Index_Model_Event::TYPE_SAVE
+            );
 
             $product
                 ->setForceReindexRequired(true)
                 ->setIsChangedCategories(true);
 
-            Mage::getSingleton('index/indexer')->processEntityAction($product, Mage_Catalog_Model_Product::ENTITY, Mage_Index_Model_Event::TYPE_SAVE);
+            Mage::getSingleton('index/indexer')->processEntityAction(
+                $product,
+                Mage_Catalog_Model_Product::ENTITY,
+                Mage_Index_Model_Event::TYPE_SAVE
+            );
         }
 
         return $this;
