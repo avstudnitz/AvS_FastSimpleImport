@@ -80,11 +80,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         foreach ($productCollection as $product) {
             /** @var $product Mage_Catalog_Model_Product */
 
-            Mage::getSingleton('index/indexer')->logEvent(
-                $product,
-                Mage_Catalog_Model_Product::ENTITY,
-                Mage_Index_Model_Event::TYPE_DELETE
-            );
+            $this->_logDeleteEvent($product);
         }
 
         return $this;
@@ -118,7 +114,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
 
             case Mage_ImportExport_Model_Import::BEHAVIOR_DELETE:
 
-                $this->_reindexDeletedProducts();
+                $this->_indexDeleteEvents();
                 break;
             case Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE:
             case Mage_ImportExport_Model_Import::BEHAVIOR_APPEND:
@@ -126,19 +122,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                 $this->_reindexUpdatedProducts();
                 break;
         }
-    }
-
-    /**
-     * Perform reindexing of deleted products after deletion;
-     * Events have been logged before
-     *
-     * @return AvS_FastSimpleImport_Model_Import_Entity_Product
-     */
-    protected function _reindexDeletedProducts()
-    {
-        Mage::getSingleton('index/indexer')->indexEvents(
-            Mage_Catalog_Model_Product::ENTITY, Mage_Index_Model_Event::TYPE_DELETE
-        );
     }
 
     /**
@@ -154,29 +137,84 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             ->addAttributeToFilter('sku', array('in' => $skus));
 
         foreach ($productCollection as $product) {
+
             /** @var $product Mage_Catalog_Model_Product */
-
-            /** @var $stockItem Mage_CatalogInventory_Model_Stock_Item */
-            $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product->getId());
-            $stockItem->setForceReindexRequired(true);
-
-            Mage::getSingleton('index/indexer')->processEntityAction(
-                $stockItem,
-                Mage_CatalogInventory_Model_Stock_Item::ENTITY,
-                Mage_Index_Model_Event::TYPE_SAVE
-            );
-
-            $product
-                ->setForceReindexRequired(true)
-                ->setIsChangedCategories(true);
-
-            Mage::getSingleton('index/indexer')->processEntityAction(
-                $product,
-                Mage_Catalog_Model_Product::ENTITY,
-                Mage_Index_Model_Event::TYPE_SAVE
-            );
+            $this->_logSaveEvent($product);
         }
 
+        $this->_indexSaveEvents();
+
         return $this;
+    }
+
+    /**
+     * Log save index events for product and its stock item
+     *
+     * @param Mage_Catalog_Model_Product $product
+     */
+    protected function _logSaveEvent($product)
+    {
+        /** @var $stockItem Mage_CatalogInventory_Model_Stock_Item */
+        $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product->getId());
+        $stockItem->setForceReindexRequired(true);
+
+        Mage::getSingleton('index/indexer')->logEvent(
+            $stockItem,
+            Mage_CatalogInventory_Model_Stock_Item::ENTITY,
+            Mage_Index_Model_Event::TYPE_SAVE
+        );
+
+        $product
+            ->setForceReindexRequired(true)
+            ->setIsChangedCategories(true);
+
+        Mage::getSingleton('index/indexer')->logEvent(
+            $product,
+            Mage_Catalog_Model_Product::ENTITY,
+            Mage_Index_Model_Event::TYPE_SAVE
+        );
+    }
+
+    /**
+     * Fulfill indexing for product save events
+     */
+    protected function _indexSaveEvents()
+    {
+        Mage::getSingleton('index/indexer')->indexEvents(
+            Mage_CatalogInventory_Model_Stock_Item::ENTITY,
+            Mage_Index_Model_Event::TYPE_SAVE
+        );
+
+        Mage::getSingleton('index/indexer')->indexEvents(
+            Mage_Catalog_Model_Product::ENTITY,
+            Mage_Index_Model_Event::TYPE_SAVE
+        );
+    }
+
+    /**
+     * Log delete index events for product
+     *
+     * @param Mage_Catalog_Model_Product $product
+     */
+    protected function _logDeleteEvent($product)
+    {
+        Mage::getSingleton('index/indexer')->logEvent(
+            $product,
+            Mage_Catalog_Model_Product::ENTITY,
+            Mage_Index_Model_Event::TYPE_DELETE
+        );
+    }
+
+    /**
+     * Perform reindexing of deleted products after deletion;
+     * Events have been logged before
+     *
+     * @return AvS_FastSimpleImport_Model_Import_Entity_Product
+     */
+    protected function _indexDeleteEvents()
+    {
+        Mage::getSingleton('index/indexer')->indexEvents(
+            Mage_Catalog_Model_Product::ENTITY, Mage_Index_Model_Event::TYPE_DELETE
+        );
     }
 }
