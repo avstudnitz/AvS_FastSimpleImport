@@ -1,14 +1,25 @@
 <?php
 
 /**
- * Import Main Model
- *
  * @category   AvS
  * @package    AvS_FastSimpleImport
  * @author     Andreas von Studnitz <avs@avs-webentwicklung.de>
  */
+
+/**
+ * Import Main Model
+ *
+ * @method AvS_FastSimpleImport_Model_Import setBehavior(string $value)
+ * @method AvS_FastSimpleImport_Model_Import setPartialIndexing(boolean $value)
+ */
 class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 {
+    protected function _construct()
+    {
+        $this->setBehavior(self::BEHAVIOR_REPLACE);
+        $this->setPartialIndexing(false);
+    }
+
     /**
      * Import products
      *
@@ -18,13 +29,13 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      */
     public function processProductImport($data, $behavior = null)
     {
-        if (is_null($behavior)) $behavior = self::BEHAVIOR_REPLACE;
+        if (!is_null($behavior)) $this->setBehavior($behavior);
 
         $this->setEntity(Mage_Catalog_Model_Product::ENTITY);
 
-        /** @var $entityAdapter AvS_FastSimpleImport_Model_ImportEntity_Product */
+        /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Product */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_product');
-        $entityAdapter->setBehavior($behavior);
+        $entityAdapter->setBehavior($this->getBehavior());
         $this->setEntityAdapter($entityAdapter);
         $validationResult = $this->validateSource($data);
         if ($this->getProcessedRowsCount() > 0) {
@@ -38,9 +49,17 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
                 }
                 Mage::throwException($message);
             }
-            $this->prepareDeletedProductsReindex();
-            $this->importSource();
-            $this->invalidateIndex();
+
+            if ($this->getPartialIndexing()) {
+
+                $this->_prepareDeletedProductsReindex();
+                $this->importSource();
+                $this->reindexImportedProducts();
+            } else {
+
+                $this->importSource();
+                $this->invalidateIndex();
+            }
         }
 
         return $this;
@@ -59,7 +78,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 
         $this->setEntity('customer');
 
-        /** @var $entityAdapter AvS_FastSimpleImport_Model_ImportEntity_Customer */
+        /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Customer */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_customer');
         $entityAdapter->setBehavior($behavior);
         $this->setEntityAdapter($entityAdapter);
@@ -130,7 +149,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      *
      * @return AvS_FastSimpleImport_Model_Import
      */
-    public function prepareDeletedProductsReindex()
+    protected function _prepareDeletedProductsReindex()
     {
         $this->getEntityAdapter()->prepareDeletedProductsReindex();
         return $this;
