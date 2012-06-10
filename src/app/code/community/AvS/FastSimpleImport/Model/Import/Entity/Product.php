@@ -44,7 +44,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         /* @var $collection Mage_Catalog_Model_Resource_Eav_Mysql4_Category_Collection */
         foreach ($collection as $category) {
             $structure = explode('/', $category->getPath());
-            $pathSize  = count($structure);
+            $pathSize = count($structure);
             if ($pathSize > 2) {
                 $path = array();
                 $this->_categories[implode('/', $path)] = $category->getId();
@@ -62,9 +62,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         return $this;
     }
 
+    /**
+     * Log Indexing Events before deleting products
+     *
+     * @return AvS_FastSimpleImport_Model_Import_Entity_Product
+     */
     public function prepareDeletedProductsReindex()
     {
-        if ($this->getBehavior() != Mage_ImportExport_Model_Import::BEHAVIOR_DELETE) return;
+        if ($this->getBehavior() != Mage_ImportExport_Model_Import::BEHAVIOR_DELETE) return $this;
 
         $skus = $this->_getDeletedProductsSkus();
 
@@ -72,12 +77,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             ->getCollection()
             ->addAttributeToFilter('sku', array('in' => $skus));
 
-        foreach($productCollection as $product) {
+        foreach ($productCollection as $product) {
             /** @var $product Mage_Catalog_Model_Product */
-
-            $product
-                ->setForceReindexRequired(true)
-                ->setIsChangedCategories(true);
 
             Mage::getSingleton('index/indexer')->logEvent(
                 $product,
@@ -106,21 +107,53 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         return $skus;
     }
 
+    /**
+     * Partially reindex newly created and updated products
+     *
+     * @return AvS_FastSimpleImport_Model_Import_Entity_Product
+     */
+    public function reindexImportedProducts()
+    {
+        switch ($this->getBehavior()) {
+
+            case Mage_ImportExport_Model_Import::BEHAVIOR_DELETE:
+
+                $this->_reindexDeletedProducts();
+                break;
+            case Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE:
+            case Mage_ImportExport_Model_Import::BEHAVIOR_APPEND:
+
+                $this->_reindexUpdatedProducts();
+                break;
+        }
+    }
+
+    /**
+     * Perform reindexing of deleted products after deletion;
+     * Events have been logged before
+     *
+     * @return AvS_FastSimpleImport_Model_Import_Entity_Product
+     */
+    protected function _reindexDeletedProducts()
+    {
+        Mage::getSingleton('index/indexer')->indexEvents(
+            Mage_Catalog_Model_Product::ENTITY, Mage_Index_Model_Event::TYPE_DELETE
+        );
+    }
 
     /**
      * Partially reindex newly created and updated products
      *
-     * @todo handle deleted products
      * @return AvS_FastSimpleImport_Model_Import_Entity_Product
      */
-    public function reindexUpdatedProducts()
+    protected function _reindexUpdatedProducts()
     {
         $skus = array_keys($this->getNewSku());
         $productCollection = Mage::getModel('catalog/product')
             ->getCollection()
             ->addAttributeToFilter('sku', array('in' => $skus));
 
-        foreach($productCollection as $product) {
+        foreach ($productCollection as $product) {
             /** @var $product Mage_Catalog_Model_Product */
 
             /** @var $stockItem Mage_CatalogInventory_Model_Stock_Item */

@@ -124,20 +124,27 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         return $result;
     }
 
+    /**
+     * Prepare Indexing of products which are to be deleted;
+     * Preparing needed as products don't exist afterwards anymore
+     *
+     * @return AvS_FastSimpleImport_Model_Import
+     */
     public function prepareDeletedProductsReindex()
     {
         $this->getEntityAdapter()->prepareDeletedProductsReindex();
+        return $this;
     }
 
     /**
-     * Partially reindex newly created and updated products
+     * Partially reindex deleted, newly created and updated products
+     * Method must be called seperately
      *
-     * @todo handle deleted products
      * @return AvS_FastSimpleImport_Model_Import
      */
-    public function reindexUpdatedProducts()
+    public function reindexImportedProducts()
     {
-        $this->getEntityAdapter()->reindexUpdatedProducts();
+        $this->getEntityAdapter()->reindexImportedProducts();
         return $this;
     }
 }
