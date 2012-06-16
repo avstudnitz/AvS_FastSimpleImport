@@ -12,5 +12,14 @@
                 <class>AvS_FastSimpleImport_Model</class>
             </fastsimpleimport>
         </models>
+
+        <importexport>
+            <import_product_types>
+                <simple>fastsimpleimport/importEntity_product_type_simple</simple>
+                <configurable>fastsimpleimport/importEntity_product_type_configurable</configurable>
+                <virtual>fastsimpleimport/importEntity_product_type_simple</virtual>
+                <grouped>fastsimpleimport/importEntity_product_type_grouped</grouped>
+            </import_product_types>
+        </importexport>
 	</global>
 </config>
