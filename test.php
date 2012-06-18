@@ -24,19 +24,20 @@ for ($i = 1; $i <= 10; $i++) {
 
 $time = microtime(true);
 /** @var $import AvS_FastSimpleImport_Model_Import */
+/*
 $import = Mage::getModel('fastsimpleimport/import');
 $import->setPartialIndexing(true);
 $import->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_DELETE);
 $import->processProductImport($data);
 echo 'Elapsed time: ' . round(microtime(true) - $time, 2) . 's' . "\n";
-
+*/
 
 $data = array();
 for ($i = 1; $i <= 10; $i++) {
 
     $randomString = getUniqueCode(20);
     $data[] = array(
-        'sku' => $i,
+        'sku' => 'test' . $i,
         '_type' => 'simple',
         '_attribute_set' => 'Default',
         '_product_websites' => 'base',

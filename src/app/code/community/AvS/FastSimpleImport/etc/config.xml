@@ -15,10 +15,10 @@
 
         <importexport>
             <import_product_types>
-                <simple>fastsimpleimport/importEntity_product_type_simple</simple>
-                <configurable>fastsimpleimport/importEntity_product_type_configurable</configurable>
-                <virtual>fastsimpleimport/importEntity_product_type_simple</virtual>
-                <grouped>fastsimpleimport/importEntity_product_type_grouped</grouped>
+                <simple>fastsimpleimport/import_entity_product_type_simple</simple>
+                <configurable>fastsimpleimport/import_entity_product_type_configurable</configurable>
+                <virtual>fastsimpleimport/import_entity_product_type_simple</virtual>
+                <grouped>fastsimpleimport/import_entity_product_type_grouped</grouped>
             </import_product_types>
         </importexport>
 	</global>

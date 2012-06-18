@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Simple (and Virtual) Products Import Model
+ * Grouped Products Import Model
  *
  * @category   AvS
  * @package    AvS_FastSimpleImport
  * @author     Andreas von Studnitz <avs@avs-webentwicklung.de>
  */
-class AvS_FastSimpleImport_Model_ImportEntity_Product_Type_Simple
-    extends Mage_ImportExport_Model_Import_Entity_Product_Type_Simple
+class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Grouped
+    extends Mage_ImportExport_Model_Import_Entity_Product_Type_Grouped
 {
     /**
      * Prepare attributes values for save: remove non-existent, remove empty values, remove static.
