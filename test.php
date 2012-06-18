@@ -14,6 +14,8 @@ Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
 ini_set('display_errors', 1);
 ini_set('max_execution_time', 600);
 
+/*
+// Delete Products
 $data = array();
 for ($i = 1; $i <= 10; $i++) {
 
@@ -23,21 +25,20 @@ for ($i = 1; $i <= 10; $i++) {
 }
 
 $time = microtime(true);
-/** @var $import AvS_FastSimpleImport_Model_Import */
-/*
-$import = Mage::getModel('fastsimpleimport/import');
-$import->setPartialIndexing(true);
-$import->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_DELETE);
-$import->processProductImport($data);
+Mage::getModel('fastsimpleimport/import')
+    ->setPartialIndexing(true)
+    ->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_DELETE)
+    ->processProductImport($data);
 echo 'Elapsed time: ' . round(microtime(true) - $time, 2) . 's' . "\n";
 */
 
+// Create/Update products
 $data = array();
 for ($i = 1; $i <= 10; $i++) {
 
     $randomString = getUniqueCode(20);
     $data[] = array(
-        'sku' => 'test' . $i,
+        'sku' => $i,
         '_type' => 'simple',
         '_attribute_set' => 'Default',
         '_product_websites' => 'base',
@@ -65,10 +66,10 @@ for ($i = 1; $i <= 10; $i++) {
 
 $time = microtime(true);
 /** @var $import AvS_FastSimpleImport_Model_Import */
-$import = Mage::getModel('fastsimpleimport/import');
-$import->setPartialIndexing(true);
-$import->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_APPEND);
-$import->processProductImport($data);
+$import = Mage::getModel('fastsimpleimport/import')
+    ->setPartialIndexing(true)
+    ->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_APPEND)
+    ->processProductImport($data);
 
 echo 'Elapsed time: ' . round(microtime(true) - $time, 2) . 's' . "\n";
 ?>
