@@ -98,7 +98,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             if (!$rowValidated) continue;
             $this->getSource()->seek($rowIndex);
             $rowData = $this->getSource()->current();
-            $skus[] = $rowData['sku'];
+            $skus[] = (string)$rowData['sku'];
         }
         return $skus;
     }
@@ -131,7 +131,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      */
     protected function _reindexUpdatedProducts()
     {
-        $skus = array_keys($this->getNewSku());
+        $skus = $this->_getUpdatedProductsSkus();
         $productCollection = Mage::getModel('catalog/product')
             ->getCollection()
             ->addAttributeToFilter('sku', array('in' => $skus));
@@ -145,6 +145,23 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         $this->_indexSaveEvents();
 
         return $this;
+    }
+
+    /**
+     * Archive SKUs of products which have been created
+     *
+     * @return array
+     */
+    protected function _getUpdatedProductsSkus()
+    {
+        $skus = array();
+        foreach ($this->_validatedRows as $rowIndex => $rowValidated) {
+            if (!$rowValidated) continue;
+            $this->getSource()->seek($rowIndex);
+            $rowData = $this->getSource()->current();
+            $skus[] = (string)$rowData['sku'];
+        }
+        return $skus;
     }
 
     /**
@@ -223,6 +240,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      */
     protected function _indexDeleteEvents()
     {
+        Mage::getSingleton('index/indexer')->indexEvents(
+            Mage_CatalogInventory_Model_Stock_Item::ENTITY, Mage_Index_Model_Event::TYPE_DELETE
+        );
         Mage::getSingleton('index/indexer')->indexEvents(
             Mage_Catalog_Model_Product::ENTITY, Mage_Index_Model_Event::TYPE_DELETE
         );
