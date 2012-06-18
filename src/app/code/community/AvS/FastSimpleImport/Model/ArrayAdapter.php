@@ -58,7 +58,7 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
     /**
      * Get data at current position
      *
-     * @return array
+     * @return mixed
      */
     public function current() {
         return $this->_array[$this->_position];
@@ -67,7 +67,7 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
     /**
      * Get current position
      *
-     * @return int
+     * @return scalar
      */
     public function key() {
         return $this->_position;
