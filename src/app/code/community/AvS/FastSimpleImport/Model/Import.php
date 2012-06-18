@@ -1,28 +1,41 @@
 <?php
 
 /**
- * Import Main Model
- *
  * @category   AvS
  * @package    AvS_FastSimpleImport
  * @author     Andreas von Studnitz <avs@avs-webentwicklung.de>
  */
+
+/**
+ * Import Main Model
+ *
+ * @method AvS_FastSimpleImport_Model_Import setBehavior(string $value)
+ * @method AvS_FastSimpleImport_Model_Import setPartialIndexing(boolean $value)
+ */
 class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 {
+    protected function _construct()
+    {
+        $this->setBehavior(self::BEHAVIOR_REPLACE);
+        $this->setPartialIndexing(false);
+    }
+
     /**
      * Import products
      *
      * @param array $data
-     * @param string $behavior
-     * @return void
+     * @param string|null $behavior
+     * @return AvS_FastSimpleImport_Model_Import
      */
-    public function processProductImport($data, $behavior = self::BEHAVIOR_REPLACE)
+    public function processProductImport($data, $behavior = null)
     {
-        $this->setEntity('catalog_product');
+        if (!is_null($behavior)) $this->setBehavior($behavior);
 
-        /** @var $entityAdapter AvS_FastSimpleImport_Model_ImportEntity_Product */
-        $entityAdapter = Mage::getModel('fastsimpleimport/importEntity_product');
-        $entityAdapter->setBehavior($behavior);
+        $this->setEntity(Mage_Catalog_Model_Product::ENTITY);
+
+        /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Product */
+        $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_product');
+        $entityAdapter->setBehavior($this->getBehavior());
         $this->setEntityAdapter($entityAdapter);
         $validationResult = $this->validateSource($data);
         if ($this->getProcessedRowsCount() > 0) {
@@ -36,9 +49,20 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
                 }
                 Mage::throwException($message);
             }
-            $this->importSource();
-            $this->invalidateIndex();
+
+            if ($this->getPartialIndexing()) {
+
+                $this->_prepareDeletedProductsReindex();
+                $this->importSource();
+                $this->reindexImportedProducts();
+            } else {
+
+                $this->importSource();
+                $this->invalidateIndex();
+            }
         }
+
+        return $this;
     }
 
     /**
@@ -46,14 +70,16 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      *
      * @param array $data
      * @param string $behavior
-     * @return void
+     * @return AvS_FastSimpleImport_Model_Import
      */
-    public function processCustomerImport($data, $behavior = self::BEHAVIOR_REPLACE)
+    public function processCustomerImport($data, $behavior = null)
     {
+        if (is_null($behavior)) $behavior = self::BEHAVIOR_REPLACE;
+
         $this->setEntity('customer');
 
-        /** @var $entityAdapter AvS_FastSimpleImport_Model_ImportEntity_Customer */
-        $entityAdapter = Mage::getModel('fastsimpleimport/importEntity_customer');
+        /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Customer */
+        $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_customer');
         $entityAdapter->setBehavior($behavior);
         $this->setEntityAdapter($entityAdapter);
         $validationResult = $this->validateSource($data);
@@ -70,6 +96,8 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
             }
             $this->importSource();
         }
+
+        return $this;
     }
 
     /**
@@ -116,20 +144,26 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     }
 
     /**
-     * Partially reindex newly created and updated products
+     * Prepare Indexing of products which are to be deleted;
+     * Preparing needed as products don't exist afterwards anymore
      *
-     * @todo update search index on new products
-     * @todo ensure that  the Stock Option "Display Out of Stock Products" is set to "Yes".
+     * @return AvS_FastSimpleImport_Model_Import
+     */
+    protected function _prepareDeletedProductsReindex()
+    {
+        $this->getEntityAdapter()->prepareDeletedProductsReindex();
+        return $this;
+    }
+
+    /**
+     * Partially reindex deleted, newly created and updated products
+     * Method must be called seperately
+     *
+     * @return AvS_FastSimpleImport_Model_Import
      */
     public function reindexImportedProducts()
     {
-        foreach($this->getEntityAdapter()->getNewSku() as $sku => $productData) {
-            $productId = $productData['entity_id'];
-            $product = Mage::getModel('catalog/product')->load($productId)
-                ->setForceReindexRequired(true)
-                ->setIsChangedCategories(true);
-
-            Mage::getSingleton('index/indexer')->processEntityAction($product, Mage_Catalog_Model_Product::ENTITY, Mage_Index_Model_Event::TYPE_SAVE);
-        }
+        $this->getEntityAdapter()->reindexImportedProducts();
+        return $this;
     }
 }

@@ -15,9 +15,24 @@ ini_set('display_errors', 1);
 ini_set('max_execution_time', 600);
 
 $data = array();
+for ($i = 1; $i <= 10; $i++) {
+
+    $data[] = array(
+        'sku' => $i,
+    );
+}
+
+$time = microtime(true);
+/** @var $import AvS_FastSimpleImport_Model_Import */
+$import = Mage::getModel('fastsimpleimport/import');
+$import->setPartialIndexing(true);
+$import->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_DELETE);
+$import->processProductImport($data);
+echo 'Elapsed time: ' . round(microtime(true) - $time, 2) . 's' . "\n";
 
 
-for ($i = 1; $i <= 100; $i++) {
+$data = array();
+for ($i = 1; $i <= 10; $i++) {
 
     $randomString = getUniqueCode(20);
     $data[] = array(
@@ -48,10 +63,11 @@ for ($i = 1; $i <= 100; $i++) {
 }
 
 $time = microtime(true);
-Mage::getSingleton('fastsimpleimport/import')
-    ->processProductImport($data);
-//Mage::getSingleton('fastsimpleimport/import')
-//    ->reindexImportedProducts();
+/** @var $import AvS_FastSimpleImport_Model_Import */
+$import = Mage::getModel('fastsimpleimport/import');
+$import->setPartialIndexing(true);
+$import->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_APPEND);
+$import->processProductImport($data);
 
-echo 'Elapsed time: ' . (microtime(true) - $time) . 's';
+echo 'Elapsed time: ' . round(microtime(true) - $time, 2) . 's' . "\n";
 ?>
