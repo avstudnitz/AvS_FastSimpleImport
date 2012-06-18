@@ -10,7 +10,9 @@
  * Import Main Model
  *
  * @method AvS_FastSimpleImport_Model_Import setBehavior(string $value)
+ * @method string getBehavior()
  * @method AvS_FastSimpleImport_Model_Import setPartialIndexing(boolean $value)
+ * @method boolean getPartialIndexing()
  */
 class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 {
@@ -74,13 +76,13 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      */
     public function processCustomerImport($data, $behavior = null)
     {
-        if (is_null($behavior)) $behavior = self::BEHAVIOR_REPLACE;
+        if (!is_null($behavior)) $this->setBehavior($behavior);
 
         $this->setEntity('customer');
 
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Customer */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_customer');
-        $entityAdapter->setBehavior($behavior);
+        $entityAdapter->setBehavior($this->getBehavior());
         $this->setEntityAdapter($entityAdapter);
         $validationResult = $this->validateSource($data);
         if ($this->getProcessedRowsCount() > 0) {
