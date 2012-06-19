@@ -36,6 +36,7 @@ Mage::getSingleton('fastsimpleimport/import')
     ->processCustomerImport($data);
 ```
 
+You can see the [test file](https://github.com/avstudnitz/AvS_FastSimpleImport/blob/master/test.php) for more examples.
 See specifications about the expected format at http://www.avs-webentwicklung.de/fileadmin/documents/20120512_Produktimport_ImportExport_eng.pdf.
 
 ## Features
@@ -43,15 +44,19 @@ See specifications about the expected format at http://www.avs-webentwicklung.de
 * Import products and customers from php arrays (see above)
 * Bugfix for ImportExport: default values were set on updates when the attribute was not given (only when a default value was present, i.e. with visibility)
 * Choose Import Behavior: "Replace" (default), "Append" or "Delete" like this:
+
 ```php
 Mage::getSingleton('fastsimpleimport/import')
     ->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_DELETE)
     ->processProductImport($data);
 ```
+
 * Activate Indexing of imported (or deleted) products only
+
 ```php
 Mage::getSingleton('fastsimpleimport/import')
     ->setPartialIndexing(true)
     ->processProductImport($data);
 ```
+
 * Improved assigning of categories. In default, you can assign the category by giving the breadcrumb path below the root category, i.e. "Electronics/Cameras/Digital Cameras". Now, you can add the root category for uniqueness ("Root Catalog/Electronics/Cameras/Digital Cameras") or just the category id ("26").
