@@ -1,0 +1,57 @@
+# FastSimpleImport
+
+## Import products and customers into Magento, using the new fast ImportExport core module.
+
+This module allows to import from arrays and thus using any import source, while the Magento module only imports from files.
+ImportExport exists since Magento 1.5 CE / 1.10 EE, image import since 1.6 CE / 1.11 EE. Thus, this module needs at least one of those versions.
+
+## Basic Usage
+
+Call it like this:
+```php
+// Import product:
+$data = array(
+    array(
+        'sku' => '1234567',
+        '_type' => 'simple',
+        '_attribute_set' => 'Default',
+        '_product_websites' => 'base',
+        'name' => 'Default',
+        'price' => 0.99,
+        'description' => 'Default',
+        'short_description' => 'Default',
+        'weight' => 0,
+        'status' => 1,
+        'visibility' => 4,
+        'tax_class_id' => 2,
+        'qty' => 76,
+    ),
+    // add more products here
+);
+Mage::getSingleton('fastsimpleimport/import')
+    ->processProductImport($data); 
+
+// Import customer:
+Mage::getSingleton('fastsimpleimport/import')
+    ->processCustomerImport($data);
+```
+
+See specifications about the expected format at http://www.avs-webentwicklung.de/fileadmin/documents/20120512_Produktimport_ImportExport_eng.pdf.
+
+## Features
+
+* Import products and customers from php arrays (see above)
+* Bugfix for ImportExport: default values were set on updates when the attribute was not given (only when a default value was present, i.e. with visibility)
+* Choose Import Behavior: "Replace" (default), "Append" or "Delete" like this:
+```php
+Mage::getSingleton('fastsimpleimport/import')
+    ->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_DELETE)
+    ->processProductImport($data);
+```
+* Activate Indexing of imported (or deleted) products only
+```php
+Mage::getSingleton('fastsimpleimport/import')
+    ->setPartialIndexing(true)
+    ->processProductImport($data);
+```
+* Improved assigning of categories. In default, you can assign the category by giving the breadcrumb path below the root category, i.e. "Electronics/Cameras/Digital Cameras". Now, you can add the root category for uniqueness ("Root Catalog/Electronics/Cameras/Digital Cameras") or just the category id ("26").
