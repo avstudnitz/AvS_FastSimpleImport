@@ -1,11 +1,11 @@
 ## FastSimpleImport - Array Adapter for Magento ImportExport
 
-*Import products and customers into Magento, using the new fast ImportExport core module.*
+### Import products and customers into Magento, using the new fast ImportExport core module.
 
 This module allows to import from arrays and thus using any import source, while the Magento module only imports from files.
 ImportExport exists since Magento 1.5 CE / 1.10 EE, image import since 1.6 CE / 1.11 EE. Thus, this module needs at least one of those versions.
 
-*Basic Usage*
+### Basic Usage
 
 Call it like this:
 ```php
@@ -40,7 +40,7 @@ You can see the [test file](https://github.com/avstudnitz/AvS_FastSimpleImport/b
 
 See [specifications about the expected format](http://www.avs-webentwicklung.de/fileadmin/documents/20120512_Produktimport_ImportExport_eng.pdf).
 
-*Features*
+### Features
 
 * Import products and customers from php arrays (see above)
 * Bugfix for ImportExport: default values were set on updates when the attribute was not given (only when a default value was present, i.e. with visibility)
