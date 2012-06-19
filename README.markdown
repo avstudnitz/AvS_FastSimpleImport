@@ -37,6 +37,7 @@ Mage::getSingleton('fastsimpleimport/import')
 ```
 
 You can see the [test file](https://github.com/avstudnitz/AvS_FastSimpleImport/blob/master/test.php) for more examples.
+
 See specifications about the expected format at http://www.avs-webentwicklung.de/fileadmin/documents/20120512_Produktimport_ImportExport_eng.pdf.
 
 ## Features
