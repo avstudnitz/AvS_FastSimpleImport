@@ -308,4 +308,20 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             Mage_Catalog_Model_Product::ENTITY, Mage_Index_Model_Event::TYPE_DELETE
         );
     }
+
+    /**
+     * Set Attributes for which new Options should be created (dropdown and multiselect only)
+     *
+     * @param array $attributeCodes
+     */
+    public function setDropdownAttributes($attributeCodes)
+    {
+        foreach($attributeCodes as $attributeCode) {
+            /** @var $attribute Mage_Eav_Model_Entity_Attribute */
+            $attribute = Mage::getSingleton('catalog/product')->getResource()->getAttribute($attributeCode);
+            if (!is_object($attribute)) {
+                Mage::throwException('Attribute ' . $attributeCode . ' not found.');
+            }
+        }
+    }
 }

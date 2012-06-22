@@ -13,6 +13,7 @@
  * @method string getBehavior()
  * @method AvS_FastSimpleImport_Model_Import setPartialIndexing(boolean $value)
  * @method boolean getPartialIndexing()
+ * @method array getDropdownAttributes()
  */
 class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 {
@@ -38,7 +39,9 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Product */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_product');
         $entityAdapter->setBehavior($this->getBehavior());
+        $entityAdapter->setDropdownAttributes($this->getDropdownAttributes());
         $this->setEntityAdapter($entityAdapter);
+
         $validationResult = $this->validateSource($data);
         if ($this->getProcessedRowsCount() > 0) {
             if (!$validationResult) {
@@ -105,7 +108,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     /**
      * Returns source adapter object.
      *
-     * @param string $sourceData Array Source Data
+     * @param array $sourceData Array Source Data
      * @return AvS_FastSimpleImport_Model_ArrayAdapter
      */
     protected function _getSourceAdapter($sourceData)
@@ -166,6 +169,21 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     public function reindexImportedProducts()
     {
         $this->getEntityAdapter()->reindexImportedProducts();
+        return $this;
+    }
+
+    /**
+     * Set Attributes for which new Options should be created (dropdown and multiselect only)
+     *
+     * @param string|array $attributeCodes
+     * @return AvS_FastSimpleImport_Model_Import
+     */
+    public function setDropdownAttributes($attributeCodes)
+    {
+        if (!is_array($attributeCodes)) {
+            $attributeCodes = array($attributeCodes);
+        }
+        $this->setData('dropdown_attributes', $attributeCodes);
         return $this;
     }
 }
