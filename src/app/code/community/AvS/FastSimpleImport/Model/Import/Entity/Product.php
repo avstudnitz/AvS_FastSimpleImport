@@ -34,6 +34,67 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     }
 
     /**
+     * Validate data.
+     *
+     * @throws Exception
+     * @return Mage_ImportExport_Model_Import_Entity_Abstract
+     */
+    public function validateData()
+    {
+        if (!$this->_dataValidated) {
+            $this->_importExternalImageFiles();
+        }
+
+        return parent::validateData();
+    }
+
+    /**
+     * Check field "_media_image" for http links to images; download them
+     */
+    protected function _importExternalImageFiles()
+    {
+        $this->_getSource()->rewind();
+        while ($this->_getSource()->valid()) {
+
+            $rowData = $this->_getSource()->current();
+            if (
+                isset($rowData['_media_image'])
+                && strpos($rowData['_media_image'], 'http') === 0
+                && strpos($rowData['_media_image'], '://') !== false
+            ) {
+                $this->_copyExternalImageFile($rowData['_media_image']);
+                $this->_getSource()->setValue('_media_image', basename($rowData['_media_image']));
+            }
+            $this->_getSource()->next();
+        }
+    }
+
+    /**
+     * Download given file to ImportExport Tmp Dir (usually media/import)
+     *
+     * @param string $url
+     */
+    protected function _copyExternalImageFile($url)
+    {
+        try {
+            $dir = $this->_getUploader()->getTmpDir();
+            if (!is_dir($dir)) {
+                mkdir($dir);
+            }
+            $fileHandle = fopen($dir . DS . basename($url), 'w+');
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+            curl_setopt($ch, CURLOPT_FILE, $fileHandle);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_exec($ch);
+            curl_close($ch);
+            fclose($fileHandle);
+        } catch (Exception $e) {
+            Mage::throwException('Download of file ' . $url . ' failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Initialize categories text-path to ID hash.
      *
      * @return Mage_ImportExport_Model_Import_Entity_Product

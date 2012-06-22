@@ -108,4 +108,10 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
         }
         return $colNames;
     }
+
+    public function setValue($key, $value)
+    {
+        if (!$this->valid()) return;
+        $this->_array[$this->_position][$key] = $value;
+    }
 }
