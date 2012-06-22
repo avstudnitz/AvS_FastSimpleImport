@@ -173,7 +173,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     }
 
     /**
-     * Set Attributes for which new Options should be created (dropdown and multiselect only)
+     * Set Attributes for which new Options should be created (dropdown only)
      *
      * @param string|array $attributeCodes
      * @return AvS_FastSimpleImport_Model_Import

@@ -9,6 +9,12 @@
  */
 class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport_Model_Import_Entity_Product
 {
+    /** @var array */
+    protected $_dropdownAttributes = array();
+
+    /** @var array */
+    protected $_attributeOptions = array();
+
     /**
      * Source model setter.
      *
@@ -42,10 +48,83 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     public function validateData()
     {
         if (!$this->_dataValidated) {
+            $this->_createAttributeOptions();
             $this->_importExternalImageFiles();
         }
 
         return parent::validateData();
+    }
+
+    /**
+     *
+     */
+    protected function _createAttributeOptions()
+    {
+        if (!sizeof($this->getDropdownAttributes())) return;
+
+        $this->_getSource()->rewind();
+        while ($this->_getSource()->valid()) {
+
+            $rowData = $this->_getSource()->current();
+            foreach($this->getDropdownAttributes() as $attribute) {
+
+                /** @var $attribute Mage_Eav_Model_Entity_Attribute */
+                $attributeCode = $attribute->getAttributeCode();
+                if (!isset($rowData[$attributeCode]) || !strlen(trim($rowData[$attributeCode]))) continue;
+                $options = $this->_getAttributeOptions($attribute);
+
+                if (!in_array(trim($rowData[$attributeCode]), $options)) {
+                    $this->_createAttributeOption($attribute, trim($rowData[$attributeCode]));
+                }
+            }
+
+            $this->_getSource()->next();
+        }
+    }
+
+    /**
+     * Get all options of a dropdown attribute
+     *
+     * @param Mage_Eav_Model_Entity_Attribute $attribute
+     * @return array
+     */
+    protected function _getAttributeOptions($attribute)
+    {
+        if (!isset($this->_attributeOptions[$attribute->getAttributeCode()])) {
+
+            /** @var $attributeOptions Mage_Eav_Model_Entity_Attribute_Source_Table */
+            $attributeOptions = Mage::getModel('eav/entity_attribute_source_table');
+            $attributeOptions->setAttribute($attribute);
+            $this->_attributeOptions[$attribute->getAttributeCode()] = array();
+            foreach($attributeOptions->getAllOptions(false) as $option) {
+
+                $this->_attributeOptions[$attribute->getAttributeCode()][$option['value']] = $option['label'];
+            }
+        }
+
+        return $this->_attributeOptions[$attribute->getAttributeCode()];
+    }
+
+    /**
+     * @param Mage_Eav_Model_Entity_Attribute $attribute
+     * @param string $optionLabel
+     */
+    protected function _createAttributeOption($attribute, $optionLabel)
+    {
+        $option = array(
+            'value' => array(
+                array('0' => $optionLabel)
+            ),
+            'order' => array(0),
+            'delete' => array('')
+        );
+
+        $attribute->setOption($option);
+
+        $attribute->save();
+
+        $this->_attributeOptions[$attribute->getAttributeCode()][] = $optionLabel;
+        $this->_initTypeModels();
     }
 
     /**
@@ -310,18 +389,35 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     }
 
     /**
-     * Set Attributes for which new Options should be created (dropdown and multiselect only)
+     * Set and Validate Attributes for which new Options should be created (dropdown only)
      *
      * @param array $attributeCodes
      */
     public function setDropdownAttributes($attributeCodes)
     {
+        $attributes = array();
         foreach($attributeCodes as $attributeCode) {
             /** @var $attribute Mage_Eav_Model_Entity_Attribute */
             $attribute = Mage::getSingleton('catalog/product')->getResource()->getAttribute($attributeCode);
             if (!is_object($attribute)) {
                 Mage::throwException('Attribute ' . $attributeCode . ' not found.');
             }
+            if ($attribute->getSourceModel() != 'eav/entity_attribute_source_table') {
+                Mage::throwException('Attribute ' . $attributeCode . ' is no dropdown attribute.');
+            }
+            $attributes[$attributeCode] = $attribute;
         }
+
+        $this->_dropdownAttributes = $attributes;
+    }
+
+    /**
+     * Get Attributes for which options will be created
+     *
+     * @return array
+     */
+    public function getDropdownAttributes()
+    {
+        return $this->_dropdownAttributes;
     }
 }
