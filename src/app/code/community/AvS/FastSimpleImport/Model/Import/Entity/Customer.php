@@ -22,4 +22,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
 
         return $this;
     }
+    
+    /**
+     * Import behavior setter
+     *
+     * @param string $behavior
+     */
+    public function setBehavior($behavior)
+    {
+        $this->_parameters['behavior'] = $behavior;
+    }
 }
