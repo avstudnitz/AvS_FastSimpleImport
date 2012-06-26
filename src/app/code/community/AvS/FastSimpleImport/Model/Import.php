@@ -32,7 +32,9 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      */
     public function processProductImport($data, $behavior = null)
     {
-        if (!is_null($behavior)) $this->setBehavior($behavior);
+        if (!is_null($behavior)) {
+            $this->setBehavior($behavior);
+        }
 
         $this->setEntity(Mage_Catalog_Model_Product::ENTITY);
 
@@ -48,8 +50,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
                 $message = sprintf("Input Data contains %s corrupt records (from a total of %s)",
                                    $this->getInvalidRowsCount(), $this->getProcessedRowsCount()
                 );
-                foreach ($this->getErrors() as $type => $lines)
-                {
+                foreach ($this->getErrors() as $type => $lines) {
                     $message .= "\n:::: " . $type . " ::::\nIn Line(s) " . implode(", ", $lines) . "\n";
                 }
                 Mage::throwException($message);
@@ -79,7 +80,9 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      */
     public function processCustomerImport($data, $behavior = null)
     {
-        if (!is_null($behavior)) $this->setBehavior($behavior);
+        if (!is_null($behavior)) {
+            $this->setBehavior($behavior);
+        }
 
         $this->setEntity('customer');
 
@@ -93,8 +96,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
                 $message = sprintf("Input Data contains %s corrupt records (from a total of %s)",
                                    $this->getInvalidRowsCount(), $this->getProcessedRowsCount()
                 );
-                foreach ($this->getErrors() as $type => $lines)
-                {
+                foreach ($this->getErrors() as $type => $lines) {
                     $message .= "\n:::: " . $type . " ::::\nIn Line(s) " . implode(", ", $lines) . "\n";
                 }
                 Mage::throwException($message);
