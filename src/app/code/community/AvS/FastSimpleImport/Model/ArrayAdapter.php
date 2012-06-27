@@ -26,12 +26,13 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
      * @param int $position
      * @return void
      */
-    public function seek($position) {
-      $this->_position = $position;
+    public function seek($position)
+    {
+        $this->_position = $position;
 
-      if (!$this->valid()) {
-          throw new OutOfBoundsException("invalid seek position ($position)");
-      }
+        if (!$this->valid()) {
+            throw new OutOfBoundsException("invalid seek position ($position)");
+        }
     }
 
     /* Methods required for Iterator interface */
@@ -41,7 +42,8 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
      *
      * @param array $data
      */
-    public function __construct($data) {
+    public function __construct($data)
+    {
         $this->_array = $data;
         $this->_position = 0;
     }
@@ -51,7 +53,8 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
      *
      * @return void
      */
-    public function rewind() {
+    public function rewind()
+    {
         $this->_position = 0;
     }
 
@@ -60,7 +63,8 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
      *
      * @return mixed
      */
-    public function current() {
+    public function current()
+    {
         return $this->_array[$this->_position];
     }
 
@@ -69,7 +73,8 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
      *
      * @return scalar
      */
-    public function key() {
+    public function key()
+    {
         return $this->_position;
     }
 
@@ -78,7 +83,8 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
      *
      * @return void
      */
-    public function next() {
+    public function next()
+    {
         ++$this->_position;
     }
 
@@ -87,7 +93,8 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
      *
      * @return bool
      */
-    public function valid() {
+    public function valid()
+    {
         return isset($this->_array[$this->_position]);
     }
 
@@ -99,7 +106,7 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
     public function getColNames()
     {
         $colNames = array();
-        foreach($this->_array as $row) {
+        foreach ($this->_array as $row) {
             foreach (array_keys($row) as $key) {
                 if (!is_numeric($key) && !isset($colNames[$key])) {
                     $colNames[$key] = $key;
@@ -111,7 +118,10 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
 
     public function setValue($key, $value)
     {
-        if (!$this->valid()) return;
+        if (!$this->valid()) {
+            return;
+        }
+
         $this->_array[$this->_position][$key] = $value;
     }
 }

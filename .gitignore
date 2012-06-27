@@ -1,0 +1,16 @@
+cache.properties
+dev.cache.properties
+live.cache.properties
+devonline.cache.properties
+.DS_Store
+.DS_STORE
+*.cache.properties
+*~
+*.swp
+build.properties
+.buildpath
+.project
+.settings
+.settings/**/*
+.externalToolBuilders
+.externalToolBuilders/**/*

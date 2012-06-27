@@ -60,17 +60,22 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      */
     protected function _createAttributeOptions()
     {
-        if (!sizeof($this->getDropdownAttributes())) return;
+        if (!sizeof($this->getDropdownAttributes())) {
+            return;
+        }
 
         $this->_getSource()->rewind();
         while ($this->_getSource()->valid()) {
 
             $rowData = $this->_getSource()->current();
-            foreach($this->getDropdownAttributes() as $attribute) {
+            foreach ($this->getDropdownAttributes() as $attribute) {
 
                 /** @var $attribute Mage_Eav_Model_Entity_Attribute */
                 $attributeCode = $attribute->getAttributeCode();
-                if (!isset($rowData[$attributeCode]) || !strlen(trim($rowData[$attributeCode]))) continue;
+                if (!isset($rowData[$attributeCode]) || !strlen(trim($rowData[$attributeCode]))) {
+                    continue;
+                }
+
                 $options = $this->_getAttributeOptions($attribute);
 
                 if (!in_array(trim($rowData[$attributeCode]), $options)) {
@@ -96,8 +101,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             $attributeOptions = Mage::getModel('eav/entity_attribute_source_table');
             $attributeOptions->setAttribute($attribute);
             $this->_attributeOptions[$attribute->getAttributeCode()] = array();
-            foreach($attributeOptions->getAllOptions(false) as $option) {
-
+            foreach ($attributeOptions->getAllOptions(false) as $option) {
                 $this->_attributeOptions[$attribute->getAttributeCode()][$option['value']] = $option['label'];
             }
         }
@@ -211,7 +215,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      */
     public function prepareDeletedProductsReindex()
     {
-        if ($this->getBehavior() != Mage_ImportExport_Model_Import::BEHAVIOR_DELETE) return $this;
+        if ($this->getBehavior() != Mage_ImportExport_Model_Import::BEHAVIOR_DELETE) {
+            return $this;
+        }
 
         $skus = $this->_getDeletedProductsSkus();
 
@@ -237,7 +243,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     {
         $skus = array();
         foreach ($this->_validatedRows as $rowIndex => $rowValidated) {
-            if (!$rowValidated) continue;
+            if (!$rowValidated) {
+                continue;
+            }
             $this->getSource()->seek($rowIndex);
             $rowData = $this->getSource()->current();
             $skus[] = (string)$rowData['sku'];
@@ -298,7 +306,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     {
         $skus = array();
         foreach ($this->_validatedRows as $rowIndex => $rowValidated) {
-            if (!$rowValidated) continue;
+            if (!$rowValidated) {
+                continue;
+            }
             $this->getSource()->seek($rowIndex);
             $rowData = $this->getSource()->current();
             $skus[] = (string)$rowData['sku'];
@@ -398,7 +408,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     public function setDropdownAttributes($attributeCodes)
     {
         $attributes = array();
-        foreach($attributeCodes as $attributeCode) {
+        foreach ($attributeCodes as $attributeCode) {
             /** @var $attribute Mage_Eav_Model_Entity_Attribute */
             $attribute = Mage::getSingleton('catalog/product')->getResource()->getAttribute($attributeCode);
             if (!is_object($attribute)) {
