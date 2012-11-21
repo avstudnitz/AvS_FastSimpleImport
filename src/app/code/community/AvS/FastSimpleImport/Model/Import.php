@@ -122,7 +122,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      * @param Mage_ImportExport_Model_Import_Entity_Abstract $entityAdapter
      * @return void
      */
-    protected function setEntityAdapter($entityAdapter)
+    public function setEntityAdapter($entityAdapter)
     {
         $this->_entityAdapter = $entityAdapter;
     }
@@ -130,9 +130,17 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     /**
      * @return Mage_ImportExport_Model_Import_Entity_Abstract
      */
-    protected function getEntityAdapter()
+    public function getEntityAdapter()
     {
         return $this->_entityAdapter;
+    }
+
+    /**
+     * @return array
+     */
+    public function getErrorMessages()
+    {
+        return $this->getEntityAdapter()->getErrorMessages();
     }
 
     /**

@@ -65,11 +65,17 @@ for ($i = 1; $i <= 10; $i++) {
 }
 
 $time = microtime(true);
-/** @var $import AvS_FastSimpleImport_Model_Import */
-$import = Mage::getModel('fastsimpleimport/import')
-    ->setPartialIndexing(true)
-    ->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_APPEND)
-    ->processProductImport($data);
+
+try {
+    /** @var $import AvS_FastSimpleImport_Model_Import */
+    $import = Mage::getModel('fastsimpleimport/import');
+    $import
+        ->setPartialIndexing(true)
+        ->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_APPEND)
+        ->processProductImport($data);
+} catch (Exception $e) {
+    print_r($import->getErrorMessages());
+}
 
 echo 'Elapsed time: ' . round(microtime(true) - $time, 2) . 's' . "\n";
 ?>
