@@ -61,8 +61,8 @@ Mage::getSingleton('fastsimpleimport/import')
 ```
 
 * Improved assigning of categories. In default, you can assign the category by giving the breadcrumb path below the root category, i.e. "Electronics/Cameras/Digital Cameras". Now, you can add the root category for uniqueness ("Root Catalog/Electronics/Cameras/Digital Cameras") or just the category id ("26").
-* **NEW:** Download images with http. Just enter the URL in the field *_media_image*, while *image*, *small_image* und *thumbnail* get the filename only.
-* **NEW:** Create options for predefined attributes automatically.
+* Download images with http. Just enter the URL in the field *_media_image*, while *image*, *small_image* und *thumbnail* get the filename only.
+* Create options for predefined attributes automatically.
 
 ```php
 Mage::getSingleton('fastsimpleimport/import')
@@ -74,5 +74,13 @@ or
 ```php
 Mage::getSingleton('fastsimpleimport/import')
     ->setDropdownAttributes(array('manufacturer', 'color'))
+    ->processProductImport($data);
+```
+
+* **NEW:** Continue import after error in parts of import data:
+
+```php
+Mage::getSingleton('fastsimpleimport/import')
+    ->setContinueAfterErrors(true)
     ->processProductImport($data);
 ```
