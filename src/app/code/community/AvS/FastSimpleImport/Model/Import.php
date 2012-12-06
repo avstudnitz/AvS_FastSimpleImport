@@ -13,6 +13,8 @@
  * @method string getBehavior()
  * @method AvS_FastSimpleImport_Model_Import setPartialIndexing(boolean $value)
  * @method boolean getPartialIndexing()
+ * @method AvS_FastSimpleImport_Model_Import setContinueAfterErrors(boolean $value)
+ * @method boolean getContinueAfterErrors()
  * @method array getDropdownAttributes()
  */
 class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
@@ -21,6 +23,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     {
         $this->setBehavior(self::BEHAVIOR_REPLACE);
         $this->setPartialIndexing(false);
+        $this->setContinueAfterErrors(false);
     }
 
     /**
@@ -47,24 +50,23 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $validationResult = $this->validateSource($data);
         if ($this->getProcessedRowsCount() > 0) {
             if (!$validationResult) {
-                $message = sprintf("Input Data contains %s corrupt records (from a total of %s)",
-                                   $this->getInvalidRowsCount(), $this->getProcessedRowsCount()
-                );
-                foreach ($this->getErrors() as $type => $lines) {
-                    $message .= "\n:::: " . $type . " ::::\nIn Line(s) " . implode(", ", $lines) . "\n";
+                if (!$this->getContinueAfterErrors()) {
+
+                    Mage::throwException($this->getErrorMessage());
                 }
-                Mage::throwException($message);
             }
 
-            if ($this->getPartialIndexing()) {
+            if ($this->getProcessedRowsCount() > $this->getInvalidRowsCount()) {
+                if ($this->getPartialIndexing()) {
 
-                $this->_prepareDeletedProductsReindex();
-                $this->importSource();
-                $this->reindexImportedProducts();
-            } else {
+                    $this->_prepareDeletedProductsReindex();
+                    $this->importSource();
+                    $this->reindexImportedProducts();
+                } else {
 
-                $this->importSource();
-                $this->invalidateIndex();
+                    $this->importSource();
+                    $this->invalidateIndex();
+                }
             }
         }
 
@@ -93,15 +95,16 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $validationResult = $this->validateSource($data);
         if ($this->getProcessedRowsCount() > 0) {
             if (!$validationResult) {
-                $message = sprintf("Input Data contains %s corrupt records (from a total of %s)",
-                                   $this->getInvalidRowsCount(), $this->getProcessedRowsCount()
-                );
-                foreach ($this->getErrors() as $type => $lines) {
-                    $message .= "\n:::: " . $type . " ::::\nIn Line(s) " . implode(", ", $lines) . "\n";
+                if (!$this->getContinueAfterErrors()) {
+
+                    Mage::throwException($this->getErrorMessage());
                 }
-                Mage::throwException($message);
             }
-            $this->importSource();
+
+            if ($this->getProcessedRowsCount() > $this->getInvalidRowsCount()) {
+
+                $this->importSource();
+            }
         }
 
         return $this;
@@ -136,6 +139,24 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     }
 
     /**
+     * Get single error message as string
+     *
+     * @return string
+     */
+    public function getErrorMessage()
+    {
+        $message = sprintf("Input Data contains %s corrupt records (from a total of %s)",
+            $this->getInvalidRowsCount(), $this->getProcessedRowsCount()
+        );
+        foreach ($this->getErrors() as $type => $lines) {
+            $message .= "\n:::: " . $type . " ::::\nIn Line(s) " . implode(", ", $lines) . "\n";
+        }
+        return $message;
+    }
+
+    /**
+     * Get error messages which information in which rows the errors occured
+     *
      * @return array
      */
     public function getErrorMessages()
