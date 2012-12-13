@@ -24,6 +24,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $this->setBehavior(self::BEHAVIOR_REPLACE);
         $this->setPartialIndexing(false);
         $this->setContinueAfterErrors(false);
+        $this->setDropdownAttributes(array());
     }
 
     /**
