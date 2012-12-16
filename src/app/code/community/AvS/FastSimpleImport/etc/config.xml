@@ -12,7 +12,14 @@
                 <class>AvS_FastSimpleImport_Model</class>
             </fastsimpleimport>
         </models>
-
+        <importexport module="importexport">
+            <import_entities>
+                <catalog_category translate="label">
+                    <model_token>fastsimpleimport/import_entity_category</model_token>
+                    <label>Category</label>
+                </catalog_category>
+            </import_entities>
+        </importexport>
         <importexport>
             <import_product_types>
                 <simple>fastsimpleimport/import_entity_product_type_simple</simple>
