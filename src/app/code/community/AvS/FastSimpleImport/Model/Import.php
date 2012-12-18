@@ -111,6 +111,43 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     }
 
     /**
+     * Import categories
+     *
+     * @param array $data
+     * @param string $behavior
+     * @return AvS_FastSimpleImport_Model_Import
+     */
+    public function processCategoryImport($data, $behavior = null)
+    {
+        if (!is_null($behavior)) {
+            $this->setBehavior($behavior);
+        }
+
+        $this->setEntity(Mage_Catalog_Model_Category::ENTITY);
+
+        /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Category */
+        $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_category');
+        $entityAdapter->setBehavior($this->getBehavior());
+        $this->setEntityAdapter($entityAdapter);
+        $validationResult = $this->validateSource($data);
+        if ($this->getProcessedRowsCount() > 0) {
+            if (!$validationResult) {
+                if (!$this->getContinueAfterErrors()) {
+
+                    Mage::throwException($this->getErrorMessage());
+                }
+            }
+
+            if ($this->getProcessedRowsCount() > $this->getInvalidRowsCount()) {
+
+                $this->importSource();
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Returns source adapter object.
      *
      * @param array $sourceData Array Source Data
