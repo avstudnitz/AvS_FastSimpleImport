@@ -222,23 +222,23 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     protected function _deleteCategories()
     {
-//        while ($bunch = $this->_dataSourceModel->getNextBunch()) {
-//            $idToDelete = array();
-//
-//            foreach ($bunch as $rowNum => $rowData) {
-//                if ($this->validateRow($rowData, $rowNum) && self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
-//                    $idToDelete[] = $this->_oldSku[$rowData[self::COL_SKU]]['entity_id'];
-//                }
-//            }
-//            if ($idToDelete) {
-//                $this->_connection->query(
-//                    $this->_connection->quoteInto(
-//                        "DELETE FROM `{$this->_entityTable}` WHERE `entity_id` IN (?)", $idToDelete
-//                    )
-//                );
-//            }
-//        }
-//        return $this;
+        while ($bunch = $this->_dataSourceModel->getNextBunch()) {
+            $idToDelete = array();
+
+            foreach ($bunch as $rowNum => $rowData) {
+                if ($this->validateRow($rowData, $rowNum) && self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
+                    $idToDelete[] = $this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]]['entity_id'];
+                }
+            }
+            if ($idToDelete) {
+                $this->_connection->query(
+                    $this->_connection->quoteInto(
+                        "DELETE FROM `{$this->_entityTable}` WHERE `entity_id` IN (?)", $idToDelete
+                    )
+                );
+            }
+        }
+        return $this;
     }
 
     /**
@@ -828,7 +828,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         }
 
         // common validation
-        if (self::SCOPE_DEFAULT == $rowScope) { // SKU is specified, row is SCOPE_DEFAULT, new category block begins
+        if (self::SCOPE_DEFAULT == $rowScope) { // category is specified, row is SCOPE_DEFAULT, new category block begins
             $rowData['name'] = $this->_getCategoryName($rowData);
 
             $this->_processedEntitiesCount ++;
