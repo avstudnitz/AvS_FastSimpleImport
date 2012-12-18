@@ -285,7 +285,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 $this->_categoriesWithRoots[$rootCategoryName][$index] = array(
                     'entity_id' => $category->getId(),
                     'path' => $category->getPath(),
-                    'level' => $category->getLevel()
+                    'level' => $category->getLevel(),
+                    'position' => $category->getPosition()
                 );
             }
         }
@@ -346,32 +347,27 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         return $this;
     }
 
-//    /**
-//     * Set valid attribute set and category type to rows with all scopes
-//     * to ensure that existing Categories doesn't changed.
-//     *
-//     * @param array $rowData
-//     * @return array
-//     */
-//    protected function _prepareRowForDb(array $rowData)
-//    {
-//        $rowData = parent::_prepareRowForDb($rowData);
-//
-//        static $lastSku  = null;
-//
-//        if (Mage_ImportExport_Model_Import::BEHAVIOR_DELETE == $this->getBehavior()) {
-//            return $rowData;
-//        }
-//        if (self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
-//            $lastCategory = $rowData[self::COL_CATEGORY];
-//        }
-//        if (isset($this->_ol [$lastSku])) {
-//            $rowData[self::COL_ATTR_SET] = $this->_newCategory[$lastSku]['attr_set_code'];
-//            $rowData[self::COL_TYPE]     = $this->_newCategory[$lastSku]['type_id'];
-//        }
-//
-//        return $rowData;
-//    }
+    /**
+     * Set valid attribute set and category type to rows with all scopes
+     * to ensure that existing Categories doesn't changed.
+     *
+     * @param array $rowData
+     * @return array
+     */
+    protected function _prepareRowForDb(array $rowData)
+    {
+        $rowData = parent::_prepareRowForDb($rowData);
+        if (Mage_ImportExport_Model_Import::BEHAVIOR_DELETE == $this->getBehavior()) {
+            return $rowData;
+        }
+
+        if (self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
+            $rowData['name'] = $this->_getCategoryName($rowData);
+            if (! $rowData['position']) $rowData['position'] = 10000;
+        }
+
+        return $rowData;
+    }
 
 
     /**
@@ -422,13 +418,15 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             $entityRowsIn = array();
             $entityRowsUp = array();
             $attributes   = array();
+            $uploadedGalleryFiles = array();
 
             foreach ($bunch as $rowNum => $rowData) {
                 if (!$this->validateRow($rowData, $rowNum)) {
                     continue;
                 }
                 $rowScope = $this->getRowScope($rowData);
-                $rowData['name'] = $this->_getCategoryName($rowData);
+
+                $rowData = $this->_prepareRowForDb($rowData);
 
                 if (self::SCOPE_DEFAULT == $rowScope) {
                     $rowCategory = $rowData[self::COL_CATEGORY];
@@ -439,9 +437,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                     $entityRow = array(
                         'parent_id'   => $parentCategory['entity_id'],
                         'level'       => $parentCategory['level'] + 1,
-                        'created_at' => empty($rowData['created_at'])
-                                        ? now() : gmstrftime($strftimeFormat, strtotime($rowData['created_at'])),
-                        'updated_at' => now()
+                        'created_at'  => empty($rowData['created_at'])
+                                         ? now()
+                                         : gmstrftime($strftimeFormat, strtotime($rowData['created_at'])),
+                        'updated_at'  => now(),
+                        'position'    => $rowData['position']
                     );
                     if (isset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]])) { // edit
                         $entityId = $this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]]['entity_id'];
@@ -456,7 +456,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                         $entityRow['attribute_set_id'] = 0;
                         $entityRowsIn[]                = $entityRow;
 
-
                         $this->_newCategory[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]] = array(
                             'entity_id' => $entityId,
                             'path' => $entityRow['path'],
@@ -466,14 +465,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                     }
                 }
 
-//                foreach ($this->_imagesArrayKeys as $imageCol) {
-//                    if (!empty($rowData[$imageCol])) { // 5. Media gallery phase
-//                        if (!array_key_exists($rowData[$imageCol], $uploadedGalleryFiles)) {
-//                            $uploadedGalleryFiles[$rowData[$imageCol]] = $this->_uploadMediaFiles($rowData[$imageCol]);
-//                        }
-//                        $rowData[$imageCol] = $uploadedGalleryFiles[$rowData[$imageCol]];
-//                    }
-//                }
+                foreach ($this->_imagesArrayKeys as $imageCol) {
+                    if (!empty($rowData[$imageCol])) { // 5. Media gallery phase
+                        if (!array_key_exists($rowData[$imageCol], $uploadedGalleryFiles)) {
+                            $uploadedGalleryFiles[$rowData[$imageCol]] = $this->_uploadMediaFiles($rowData[$imageCol]);
+                        }
+                        $rowData[$imageCol] = $uploadedGalleryFiles[$rowData[$imageCol]];
+                    }
+                }
 
                 // Attributes phase
                 $rowStore = self::SCOPE_STORE == $rowScope ? $this->_storeCodeToId[$rowData[self::COL_STORE]] : 0;
@@ -548,47 +547,49 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     }
 
 
-//    /**
-//     * Returns an object for upload a media files
-//     */
-//    protected function _getUploader()
-//    {
-//        if (is_null($this->_fileUploader)) {
-//            $this->_fileUploader    = new Mage_ImportExport_Model_Import_Uploader();
-//
-//            $this->_fileUploader->init();
-//
-//            $tmpDir     = Mage::getConfig()->getOptions()->getMediaDir() . '/import';
-//            $destDir    = Mage::getConfig()->getOptions()->getMediaDir() . '/catalog/category';
-//            if (!is_writable($destDir)) {
-//                @mkdir($destDir, 0777, true);
-//            }
-//            if (!$this->_fileUploader->setTmpDir($tmpDir)) {
-//                Mage::throwException("File directory '{$tmpDir}' is not readable.");
-//            }
-//            if (!$this->_fileUploader->setDestDir($destDir)) {
-//                Mage::throwException("File directory '{$destDir}' is not writable.");
-//            }
-//        }
-//        return $this->_fileUploader;
-//    }
+    /**
+     * Returns an object for upload a media files
+     */
+    protected function _getUploader()
+    {
+        if (is_null($this->_fileUploader)) {
+            $this->_fileUploader    = new Mage_ImportExport_Model_Import_Uploader();
 
-//    /**
-//     * Uploading files into the "catalog/category" media folder.
-//     * Return a new file name if the same file is already exists.
-//     *
-//     * @param string $fileName
-//     * @return string
-//     */
-//    protected function _uploadMediaFiles($fileName)
-//    {
-//        try {
-//            $res = $this->_getUploader()->move($fileName);
-//            return $res['file'];
-//        } catch (Exception $e) {
-//            return '';
-//        }
-//    }
+            $this->_fileUploader->init();
+            $this->_fileUploader->setFilesDispersion(false);
+
+            $tmpDir     = Mage::getConfig()->getOptions()->getMediaDir() . '/import';
+            $destDir    = Mage::getConfig()->getOptions()->getMediaDir() . '/catalog/category';
+            if (!is_writable($destDir)) {
+                @mkdir($destDir, 0777, true);
+            }
+            if (!$this->_fileUploader->setTmpDir($tmpDir)) {
+                Mage::throwException("File directory '{$tmpDir}' is not readable.");
+            }
+            if (!$this->_fileUploader->setDestDir($destDir)) {
+                Mage::throwException("File directory '{$destDir}' is not writable.");
+            }
+        }
+        return $this->_fileUploader;
+    }
+
+    /**
+     * Uploading files into the "catalog/category" media folder.
+     * Return a new file name if the same file is already exists.
+     * @todo Solve the problem with images that get imported multiple times.
+     *
+     * @param string $fileName
+     * @return string
+     */
+    protected function _uploadMediaFiles($fileName)
+    {
+        try {
+            $res = $this->_getUploader()->move($fileName);
+            return $res['file'];
+        } catch (Exception $e) {
+            return '';
+        }
+    }
 
     /**
      * Update and insert data in entity table.
@@ -611,89 +612,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         }
         return $this;
     }
-
-//    /**
-//     * Save category media gallery.
-//     *
-//     * @param array $mediaGalleryData
-//     * @return AvS_FastSimpleImport_Model_Import_Entity_Category
-//     */
-//    protected function _saveMediaGallery(array $mediaGalleryData)
-//    {
-//        if (empty($mediaGalleryData)) {
-//            return $this;
-//        }
-//
-//        static $mediaGalleryTableName = null;
-//        static $mediaValueTableName = null;
-//        static $categoryId = null;
-//
-//        if (!$mediaGalleryTableName) {
-//            $mediaGalleryTableName = Mage::getModel('importexport/import_proxy_category_resource')
-//                    ->getTable('catalog/category_attribute_media_gallery');
-//        }
-//
-//        if (!$mediaValueTableName) {
-//            $mediaValueTableName = Mage::getModel('importexport/import_proxy_category_resource')
-//                    ->getTable('catalog/category_attribute_media_gallery_value');
-//        }
-//
-//        foreach ($mediaGalleryData as $Categoriesku => $mediaGalleryRows) {
-//            $categoryId = $this->_newCategory[$Categoriesku]['entity_id'];
-//            $insertedGalleryImgs = array();
-//
-//            if (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND != $this->getBehavior()) {
-//                $this->_connection->delete(
-//                    $mediaGalleryTableName,
-//                    $this->_connection->quoteInto('entity_id IN (?)', $categoryId)
-//                );
-//            }
-//
-//            foreach ($mediaGalleryRows as $insertValue) {
-//
-//                if (!in_array($insertValue['value'], $insertedGalleryImgs)) {
-//                    $valueArr = array(
-//                        'attribute_id' => $insertValue['attribute_id'],
-//                        'entity_id'    => $categoryId,
-//                        'value'        => $insertValue['value']
-//                    );
-//
-//                    $this->_connection
-//                            ->insertOnDuplicate($mediaGalleryTableName, $valueArr, array('entity_id'));
-//
-//                    $insertedGalleryImgs[] = $insertValue['value'];
-//                }
-//
-//                $newMediaValues = $this->_connection->fetchPairs($this->_connection->select()
-//                                        ->from($mediaGalleryTableName, array('value', 'value_id'))
-//                                        ->where('entity_id IN (?)', $categoryId)
-//                );
-//
-//                if (array_key_exists($insertValue['value'], $newMediaValues)) {
-//                    $insertValue['value_id'] = $newMediaValues[$insertValue['value']];
-//                }
-//
-//                $valueArr = array(
-//                    'value_id' => $insertValue['value_id'],
-//                    'store_id' => Mage_Catalog_Model_Abstract::DEFAULT_STORE_ID,
-//                    'label'    => $insertValue['label'],
-//                    'position' => $insertValue['position'],
-//                    'disabled' => $insertValue['disabled']
-//                );
-//
-//                try {
-//                    $this->_connection
-//                            ->insertOnDuplicate($mediaValueTableName, $valueArr, array('value_id'));
-//                } catch (Exception $e) {
-//                    $this->_connection->delete(
-//                            $mediaGalleryTableName, $this->_connection->quoteInto('value_id IN (?)', $newMediaValues)
-//                    );
-//                }
-//            }
-//        }
-//
-//        return $this;
-//    }
 
 
     /**
