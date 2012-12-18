@@ -241,6 +241,36 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         return $this;
     }
 
+    protected function _explodeEscaped($delimiter = '/', $string)
+    {
+        $exploded = explode($delimiter, $string);
+        $fixed = array();
+        for($k = 0, $l = count($exploded); $k < $l; ++$k){
+            if($exploded[$k][strlen($exploded[$k]) - 1] == '\\') {
+                if($k + 1 >= $l) {
+                    $fixed[] = trim($exploded[$k]);
+                    break;
+                }
+                $exploded[$k][strlen($exploded[$k]) - 1] = $delimiter;
+                $exploded[$k] .= $exploded[$k + 1];
+                array_splice($exploded, $k + 1, 1);
+                --$l;
+                --$k;
+            } else $fixed[] = trim($exploded[$k]);
+        }
+        return $fixed;
+    }
+
+    protected function _implodeEscaped($glue, $array)
+    {
+        $newArray = array();
+        foreach($array as $value)
+        {
+            $newArray[] = str_replace($glue, '\\'.$glue, $value);
+        }
+        return implode('/',$newArray);
+    }
+
     /**
      * Create Category entity from raw data.
      *
@@ -281,7 +311,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 if (!isset($this->_categoriesWithRoots[$rootCategoryName])) {
                     $this->_categoriesWithRoots[$rootCategoryName] = array();
                 }
-                $index = implode('/', $path);
+                $index = $this->_implodeEscaped('/', $path);
+
                 $this->_categoriesWithRoots[$rootCategoryName][$index] = array(
                     'entity_id' => $category->getId(),
                     'path' => $category->getPath(),
@@ -407,9 +438,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     protected function _saveCategories()
     {
-        /** @var $resource Mage_Catalog_Model_Category */
-        $resource       = Mage::getModel('catalog/category');
-
         $strftimeFormat = Varien_Date::convertZendToStrftime(Varien_Date::DATETIME_INTERNAL_FORMAT, true, true);
         $nextEntityId   = Mage::getResourceHelper('importexport')->getNextAutoincrement($this->_entityTable);
         static $entityId;
@@ -437,18 +465,21 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                     $entityRow = array(
                         'parent_id'   => $parentCategory['entity_id'],
                         'level'       => $parentCategory['level'] + 1,
-                        'created_at'  => empty($rowData['created_at'])
-                                         ? now()
+                        'created_at'  => empty($rowData['created_at']) ? now()
                                          : gmstrftime($strftimeFormat, strtotime($rowData['created_at'])),
                         'updated_at'  => now(),
                         'position'    => $rowData['position']
                     );
-                    if (isset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]])) { // edit
+
+                    if (isset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]]))
+                    { //edit
+
                         $entityId = $this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]]['entity_id'];
                         $entityRow['entity_id']        = $entityId;
                         $entityRow['path']             = $parentCategory['path'] .'/'.$entityId;
                         $entityRowsUp[]                = $entityRow;
-                    } else { // create
+                    } else
+                    { // create
                         $entityId                      = $nextEntityId++;
                         $entityRow['entity_id']        = $entityId;
                         $entityRow['path']             = $parentCategory['path'] .'/'.$entityId;
@@ -681,9 +712,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     protected function _getParentCategory($rowData)
     {
-        $categoryParts = explode('/',$rowData[self::COL_CATEGORY]);
+        $categoryParts = $this->_explodeEscaped('/',$rowData[self::COL_CATEGORY]);
         array_pop($categoryParts);
-        $parent = implode('/',$categoryParts);
+        $parent = $this->_implodeEscaped('/',$categoryParts);
 
         if ($parent)
         {
@@ -704,7 +735,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     {
         if (isset($rowData['name']) && strlen($rowData['name']))
             return $rowData['name'];
-        $categoryParts = explode('/',$rowData[self::COL_CATEGORY]);
+        $categoryParts = $this->_explodeEscaped('/',$rowData[self::COL_CATEGORY]);
         return end($categoryParts);
     }
 
@@ -757,6 +788,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             //check if parent category exists
             if ($this->_getParentCategory($rowData) === false)
             {
+
                 $this->addRowError(self::ERROR_PARENT_NOT_FOUND, $rowNum);
                 return false;
             }
