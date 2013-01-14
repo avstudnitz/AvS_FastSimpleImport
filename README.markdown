@@ -68,7 +68,7 @@ Mage::getSingleton('fastsimpleimport/import')
 Mage::getSingleton('fastsimpleimport/import')
     ->setAllowRenameFiles(false);
 ```
-* **NEW:** 
+
 * Create options for predefined attributes automatically.
 
 ```php
