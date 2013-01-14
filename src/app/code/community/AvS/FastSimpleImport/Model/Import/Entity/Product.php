@@ -15,6 +15,19 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     /** @var array */
     protected $_attributeOptions = array();
 
+    /** @var bool */
+    protected $_allowRenameFiles = false;
+
+    public function setAllowRenameFiles($allow)
+    {
+        $this->_allowRenameFiles = (boolean) $allow;
+    }
+
+    public function getAllowRenameFiles()
+    {
+        return $this->_allowRenameFiles;
+    }
+
     /**
      * Source model setter.
      *
@@ -50,7 +63,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         if (!$this->_dataValidated) {
             $this->_createAttributeOptions();
             $this->_importExternalImageFiles();
-            $this->_getUploader()->setAllowRenameFiles(false);
+
+            if (! $this->getAllowRenameFiles())
+            {
+                $this->_getUploader()->setAllowRenameFiles(false);
+            }
         }
 
         return parent::validateData();
