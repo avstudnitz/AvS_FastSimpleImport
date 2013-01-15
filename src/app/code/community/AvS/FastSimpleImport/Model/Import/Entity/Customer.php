@@ -47,6 +47,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
         $message = '';
         switch ($attrParams['type']) {
             case 'varchar':
+            case 'multiselect': // isn't properly supported in customer import, so no validation.
                 $val   = Mage::helper('core/string')->cleanString($rowData[$attrCode]);
                 $valid = Mage::helper('core/string')->strlen($val) < self::DB_MAX_VARCHAR_LENGTH;
                 $message = 'String is too long, only ' . self::DB_MAX_VARCHAR_LENGTH . ' characters allowed.';
@@ -57,7 +58,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                 $message = 'Decimal value expected.';
                 break;
             case 'select':
-            case 'multiselect':
                 $valid = isset($attrParams['options'][strtolower($rowData[$attrCode])]);
                 $message = 'Possible options are: ' . implode(', ', array_keys($attrParams['options']));
                 break;
