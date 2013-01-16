@@ -545,8 +545,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             'is_in_stock'                   => 0,
             'low_stock_date'                => null,
             'stock_status_changed_auto'     => 0,
-            'is_decimal_divided'            => 0
         );
+
+        if (version_compare(Mage::getVersion(), '1.7.0.0', 'ge')) {
+            $defaultStockData['is_decimal_divided'] = 0;
+        }
 
         $entityTable = Mage::getResourceModel('cataloginventory/stock_item')->getMainTable();
         $helper      = Mage::helper('catalogInventory');
