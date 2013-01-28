@@ -51,6 +51,13 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $validationResult = $this->validateSource($data);
         if ($this->getProcessedRowsCount() > 0) {
             if (!$validationResult) {
+                if ($entityAdapter->getErrorsCount() >= $entityAdapter->getErrorsLimit()) {
+                    Mage::throwException(
+                        sprintf("Error Limit of %s Errors reached, stopping import.", $entityAdapter->getErrorsLimit())
+                            . "\n" . $this->getErrorMessage()
+                    );
+                }
+
                 if (!$this->getContinueAfterErrors()) {
 
                     Mage::throwException($this->getErrorMessage());
@@ -96,6 +103,13 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $validationResult = $this->validateSource($data);
         if ($this->getProcessedRowsCount() > 0) {
             if (!$validationResult) {
+                if ($entityAdapter->getErrorsCount() >= $entityAdapter->getErrorsLimit()) {
+                    Mage::throwException(
+                        sprintf("Error Limit of %s Errors reached, stopping import.", $entityAdapter->getErrorsLimit())
+                            . "\n" . $this->getErrorMessage()
+                    );
+                }
+
                 if (!$this->getContinueAfterErrors()) {
 
                     Mage::throwException($this->getErrorMessage());
@@ -133,6 +147,13 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $validationResult = $this->validateSource($data);
         if ($this->getProcessedRowsCount() > 0) {
             if (!$validationResult) {
+                if ($entityAdapter->getErrorsCount() >= $entityAdapter->getErrorsLimit()) {
+                    Mage::throwException(
+                        sprintf("Error Limit of %s Errors reached, stopping import.", $entityAdapter->getErrorsLimit())
+                            . "\n" . $this->getErrorMessage()
+                    );
+                }
+
                 if (!$this->getContinueAfterErrors()) {
 
                     Mage::throwException($this->getErrorMessage());
