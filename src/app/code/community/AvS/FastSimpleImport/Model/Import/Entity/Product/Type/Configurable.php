@@ -30,7 +30,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
                 } elseif (array_key_exists($attrCode, $rowData)) {
                     $resultAttrs[$attrCode] = $rowData[$attrCode];
                 } elseif (null !== $attrParams['default_value']) {
-                    if ($this->_isSkuNew($rowData['sku'])) {
+                    if ($this->_isSkuNew($rowData['sku']) && isset($rowData['sku'])) {
                         $resultAttrs[$attrCode] = $attrParams['default_value'];
                     }
                 }
