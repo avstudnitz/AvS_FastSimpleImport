@@ -47,6 +47,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Simple
      */
     protected function _isSkuNew($sku)
     {
+        if ($sku == '') {
+            return false;
+        }
         $oldSkus = $this->_entityModel->getOldSku();
         return !isset($oldSkus[$sku]);
     }
