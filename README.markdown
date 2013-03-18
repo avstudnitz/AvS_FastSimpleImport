@@ -32,13 +32,42 @@ Mage::getSingleton('fastsimpleimport/import')
     ->processProductImport($data); 
 
 // Import customer:
+$data = array(
+    array(
+		'email' => 'customer@company.com',
+		'_website' => 'base',
+        'group_id' => 1,
+        'firstname' => 'John',
+        'lastname' => 'Doe',
+        '_address_firstname' => 'John',
+        '_address_lastname' => 'Doe',
+        '_address_street' => 'Main Street 1',
+        '_address_postcode' => '12345',
+        '_address_city' => 'Springfield',
+        '_address_country_id' => 'US',
+        '_address_telephone' => '+1 2345 6789',
+        '_address_default_billing_' => 1,
+        '_address_default_shipping_' => 0,
+	),
+    array(
+        '_address_firstname' => 'John',
+        '_address_lastname' => 'Doe',
+        '_address_street' => 'Countryside 99',
+        '_address_postcode' => '98765',
+        '_address_city' => 'Cape Cod',
+        '_address_country_id' => 'US',
+        '_address_telephone' => '+1 9876 54321',
+        '_address_default_billing_' => 0,
+        '_address_default_shipping_' => 1,
+	),
+);
 Mage::getSingleton('fastsimpleimport/import')
     ->processCustomerImport($data);
 ```
 
 You can see the [test file](https://github.com/avstudnitz/AvS_FastSimpleImport/blob/master/test.php) for more examples.
 
-See [specifications about the expected format](http://www.avs-webentwicklung.de/fileadmin/documents/20120512_Produktimport_ImportExport_eng.pdf).
+See [specifications about the expected format](http://www.integer-net.de/download/ImportExport_EN.pdf).
 
 ### Features
 
