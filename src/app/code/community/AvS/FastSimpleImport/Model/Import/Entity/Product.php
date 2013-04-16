@@ -9,6 +9,7 @@
  */
 class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport_Model_Import_Entity_Product
 {
+    CONST COL_CATEGORY_POSITION = 'position';
     /** @var array */
     protected $_dropdownAttributes = array();
 
@@ -27,6 +28,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     {
         return $this->_allowRenameFiles;
     }
+
+
 
     /**
      * Source model setter.
@@ -685,7 +688,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                     $categoryId = $this->_categoriesWithRoots[$rowData[self::COL_ROOT_CATEGORY]][$categoryPath];
                     $categories[$rowSku][$categoryId] = true;
                 } elseif (!empty($categoryPath)) {
-                    $categories[$rowSku][$this->_categories[$categoryPath]] = $rowData['position'] + 1;
+                    $categories[$rowSku][$this->_categories[$categoryPath]] = $rowData[self::COL_CATEGORY_POSITION] + 1;
                 }
 
                 if (!empty($rowData['_tier_price_website'])) { // 4.1. Tier prices phase
@@ -811,8 +814,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      */
     protected function _saveProductCategories(array $categoriesData)
     {
-        Zend_Debug::dump($categoriesData);
-//Zend_Debug::dump($this->_dataSourceModel->getNextBunch());
         static $tableName = null;
 
         if (!$tableName) {
