@@ -204,23 +204,30 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      */
     protected function _initCategories()
     {
-        $collection = Mage::getResourceModel('catalog/category_collection')->addNameToResult();
-        /* @var $collection Mage_Catalog_Model_Resource_Eav_Mysql4_Category_Collection */
-        foreach ($collection as $category) {
-            $structure = explode('/', $category->getPath());
-            $pathSize = count($structure);
-            if ($pathSize > 2) {
-                $path = array();
-                $this->_categories[implode('/', $path)] = $category->getId();
-                for ($i = 1; $i < $pathSize; $i++) {
-                    $path[] = $collection->getItemById($structure[$i])->getName();
-                }
+        $transportObject = new Varien_Object();
+        Mage::dispatchEvent( 'avs_fastsimpleimport_entity_product_init_categories', array('transport' => $transportObject) );
 
-                // additional options for category referencing: name starting from base category, or category id
-                $this->_categories[implode('/', $path)] = $category->getId();
-                array_shift($path);
-                $this->_categories[implode('/', $path)] = $category->getId();
-                $this->_categories[$category->getId()] = $category->getId();
+        if ( $transportObject->getCategories() ) {
+            $this->_categories = $transportObject->getCategories();
+        } else {
+            $collection = Mage::getResourceModel('catalog/category_collection')->addNameToResult();
+            /* @var $collection Mage_Catalog_Model_Resource_Eav_Mysql4_Category_Collection */
+            foreach ($collection as $category) {
+                $structure = explode('/', $category->getPath());
+                $pathSize = count($structure);
+                if ($pathSize > 2) {
+                    $path = array();
+                    $this->_categories[implode('/', $path)] = $category->getId();
+                    for ($i = 1; $i < $pathSize; $i++) {
+                        $path[] = $collection->getItemById($structure[$i])->getName();
+                    }
+
+                    // additional options for category referencing: name starting from base category, or category id
+                    $this->_categories[implode('/', $path)] = $category->getId();
+                    array_shift($path);
+                    $this->_categories[implode('/', $path)] = $category->getId();
+                    $this->_categories[$category->getId()] = $category->getId();
+                }
             }
         }
         return $this;
