@@ -262,7 +262,11 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      */
     protected function _getSourceAdapter($sourceData)
     {
-        return Mage::getModel('fastsimpleimport/arrayAdapter', $sourceData);
+        if (is_array($sourceData)) {
+            return Mage::getModel('fastsimpleimport/arrayAdapter', $sourceData);
+        }
+
+        return parent::_getSourceAdapter($sourceData);
     }
 
     /**
