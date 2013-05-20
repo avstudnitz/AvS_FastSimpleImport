@@ -81,6 +81,32 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         return $this;
     }
 
+
+    /**
+     * Import products
+     *
+     * @param array       $data
+     * @param string|null $behavior
+     *
+     * @return AvS_FastSimpleImport_Model_Import
+     */
+    public function dryrunProductImport($data, $behavior = null)
+    {
+        if (!is_null($behavior)) {
+            $this->setBehavior($behavior);
+        }
+
+        $this->setEntity(Mage_Catalog_Model_Product::ENTITY);
+
+        /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Product */
+        $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_product');
+        $entityAdapter->setBehavior($this->getBehavior());
+        $this->setEntityAdapter($entityAdapter);
+
+        $validationResult = $this->validateSource($data);
+        return $validationResult;
+    }
+
     /**
      * Import customers
      *
