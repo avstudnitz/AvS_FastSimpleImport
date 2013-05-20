@@ -152,6 +152,31 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     }
 
     /**
+     * Import products
+     *
+     * @param array       $data
+     * @param string|null $behavior
+     *
+     * @return AvS_FastSimpleImport_Model_Import
+     */
+    public function dryrunCustomerImport($data, $behavior = null)
+    {
+        if (!is_null($behavior)) {
+            $this->setBehavior($behavior);
+        }
+
+        $this->setEntity('customer');
+
+        /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Customer */
+        $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_customer');
+        $entityAdapter->setBehavior($this->getBehavior());
+        $this->setEntityAdapter($entityAdapter);
+
+        $validationResult = $this->validateSource($data);
+        return $validationResult;
+    }
+
+    /**
      * Import categories
      *
      * @param array $data
@@ -195,6 +220,30 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         return $this;
     }
 
+    /**
+     * Import products
+     *
+     * @param array       $data
+     * @param string|null $behavior
+     *
+     * @return AvS_FastSimpleImport_Model_Import
+     */
+    public function dryrunCategoryImport($data, $behavior = null)
+    {
+        if (!is_null($behavior)) {
+            $this->setBehavior($behavior);
+        }
+
+        $this->setEntity(Mage_Catalog_Model_Category::ENTITY);
+
+        /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Category */
+        $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_category');
+        $entityAdapter->setBehavior($this->getBehavior());
+        $this->setEntityAdapter($entityAdapter);
+
+        $validationResult = $this->validateSource($data);
+        return $validationResult;
+    }
     /**
      * Returns source adapter object.
      *
