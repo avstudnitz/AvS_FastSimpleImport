@@ -76,10 +76,20 @@ See [specifications about the expected format](http://www.integer-net.de/downloa
 Just replace the word "process" in the above calls with "dryrun":
 
 ```php
-Mage::getSingleton('fastsimpleimport/import')
-    ->dryrunProductImport($data);
+$importer = Mage::getSingleton('fastsimpleimport/import');
+
+$result = $importer->dryrunProductImport($data);
+
+echo ($result  ? 'Input is OK' : 'Input has Errors');
+
+echo "Messages: " . PHP_EOL;
+echo $importer->getErrorMessage();
+
+# for categories    
 Mage::getSingleton('fastsimpleimport/import')
     ->dryrunCategoryImport($data);
+    
+# for customers
 Mage::getSingleton('fastsimpleimport/import')
     ->dryrunCustomerImport($data);
 ```
