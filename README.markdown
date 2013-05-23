@@ -71,6 +71,29 @@ See [specifications about the expected format](http://www.integer-net.de/downloa
 
 ### Features
 
+* Check data without importing it
+
+Just replace the word "process" in the above calls with "dryrun":
+
+```php
+$importer = Mage::getSingleton('fastsimpleimport/import');
+
+$result = $importer->dryrunProductImport($data);
+
+echo ($result  ? 'Input is OK' : 'Input has Errors');
+
+echo "Messages: " . PHP_EOL;
+echo $importer->getErrorMessage();
+
+# for categories    
+Mage::getSingleton('fastsimpleimport/import')
+    ->dryrunCategoryImport($data);
+    
+# for customers
+Mage::getSingleton('fastsimpleimport/import')
+    ->dryrunCustomerImport($data);
+```
+
 * Import products and customers from php arrays (see above)
 * Bugfix for ImportExport: default values were set on updates when the attribute was not given (only when a default value was present, i.e. with visibility)
 * Choose Import Behavior: "Replace" (default), "Append" or "Delete" like this:
