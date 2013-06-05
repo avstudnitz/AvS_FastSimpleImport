@@ -179,3 +179,8 @@ try {
     print_r($import->getErrorMessages());
 }
 ```
+
+### More Information / Wiki / Limitations 
+
+Refer to the [project wiki](https://github.com/avstudnitz/AvS_FastSimpleImport/wiki) for more information on known issues or limitations and more.
+
