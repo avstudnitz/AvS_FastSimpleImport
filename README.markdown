@@ -180,7 +180,7 @@ try {
 }
 ```
 
-### More Information / Wiki / Limitations 
+### Limitations / Wiki
 
-Refer to the [project wiki](https://github.com/avstudnitz/AvS_FastSimpleImport/wiki) for more information on known issues or limitations and more.
+Refer to the [project wiki](https://github.com/avstudnitz/AvS_FastSimpleImport/wiki) for more information on known issues or limitations.
 
