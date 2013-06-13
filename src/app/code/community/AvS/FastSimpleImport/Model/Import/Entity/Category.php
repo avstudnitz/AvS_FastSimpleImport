@@ -926,4 +926,53 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     {
         $this->_parameters['behavior'] = $behavior;
     }
+
+
+    /**
+     * Partially reindex newly created and updated products
+     *
+     * @return AvS_FastSimpleImport_Model_Import_Entity_Product
+     */
+    public function reindexImportedCategories()
+    {
+        switch ($this->getBehavior()) {
+            case Mage_ImportExport_Model_Import::BEHAVIOR_DELETE:
+                $this->_indexDeleteEvents();
+                break;
+            case Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE:
+            case Mage_ImportExport_Model_Import::BEHAVIOR_APPEND:
+
+                $this->_reindexUpdatedCategories();
+                break;
+        }
+    }
+
+    public function updateChildrenCount() {
+        //we only need to update the children count when we are updating, not when we are deleting.
+        if (! in_array($this->getBehavior(), array(Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE, Mage_ImportExport_Model_Import::BEHAVIOR_APPEND))) {
+            return;
+        }
+
+        /** @var Varien_Db_Adapter_Pdo_Mysql $connection */
+        $connection = $this->_connection;
+
+        $connection->query("CREATE TEMPORARY TABLE catalog_category_entity_tmp LIKE catalog_category_entity;
+            INSERT INTO catalog_category_entity_tmp SELECT * FROM catalog_category_entity;
+            UPDATE catalog_category_entity cce
+            SET children_count =
+            (
+                SELECT count(cce2.entity_id) - 1 as children_county
+                FROM catalog_category_entity_tmp cce2
+                WHERE PATH LIKE CONCAT(cce.path,'%')
+            );
+        ");
+    }
+
+    protected function _indexDeleteEvents() {
+        //not yet implemented
+    }
+
+    protected function _reindexUpdatedCategories() {
+        //not yet implemented
+    }
 }

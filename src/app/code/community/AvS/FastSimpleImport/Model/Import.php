@@ -78,7 +78,6 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
                     $this->importSource();
                     $this->reindexImportedProducts();
                 } else {
-
                     $this->importSource();
                     $this->invalidateIndex();
                 }
@@ -147,13 +146,11 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
                 }
 
                 if (!$this->getContinueAfterErrors()) {
-
                     Mage::throwException($this->getErrorMessage());
                 }
             }
 
             if ($this->getProcessedRowsCount() > $this->getInvalidRowsCount()) {
-
                 $this->importSource();
             }
         }
@@ -216,14 +213,20 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
                 }
 
                 if (!$this->getContinueAfterErrors()) {
-
                     Mage::throwException($this->getErrorMessage());
                 }
             }
 
             if ($this->getProcessedRowsCount() > $this->getInvalidRowsCount()) {
-
                 $this->importSource();
+
+                $this->getEntityAdapter()->updateChildrenCount();
+
+                if ($this->getPartialIndexing()) {
+                    $this->getEntityAdapter()->reindexImportedCategories();
+                } else {
+                    $this->invalidateIndex();
+                }
             }
         }
 
