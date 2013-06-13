@@ -1,4 +1,28 @@
 <?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    Mage
+ * @package     Mage_ImportExport
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
 
 /**
  * Entity Adapter for importing Magento Categories
@@ -173,6 +197,20 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     protected $_fileUploader;
 
+    /** @var bool */
+    protected $_ignoreDuplicates = false;
+
+    public function setIgnoreDuplicates($ignore)
+    {
+        $this->_ignoreDuplicates = (boolean) $ignore;
+    }
+
+
+    public function getIgnoreDuplicates()
+    {
+        return $this->_ignoreDuplicates;
+    }
+
     /**
      * Constructor.
      *
@@ -217,6 +255,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         }
         return $this;
     }
+
+    public function getCategoriesWithRoots() {
+        return $this->_categoriesWithRoots;
+    }
+
 
     protected function _explodeEscaped($delimiter = '/', $string)
     {
@@ -455,6 +498,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                         $entityRow['entity_id']        = $entityId;
                         $entityRow['path']             = $parentCategory['path'] .'/'.$entityId;
                         $entityRowsUp[]                = $entityRow;
+                        $rowData['entity_id']          = $entityId;
                     } else
                     { // create
                         $entityId                      = $nextEntityId++;
@@ -545,8 +589,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                     }
                 }
             }
-
-            Mage::log($attributes);
 
             $this->_saveCategoryEntity($entityRowsIn, $entityRowsUp);
             $this->_saveCategoryAttributes($attributes);
@@ -740,8 +782,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         $this->_validatedRows[$rowNum] = true;
 
         //check for duplicates
-        if (isset($this->_newCategory[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]])) {
-            $this->addRowError(self::ERROR_DUPLICATE_CATEGORY, $rowNum);
+        if (isset($rowData[self::COL_ROOT])
+            && isset($rowData[self::COL_CATEGORY])
+            && isset($this->_newCategory[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]])) {
+            if (! $this->getIgnoreDuplicates()) {
+                $this->addRowError(self::ERROR_DUPLICATE_CATEGORY, $rowNum);
+            }
+
             return false;
         }
         $rowScope = $this->getRowScope($rowData);
