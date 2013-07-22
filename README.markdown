@@ -34,8 +34,8 @@ Mage::getSingleton('fastsimpleimport/import')
 // Import customer:
 $data = array(
     array(
-		'email' => 'customer@company.com',
-		'_website' => 'base',
+        'email' => 'customer@company.com',
+        '_website' => 'base',
         'group_id' => 1,
         'firstname' => 'John',
         'lastname' => 'Doe',
@@ -50,6 +50,8 @@ $data = array(
         '_address_default_shipping_' => 0,
 	),
     array(
+        'email' => '',
+        '_website' => '',
         '_address_firstname' => 'John',
         '_address_lastname' => 'Doe',
         '_address_street' => 'Countryside 99',
