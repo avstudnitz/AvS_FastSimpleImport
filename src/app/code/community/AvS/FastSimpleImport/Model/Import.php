@@ -15,6 +15,8 @@
  * @method boolean getPartialIndexing()
  * @method AvS_FastSimpleImport_Model_Import setContinueAfterErrors(boolean $value)
  * @method boolean getContinueAfterErrors()
+ * @method AvS_FastSimpleImport_Model_Import setAllowRenameFiles(boolean $value)
+ * @method boolean getAllowRenameFiles()
  * @method array getDropdownAttributes()
  * @method array getMultiselectAttributes()
  */
