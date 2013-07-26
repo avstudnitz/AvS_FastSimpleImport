@@ -13,6 +13,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     protected $_dropdownAttributes = array();
 
     /** @var array */
+    protected $_multiselectAttributes = array();
+
+    /** @var array */
     protected $_attributeOptions = array();
 
     /** @var bool */
@@ -78,6 +81,15 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      */
     protected function _createAttributeOptions()
     {
+        $this->_createDropdownAttributeOptions();
+        $this->_createMultiselectAttributeOptions();
+    }
+
+    /**
+     *
+     */
+    protected function _createDropdownAttributeOptions()
+    {
         if (!sizeof($this->getDropdownAttributes())) {
             return;
         }
@@ -106,6 +118,38 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     }
 
     /**
+     *
+     */
+    protected function _createMultiselectAttributeOptions()
+    {
+        if (!sizeof($this->getMultiselectAttributes())) {
+            return;
+        }
+
+        $this->_getSource()->rewind();
+        while ($this->_getSource()->valid()) {
+
+            $rowData = $this->_getSource()->current();
+            foreach ($this->getMultiselectAttributes() as $attribute) {
+
+                /** @var $attribute Mage_Eav_Model_Entity_Attribute */
+                $attributeCode = $attribute->getAttributeCode();
+                if (!isset($rowData[$attributeCode]) || !strlen(trim($rowData[$attributeCode]))) {
+                    continue;
+                }
+
+                $options = $this->_getAttributeOptions($attribute);
+
+                if (!in_array(trim($rowData[$attributeCode]), $options)) {
+                    $this->_createAttributeOption($attribute, trim($rowData[$attributeCode]));
+                }
+            }
+
+            $this->_getSource()->next();
+        }
+    }
+
+    /**
      * Get all options of a dropdown attribute
      *
      * @param Mage_Eav_Model_Entity_Attribute $attribute
@@ -114,10 +158,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     protected function _getAttributeOptions($attribute)
     {
         if (!isset($this->_attributeOptions[$attribute->getAttributeCode()])) {
+            if ($attribute->getFrontendInput() == 'select') {
+                /** @var $attributeOptions Mage_Eav_Model_Entity_Attribute_Source_Table */
+                $attributeOptions = Mage::getModel('eav/entity_attribute_source_table');
+                $attributeOptions->setAttribute($attribute);
+            } else {
+                $attributeOptions = $attribute->getSource();
+            }
 
-            /** @var $attributeOptions Mage_Eav_Model_Entity_Attribute_Source_Table */
-            $attributeOptions = Mage::getModel('eav/entity_attribute_source_table');
-            $attributeOptions->setAttribute($attribute);
             $this->_attributeOptions[$attribute->getAttributeCode()] = array();
             foreach ($attributeOptions->getAllOptions(false) as $option) {
                 $this->_attributeOptions[$attribute->getAttributeCode()][$option['value']] = $option['label'];
@@ -449,6 +497,29 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     }
 
     /**
+     * Set and Validate Attributes for which new Options should be created (multiselect only)
+     *
+     * @param array $attributeCodes
+     */
+    public function setMultiselectAttributes($attributeCodes)
+    {
+        $attributes = array();
+        foreach ($attributeCodes as $attributeCode) {
+            /** @var $attribute Mage_Eav_Model_Entity_Attribute */
+            $attribute = Mage::getSingleton('catalog/product')->getResource()->getAttribute($attributeCode);
+            if (!is_object($attribute)) {
+                Mage::throwException('Attribute ' . $attributeCode . ' not found.');
+            }
+            if ($attribute->getBackendModel() != 'eav/entity_attribute_backend_array') {
+                Mage::throwException('Attribute ' . $attributeCode . ' is no multiselect attribute.');
+            }
+            $attributes[$attributeCode] = $attribute;
+        }
+
+        $this->_multiselectAttributes = $attributes;
+    }
+
+    /**
      * Get Attributes for which options will be created
      *
      * @return array
@@ -458,6 +529,15 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         return $this->_dropdownAttributes;
     }
 
+    /**
+     * Get Attributes for which options will be created
+     *
+     * @return array
+     */
+    public function getMultiselectAttributes()
+    {
+        return $this->_multiselectAttributes;
+    }
 
     /**
      * Check one attribute. Can be overridden in child.

@@ -16,6 +16,7 @@
  * @method AvS_FastSimpleImport_Model_Import setContinueAfterErrors(boolean $value)
  * @method boolean getContinueAfterErrors()
  * @method array getDropdownAttributes()
+ * @method array getMultiselectAttributes()
  */
 class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 {
@@ -25,6 +26,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $this->setPartialIndexing(false);
         $this->setContinueAfterErrors(false);
         $this->setDropdownAttributes(array());
+        $this->setMultiselectAttributes(array());
     }
 
     /**
@@ -46,6 +48,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_product');
         $entityAdapter->setBehavior($this->getBehavior());
         $entityAdapter->setDropdownAttributes($this->getDropdownAttributes());
+        $entityAdapter->setMultiselectAttributes($this->getMultiselectAttributes());
         $this->setEntityAdapter($entityAdapter);
 
         $validationResult = $this->validateSource($data);
@@ -349,6 +352,21 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
             $attributeCodes = array($attributeCodes);
         }
         $this->setData('dropdown_attributes', $attributeCodes);
+        return $this;
+    }
+
+    /**
+     * Set Attributes for which new Options should be created (multiselect only)
+     *
+     * @param string|array $attributeCodes
+     * @return AvS_FastSimpleImport_Model_Import
+     */
+    public function setMultiselectAttributes($attributeCodes)
+    {
+        if (!is_array($attributeCodes)) {
+            $attributeCodes = array($attributeCodes);
+        }
+        $this->setData('multiselect_attributes', $attributeCodes);
         return $this;
     }
 }
