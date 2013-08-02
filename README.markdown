@@ -29,7 +29,7 @@ $data = array(
     // add more products here
 );
 Mage::getSingleton('fastsimpleimport/import')
-    ->processProductImport($data); 
+    ->processProductImport($data);
 
 // Import customer:
 $data = array(
@@ -87,10 +87,10 @@ echo ($result  ? 'Input is OK' : 'Input has Errors');
 echo "Messages: " . PHP_EOL;
 echo $importer->getErrorMessage();
 
-# for categories    
+# for categories
 Mage::getSingleton('fastsimpleimport/import')
     ->dryrunCategoryImport($data);
-    
+
 # for customers
 Mage::getSingleton('fastsimpleimport/import')
     ->dryrunCustomerImport($data);
@@ -123,7 +123,7 @@ Mage::getSingleton('fastsimpleimport/import')
     ->setAllowRenameFiles(false);
 ```
 
-* Create options for predefined attributes automatically.
+* Create options for predefined **DROPDOWN** attributes automatically.
 
 ```php
 Mage::getSingleton('fastsimpleimport/import')
@@ -135,6 +135,21 @@ or
 ```php
 Mage::getSingleton('fastsimpleimport/import')
     ->setDropdownAttributes(array('manufacturer', 'color'))
+    ->processProductImport($data);
+```
+
+* Create options for predefined **MULTI-SELECT** attributes automatically.
+
+```php
+Mage::getSingleton('fastsimpleimport/import')
+    ->setMultiselectAttributes('my_multi_select_attribute')
+    ->processProductImport($data);
+```
+
+or
+```php
+Mage::getSingleton('fastsimpleimport/import')
+    ->setMultiselectAttributes(array('my_multi_select_attribute_1', 'my_multi_select_attribute_2'))
     ->processProductImport($data);
 ```
 
