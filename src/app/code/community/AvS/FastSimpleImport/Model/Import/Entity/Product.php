@@ -672,8 +672,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         }
         if (version_compare(Mage::getVersion(), '1.6.0.0', 'lt')) {
         {
-			unset($defaultStockData['use_config_enable_qty_inc'], $defaultStockData['stock_status_changed_auto']);
-		}
+            unset($defaultStockData['use_config_enable_qty_inc'], $defaultStockData['stock_status_changed_auto']);
+        }
 
         $entityTable = Mage::getResourceModel('cataloginventory/stock_item')->getMainTable();
         $helper      = Mage::helper('catalogInventory');
