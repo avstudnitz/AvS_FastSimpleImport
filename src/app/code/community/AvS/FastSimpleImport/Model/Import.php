@@ -109,6 +109,8 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_product');
         $entityAdapter->setBehavior($this->getBehavior());
         $entityAdapter->setIsDryRun(true);
+        $entityAdapter->setDropdownAttributes($this->getDropdownAttributes());
+        $entityAdapter->setMultiselectAttributes($this->getMultiselectAttributes());
         $this->setEntityAdapter($entityAdapter);
 
         $validationResult = $this->validateSource($data);
