@@ -22,6 +22,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     /** @var bool */
     protected $_allowRenameFiles = false;
 
+    /** @var bool */
+    protected $_isDryRun = false;
+
     public function setAllowRenameFiles($allow)
     {
         $this->_allowRenameFiles = (boolean) $allow;
@@ -540,6 +543,28 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         return $this->_multiselectAttributes;
     }
 
+
+    /**
+     * Set a flag if the current import is a dryrun
+     *
+     * @param bool $isDryrun
+     * @return $this
+     */
+    public function setIsDryrun($isDryrun) {
+        $this->_isDryRun = (bool) $isDryrun;
+        return $this;
+    }
+
+
+    /**
+     * Set a flag if the current import is a dryrun
+     *
+     * @return bool
+     */
+    public function getIsDryRun() {
+        return $this->_isDryRun;
+    }
+
     /**
      * Check one attribute. Can be overridden in child.
      *
@@ -566,6 +591,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             case 'select':
             case 'multiselect':
                 $valid = isset($attrParams['options'][strtolower($rowData[$attrCode])]);
+
+                $isAutocreate = isset($this->_dropdownAttributes[$attrCode]) || isset($this->_multiselectAttributes[$attrCode]);
+                if ($this->getIsDryRun() && ($isAutocreate)) {
+                    break;
+                }
                 $message = 'Possible options are: ' . implode(', ', array_keys($attrParams['options']));
                 break;
             case 'int':
