@@ -570,9 +570,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             case 'multiselect':
                 $valid = true;
                 $paramsArray = explode('|', strtolower($rowData[$attrCode]));
-                foreach($paramsArray as $param)
+                foreach($paramsArray as $param){
                     $valid = isset($attrParams['options'][$param]);
-                
+                    if(!$valid) break;
+                }
                 $message = 'Possible options are: ' . implode(', ', array_keys($attrParams['options']));
                 break;
             case 'int':
