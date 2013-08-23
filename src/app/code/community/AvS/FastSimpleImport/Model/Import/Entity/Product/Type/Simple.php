@@ -24,10 +24,18 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Simple
         foreach ($this->_getProductAttributes($rowData) as $attrCode => $attrParams) {
             if (!$attrParams['is_static']) {
                 if (isset($rowData[$attrCode]) && strlen($rowData[$attrCode])) {
-                    $resultAttrs[$attrCode] =
-                        ('select' == $attrParams['type'] || 'multiselect' == $attrParams['type'])
-                            ? $attrParams['options'][strtolower($rowData[$attrCode])]
-                            : $rowData[$attrCode];
+                    if('select' == $attrParams['type']){
+                        $resultAttrs[$attrCode] = $attrParams['options'][strtolower($rowData[$attrCode])];
+                    }elseif('multiselect' == $attrParams['type']){
+                        $rowDataArray = explode("|", $rowData[$attrCode]);
+                        $values = array();
+                        foreach($rowDataArray as $option)
+                            $values[] = $attrParams['options'][strtolower($option)];
+
+                        $resultAttrs[$attrCode] = implode(",", $values);
+                    }else{
+                        $resultAttrs[$attrCode] = $rowData[$attrCode];
+                    }
                 } elseif (array_key_exists($attrCode, $rowData)) {
                     $resultAttrs[$attrCode] = $rowData[$attrCode];
                 } elseif (null !== $attrParams['default_value']) {
