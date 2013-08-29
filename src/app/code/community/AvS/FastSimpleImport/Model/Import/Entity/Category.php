@@ -371,7 +371,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
         if (self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
             $rowData['name'] = $this->_getCategoryName($rowData);
-            if (! $rowData['position']) $rowData['position'] = 10000;
+            if (! isset($rowData['position'])) $rowData['position'] = 10000; // diglin - prevent warning message
         }
 
         return $rowData;
@@ -570,6 +570,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             $destDir    = Mage::getConfig()->getOptions()->getMediaDir() . '/catalog/category';
             if (!is_writable($destDir)) {
                 @mkdir($destDir, 0777, true);
+            }
+            // diglin - add auto creation in case folder doesn't exist
+            if (!file_exists($tmpDir)) {
+                @mkdir($tmpDir, 0777, true);
             }
             if (!$this->_fileUploader->setTmpDir($tmpDir)) {
                 Mage::throwException("File directory '{$tmpDir}' is not readable.");
