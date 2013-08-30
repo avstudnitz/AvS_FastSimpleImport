@@ -64,7 +64,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      */
     protected function _getUploader()
     {
-        if(method_exists(Mage_ImportExport_Model_Import_Entity_Product, '_getUploader'))
+        if(method_exists('Mage_ImportExport_Model_Import_Entity_Product', '_getUploader'))
         {
             return parent::_getUploader();
         }
@@ -582,7 +582,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      * @param bool $isDryrun
      * @return $this
      */
-    public function setIsDryrun($isDryrun) {
+    public function setIsDryrun($isDryrun)
+    {
         $this->_isDryRun = (bool) $isDryrun;
         return $this;
     }
@@ -593,7 +594,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      *
      * @return bool
      */
-    public function getIsDryRun() {
+    public function getIsDryRun()
+    {
         return $this->_isDryRun;
     }
 
@@ -701,7 +703,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             $defaultStockData['is_decimal_divided'] = 0;
         }
         if (version_compare(Mage::getVersion(), '1.6.0.0', 'lt')) {
-        {
             unset($defaultStockData['use_config_enable_qty_inc'], $defaultStockData['stock_status_changed_auto']);
         }
 
