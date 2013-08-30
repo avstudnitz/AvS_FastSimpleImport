@@ -8,17 +8,22 @@
  */
 -->
 <config>
-	<modules>
-		<AvS_FastSimpleImport>
-			<version>0.2.0</version>
-		</AvS_FastSimpleImport>
-	</modules>
+    <modules>
+        <AvS_FastSimpleImport>
+            <version>0.2.0</version>
+        </AvS_FastSimpleImport>
+    </modules>
 
-	<global>
-		<models>
+    <global>
+        <models>
             <fastsimpleimport>
                 <class>AvS_FastSimpleImport_Model</class>
             </fastsimpleimport>
+            <importexport>
+                <rewrite>
+                    <import_uploader>AvS_FastSimpleImport_Model_Import_Uploader</import_uploader>
+                </rewrite>
+            <importexport>
         </models>
         <importexport module="importexport">
             <import_entities>
@@ -37,5 +42,5 @@
                 <bundle>fastsimpleimport/import_entity_product_type_bundle</bundle>
             </import_product_types>
         </importexport>
-	</global>
+    </global>
 </config>
