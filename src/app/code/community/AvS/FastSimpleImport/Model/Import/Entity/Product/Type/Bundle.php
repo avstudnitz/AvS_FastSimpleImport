@@ -59,7 +59,12 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
          * Price type does not live in an attribute set, so it is not picked up
          * by abstract _initAttributes method. We add it here manually.
          */
-        $attribute = Mage::getResourceModel('catalog/eav_attribute')->load('price_type', 'attribute_code');
+        if (version_compare(Mage::getVersion(), '1.6.0.0', 'lt')) {
+        {
+            $attribute = Mage::getModel('catalog/resource_eav_attribute')->load('price_type', 'attribute_code');
+        } else {
+            $attribute = Mage::getResourceModel('catalog/eav_attribute')->load('price_type', 'attribute_code');
+        }
         foreach ($this->_attributes as $attrSetName => $attributes) {
             $this->_addAttributeParams(
                 $attrSetName,
