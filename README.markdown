@@ -29,13 +29,13 @@ $data = array(
     // add more products here
 );
 Mage::getSingleton('fastsimpleimport/import')
-    ->processProductImport($data); 
+    ->processProductImport($data);
 
 // Import customer:
 $data = array(
     array(
-		'email' => 'customer@company.com',
-		'_website' => 'base',
+        'email' => 'customer@company.com',
+        '_website' => 'base',
         'group_id' => 1,
         'firstname' => 'John',
         'lastname' => 'Doe',
