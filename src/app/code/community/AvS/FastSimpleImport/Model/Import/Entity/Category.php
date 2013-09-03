@@ -956,13 +956,15 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         /** @var Varien_Db_Adapter_Pdo_Mysql $connection */
         $connection = $this->_connection;
 
-        $connection->query("CREATE TEMPORARY TABLE catalog_category_entity_tmp LIKE catalog_category_entity;
-            INSERT INTO catalog_category_entity_tmp SELECT * FROM catalog_category_entity;
-            UPDATE catalog_category_entity cce
+        $categoryTable = $connection->getTableName('catalog/category');
+        $categoryTableTmp = $categoryTable . '_tmp';
+        $connection->query("CREATE TEMPORARY TABLE {$categoryTableTmp} LIKE {$categoryTable};
+            INSERT INTO {$categoryTableTmp} SELECT * FROM {$categoryTable};
+            UPDATE {$categoryTable} cce
             SET children_count =
             (
                 SELECT count(cce2.entity_id) - 1 as children_county
-                FROM catalog_category_entity_tmp cce2
+                FROM {$categoryTableTmp} cce2
                 WHERE PATH LIKE CONCAT(cce.path,'%')
             );
         ");
