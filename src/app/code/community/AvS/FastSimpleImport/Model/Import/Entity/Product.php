@@ -362,7 +362,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         $productCollection = Mage::getModel('catalog/product')
             ->getCollection()
             ->addAttributeToFilter('sku', array('in' => $this->_getUpdatedProductsSkus()));
-        $entityIds = $productCollection->getColumnValues('entity_id');
+        $entityIds = $productCollection->getAllIds();
 
         /*
          * Generate a fake mass update event that we pass to our indexers.
