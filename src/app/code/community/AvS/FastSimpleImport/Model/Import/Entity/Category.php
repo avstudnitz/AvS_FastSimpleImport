@@ -218,6 +218,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         return $this;
     }
 
+    public function getCategoriesWithRoots() {
+        return $this->_categoriesWithRoots;
+    }
+
+
     protected function _explodeEscaped($delimiter = '/', $string)
     {
         $exploded = explode($delimiter, $string);
@@ -455,6 +460,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                         $entityRow['entity_id']        = $entityId;
                         $entityRow['path']             = $parentCategory['path'] .'/'.$entityId;
                         $entityRowsUp[]                = $entityRow;
+                        $rowData['entity_id']          = $entityId;
                     } else
                     { // create
                         $entityId                      = $nextEntityId++;
