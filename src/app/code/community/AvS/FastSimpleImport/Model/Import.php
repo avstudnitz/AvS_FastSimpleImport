@@ -18,6 +18,8 @@
  * @method boolean getContinueAfterErrors()
  * @method AvS_FastSimpleImport_Model_Import setAllowRenameFiles(boolean $value)
  * @method boolean getAllowRenameFiles()
+ * @method AvS_FastSimpleImport_Model_Import setIgnoreDuplicates(boolean $value)
+ * @method boolean getIgnoreDuplicates()
  * @method array getDropdownAttributes()
  * @method array getMultiselectAttributes()
  */
@@ -204,6 +206,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Category */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_category');
         $entityAdapter->setBehavior($this->getBehavior());
+        $entityAdapter->setIgnoreDuplicates($this->getIgnoreDuplicates());
         $this->setEntityAdapter($entityAdapter);
         $validationResult = $this->validateSource($data);
         if ($this->getProcessedRowsCount() > 0) {

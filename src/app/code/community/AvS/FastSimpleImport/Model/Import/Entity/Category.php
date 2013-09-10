@@ -173,6 +173,20 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     protected $_fileUploader;
 
+    /** @var bool */
+    protected $_ignoreDuplicates = false;
+
+    public function setIgnoreDuplicates($ignore)
+    {
+        $this->_ignoreDuplicates = (boolean) $ignore;
+    }
+
+
+    public function getIgnoreDuplicates()
+    {
+        return $this->_ignoreDuplicates;
+    }
+
     /**
      * Constructor.
      *
@@ -217,6 +231,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         }
         return $this;
     }
+
 
     protected function _explodeEscaped($delimiter = '/', $string)
     {
@@ -455,6 +470,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                         $entityRow['entity_id']        = $entityId;
                         $entityRow['path']             = $parentCategory['path'] .'/'.$entityId;
                         $entityRowsUp[]                = $entityRow;
+                        $rowData['entity_id']          = $entityId;
                     } else
                     { // create
                         $entityId                      = $nextEntityId++;
@@ -545,8 +561,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                     }
                 }
             }
-
-            Mage::log($attributes);
 
             $this->_saveCategoryEntity($entityRowsIn, $entityRowsUp);
             $this->_saveCategoryAttributes($attributes);
@@ -740,8 +754,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         $this->_validatedRows[$rowNum] = true;
 
         //check for duplicates
-        if (isset($this->_newCategory[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]])) {
-            $this->addRowError(self::ERROR_DUPLICATE_CATEGORY, $rowNum);
+        if (isset($rowData[self::COL_ROOT])
+            && isset($rowData[self::COL_CATEGORY])
+            && isset($this->_newCategory[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]])) {
+            if (! $this->getIgnoreDuplicates()) {
+                $this->addRowError(self::ERROR_DUPLICATE_CATEGORY, $rowNum);
+            }
+
             return false;
         }
         $rowScope = $this->getRowScope($rowData);

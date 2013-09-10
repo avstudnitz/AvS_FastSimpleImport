@@ -204,3 +204,10 @@ Refer to the [project wiki](https://github.com/avstudnitz/AvS_FastSimpleImport/w
 ### License
 
 [OSL - Open Software Licence 3.0](http://opensource.org/licenses/osl-3.0.php)
+```
+
+* **NEW:** Import categories option:
+
+```php
+$import->setIgnoreDuplicates(true); //if a row is encountered more than once it will be ignored and wont throw an error
+```
