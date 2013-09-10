@@ -388,7 +388,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             if (Mage::getResourceSingleton('ecomdev_urlrewrite/indexer')) {
                 Mage::getResourceSingleton('ecomdev_urlrewrite/indexer')->updateProductRewrites($entityIds);
             } else {
-                echo 'Default URL rewrites not yet implemented';
+                /* @var $urlModel Mage_Catalog_Model_Url */
+                $urlModel = Mage::getSingleton('catalog/url');
+
+                $urlModel->clearStoreInvalidRewrites(); // Maybe some products were moved or removed from website
+                foreach ($entityIds as $productId) {
+                    $urlModel->refreshProductRewrite($productId);
+                }
             }
         } catch (Exception $e) {
             echo $e->getMessage();
