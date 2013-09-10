@@ -32,6 +32,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $this->setContinueAfterErrors(false);
         $this->setDropdownAttributes(array());
         $this->setMultiselectAttributes(array());
+        $this->setAllowRenameFiles(true);
     }
 
     /**
@@ -55,6 +56,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setIsDryrun(false);
         $entityAdapter->setDropdownAttributes($this->getDropdownAttributes());
         $entityAdapter->setMultiselectAttributes($this->getMultiselectAttributes());
+        $entityAdapter->setAllowRenameFiles($this->getAllowRenameFiles());
         $this->setEntityAdapter($entityAdapter);
 
         $validationResult = $this->validateSource($data);
