@@ -232,6 +232,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         return $this;
     }
 
+    public function getCategoriesWithRoots() {
+        return $this->_categoriesWithRoots;
+    }
+
 
     protected function _explodeEscaped($delimiter = '/', $string)
     {
