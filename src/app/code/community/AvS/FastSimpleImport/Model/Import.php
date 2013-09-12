@@ -56,6 +56,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setIsDryrun(false);
         $entityAdapter->setDropdownAttributes($this->getDropdownAttributes());
         $entityAdapter->setMultiselectAttributes($this->getMultiselectAttributes());
+        $entityAdapter->setImageAttributes($this->getImageAttributes());
         $entityAdapter->setAllowRenameFiles($this->getAllowRenameFiles());
         $this->setEntityAdapter($entityAdapter);
 
@@ -82,6 +83,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
                     $this->importSource();
                     $this->reindexImportedProducts();
                 } else {
+
                     $this->importSource();
                     $this->invalidateIndex();
                 }
@@ -150,11 +152,13 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
                 }
 
                 if (!$this->getContinueAfterErrors()) {
+
                     Mage::throwException($this->getErrorMessage());
                 }
             }
 
             if ($this->getProcessedRowsCount() > $this->getInvalidRowsCount()) {
+
                 $this->importSource();
             }
         }
@@ -218,11 +222,13 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
                 }
 
                 if (!$this->getContinueAfterErrors()) {
+
                     Mage::throwException($this->getErrorMessage());
                 }
             }
 
             if ($this->getProcessedRowsCount() > $this->getInvalidRowsCount()) {
+
                 $this->importSource();
 
                 $this->getEntityAdapter()->updateChildrenCount();
@@ -386,6 +392,21 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
             $attributeCodes = array($attributeCodes);
         }
         $this->setData('multiselect_attributes', $attributeCodes);
+        return $this;
+    }
+
+    /**
+     * Set Attributes which will be handled as images
+     *
+     * @param string|array $attributeCodes
+     * @return AvS_FastSimpleImport_Model_Import
+     */
+    public function setImageAttributes($attributeCodes)
+    {
+        if (!is_array($attributeCodes)) {
+            $attributeCodes = array($attributeCodes);
+        }
+        $this->setData('image_attributes', $attributeCodes);
         return $this;
     }
 }
