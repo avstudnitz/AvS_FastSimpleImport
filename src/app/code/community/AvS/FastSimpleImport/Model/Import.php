@@ -18,6 +18,8 @@
  * @method boolean getContinueAfterErrors()
  * @method AvS_FastSimpleImport_Model_Import setAllowRenameFiles(boolean $value)
  * @method boolean getAllowRenameFiles()
+ * @method AvS_FastSimpleImport_Model_Import setIgnoreDuplicates(boolean $value)
+ * @method boolean getIgnoreDuplicates()
  * @method array getDropdownAttributes()
  * @method array getMultiselectAttributes()
  */
@@ -30,6 +32,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $this->setContinueAfterErrors(false);
         $this->setDropdownAttributes(array());
         $this->setMultiselectAttributes(array());
+        $this->setAllowRenameFiles(true);
     }
 
     /**
@@ -54,6 +57,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setDropdownAttributes($this->getDropdownAttributes());
         $entityAdapter->setMultiselectAttributes($this->getMultiselectAttributes());
         $entityAdapter->setImageAttributes($this->getImageAttributes());
+        $entityAdapter->setAllowRenameFiles($this->getAllowRenameFiles());
         $this->setEntityAdapter($entityAdapter);
 
         $validationResult = $this->validateSource($data);
@@ -205,6 +209,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Category */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_category');
         $entityAdapter->setBehavior($this->getBehavior());
+        $entityAdapter->setIgnoreDuplicates($this->getIgnoreDuplicates());
         $this->setEntityAdapter($entityAdapter);
         $validationResult = $this->validateSource($data);
         if ($this->getProcessedRowsCount() > 0) {
@@ -225,6 +230,14 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
             if ($this->getProcessedRowsCount() > $this->getInvalidRowsCount()) {
 
                 $this->importSource();
+
+                $this->getEntityAdapter()->updateChildrenCount();
+
+                if ($this->getPartialIndexing()) {
+                    $this->getEntityAdapter()->reindexImportedCategories();
+                } else {
+                    $this->invalidateIndex();
+                }
             }
         }
 
@@ -263,7 +276,11 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      */
     protected function _getSourceAdapter($sourceData)
     {
-        return Mage::getModel('fastsimpleimport/arrayAdapter', $sourceData);
+        if (is_array($sourceData)) {
+            return Mage::getModel('fastsimpleimport/arrayAdapter', $sourceData);
+        }
+
+        return parent::_getSourceAdapter($sourceData);
     }
 
     /**

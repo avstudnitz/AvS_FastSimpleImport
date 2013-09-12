@@ -173,6 +173,20 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     protected $_fileUploader;
 
+    /** @var bool */
+    protected $_ignoreDuplicates = false;
+
+    public function setIgnoreDuplicates($ignore)
+    {
+        $this->_ignoreDuplicates = (boolean) $ignore;
+    }
+
+
+    public function getIgnoreDuplicates()
+    {
+        return $this->_ignoreDuplicates;
+    }
+
     /**
      * Constructor.
      *
@@ -217,6 +231,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         }
         return $this;
     }
+
+    public function getCategoriesWithRoots() {
+        return $this->_categoriesWithRoots;
+    }
+
 
     protected function _explodeEscaped($delimiter = '/', $string)
     {
@@ -455,6 +474,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                         $entityRow['entity_id']        = $entityId;
                         $entityRow['path']             = $parentCategory['path'] .'/'.$entityId;
                         $entityRowsUp[]                = $entityRow;
+                        $rowData['entity_id']          = $entityId;
                     } else
                     { // create
                         $entityId                      = $nextEntityId++;
@@ -545,8 +565,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                     }
                 }
             }
-
-            Mage::log($attributes);
 
             $this->_saveCategoryEntity($entityRowsIn, $entityRowsUp);
             $this->_saveCategoryAttributes($attributes);
@@ -740,8 +758,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         $this->_validatedRows[$rowNum] = true;
 
         //check for duplicates
-        if (isset($this->_newCategory[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]])) {
-            $this->addRowError(self::ERROR_DUPLICATE_CATEGORY, $rowNum);
+        if (isset($rowData[self::COL_ROOT])
+            && isset($rowData[self::COL_CATEGORY])
+            && isset($this->_newCategory[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]])) {
+            if (! $this->getIgnoreDuplicates()) {
+                $this->addRowError(self::ERROR_DUPLICATE_CATEGORY, $rowNum);
+            }
+
             return false;
         }
         $rowScope = $this->getRowScope($rowData);
@@ -925,5 +948,56 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     public function setBehavior($behavior)
     {
         $this->_parameters['behavior'] = $behavior;
+    }
+
+
+    /**
+     * Partially reindex newly created and updated products
+     *
+     * @return AvS_FastSimpleImport_Model_Import_Entity_Product
+     */
+    public function reindexImportedCategories()
+    {
+        switch ($this->getBehavior()) {
+            case Mage_ImportExport_Model_Import::BEHAVIOR_DELETE:
+                $this->_indexDeleteEvents();
+                break;
+            case Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE:
+            case Mage_ImportExport_Model_Import::BEHAVIOR_APPEND:
+
+                $this->_reindexUpdatedCategories();
+                break;
+        }
+    }
+
+    public function updateChildrenCount() {
+        //we only need to update the children count when we are updating, not when we are deleting.
+        if (! in_array($this->getBehavior(), array(Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE, Mage_ImportExport_Model_Import::BEHAVIOR_APPEND))) {
+            return;
+        }
+
+        /** @var Varien_Db_Adapter_Pdo_Mysql $connection */
+        $connection = $this->_connection;
+
+        $categoryTable = Mage::getSingleton('core/resource')->getTableName('catalog/category');
+        $categoryTableTmp = $categoryTable . '_tmp';
+        $connection->query("CREATE TEMPORARY TABLE {$categoryTableTmp} LIKE {$categoryTable};
+            INSERT INTO {$categoryTableTmp} SELECT * FROM {$categoryTable};
+            UPDATE {$categoryTable} cce
+            SET children_count =
+            (
+                SELECT count(cce2.entity_id) - 1 as children_county
+                FROM {$categoryTableTmp} cce2
+                WHERE PATH LIKE CONCAT(cce.path,'%')
+            );
+        ");
+    }
+
+    protected function _indexDeleteEvents() {
+        //not yet implemented
+    }
+
+    protected function _reindexUpdatedCategories() {
+        //not yet implemented
     }
 }
