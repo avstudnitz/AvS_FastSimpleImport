@@ -14,6 +14,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     protected $_dropdownAttributes = array();
 
     /** @var array */
+    protected $_imageAttributes = array();
+
+    /** @var array */
     protected $_multiselectAttributes = array();
 
     /** @var array */
@@ -521,6 +524,26 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         }
 
         $this->_multiselectAttributes = $attributes;
+    }
+
+    /**
+     * Set _imageAttributes to allow importing other media_gallery fields as images beside _media_gallery, image,
+     * small_image and thumbnail.
+     * Automatically sets $this->_imagesArrayKeys that is used by parent class to read from
+     * @param array $attributeCodes
+     */
+    public function setImageAttributes($attributeCodes)
+    {
+        $this->_imagesArrayKeys = $this->_imageAttributes = array_merge($this->_imagesArrayKeys, $attributeCodes);
+    }
+
+    /**
+     * Get Attributes that should be handled as images
+     * @return array
+     */
+    public function getImageAttributes()
+    {
+        return $this->_imageAttributes;
     }
 
     /**
