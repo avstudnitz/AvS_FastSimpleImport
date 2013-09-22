@@ -144,6 +144,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Customer */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_customer');
         $entityAdapter->setBehavior($this->getBehavior());
+        $entityAdapter->setIgnoreDuplicates($this->getIgnoreDuplicates());
         $entityAdapter->setErrorLimit($this->getErrorLimit());
         $this->setEntityAdapter($entityAdapter);
         $validationResult = $this->validateSource($data);
