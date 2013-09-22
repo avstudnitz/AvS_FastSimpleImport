@@ -20,6 +20,8 @@
  * @method boolean getAllowRenameFiles()
  * @method AvS_FastSimpleImport_Model_Import setIgnoreDuplicates(boolean $value)
  * @method boolean getIgnoreDuplicates()
+ * @method AvS_FastSimpleImport_Model_Import setErrorLimit(boolean $value)
+ * @method boolean getErrorLimit()
  * @method array getDropdownAttributes()
  * @method array getMultiselectAttributes()
  */
@@ -55,6 +57,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_product');
         $entityAdapter->setBehavior($this->getBehavior());
         $entityAdapter->setIsDryrun(false);
+        $entityAdapter->setErrorLimit($this->getErrorLimit());
         $entityAdapter->setDropdownAttributes($this->getDropdownAttributes());
         $entityAdapter->setMultiselectAttributes($this->getMultiselectAttributes());
         $entityAdapter->setImageAttributes($this->getImageAttributes());
@@ -114,6 +117,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_product');
         $entityAdapter->setBehavior($this->getBehavior());
         $entityAdapter->setIsDryRun(true);
+        $entityAdapter->setErrorLimit($this->getErrorLimit());
         $entityAdapter->setDropdownAttributes($this->getDropdownAttributes());
         $entityAdapter->setMultiselectAttributes($this->getMultiselectAttributes());
         $this->setEntityAdapter($entityAdapter);
@@ -140,6 +144,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Customer */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_customer');
         $entityAdapter->setBehavior($this->getBehavior());
+        $entityAdapter->setErrorLimit($this->getErrorLimit());
         $this->setEntityAdapter($entityAdapter);
         $validationResult = $this->validateSource($data);
         if ($this->getProcessedRowsCount() > 0) {
@@ -183,6 +188,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Customer */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_customer');
         $entityAdapter->setBehavior($this->getBehavior());
+        $entityAdapter->setErrorLimit($this->getErrorLimit());
         $this->setEntityAdapter($entityAdapter);
 
         $validationResult = $this->validateSource($data);
@@ -207,6 +213,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Category */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_category');
         $entityAdapter->setBehavior($this->getBehavior());
+        $entityAdapter->setErrorLimit($this->getErrorLimit());
         $entityAdapter->setIgnoreDuplicates($this->getIgnoreDuplicates());
         $this->setEntityAdapter($entityAdapter);
         $validationResult = $this->validateSource($data);
@@ -259,6 +266,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Category */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_category');
         $entityAdapter->setBehavior($this->getBehavior());
+        $entityAdapter->setErrorLimit($this->getErrorLimit());
         $this->setEntityAdapter($entityAdapter);
 
         $validationResult = $this->validateSource($data);

@@ -188,6 +188,18 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     }
 
     /**
+     * Set the error limit when the importer will stop
+     * @param $limit
+     */
+    public function setErrorLimit($limit) {
+        if ($limit) {
+            $this->_errorsLimit = $limit;
+        } else {
+            $this->_errorsLimit = 100;
+        }
+    }
+
+    /**
      * Constructor.
      *
      */
