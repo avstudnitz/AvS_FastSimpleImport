@@ -731,7 +731,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
 
                 $stockItem->setData($row);
 
-                if ($helper->isQty($this->_newSku[$rowData[self::COL_SKU]]['type_id'])) {
+                if ($helper->isQty($this->_newSku[$sku]['type_id'])) {
                     if ($stockItem->verifyNotification()) {
                         $stockItem->setLowStockDate(Mage::app()->getLocale()
                                 ->date(null, null, null, false)
