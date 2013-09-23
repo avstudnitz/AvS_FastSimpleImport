@@ -694,6 +694,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
 
         $entityTable = Mage::getResourceModel('cataloginventory/stock_item')->getMainTable();
         $helper      = Mage::helper('catalogInventory');
+        $sku = null;
 
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
             $stockData = array();
@@ -703,13 +704,18 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                 if (!$this->isRowAllowedToImport($rowData, $rowNum)) {
                     continue;
                 }
-                // only SCOPE_DEFAULT can contain stock data
-                if (self::SCOPE_DEFAULT != $this->getRowScope($rowData)) {
+
+                if (self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
+                    $sku = $rowData[self::COL_SKU];
+                }
+
+                //we have a non-SCOPE_DEFAULT row, we check if it has a stock_id, if not, skip it.
+                if (self::SCOPE_DEFAULT != $this->getRowScope($rowData) && !isset($rowData['stock_id'])) {
                     continue;
                 }
 
-                $row['product_id'] = $this->_newSku[$rowData[self::COL_SKU]]['entity_id'];
-                $row['stock_id'] = 1;
+                $row['product_id'] = $this->_newSku[$sku]['entity_id'];
+                $row['stock_id'] = isset($rowData['stock_id']) ? $rowData['stock_id'] : 1;
 
                 /** @var $stockItem Mage_CatalogInventory_Model_Stock_Item */
                 $stockItem = Mage::getModel('cataloginventory/stock_item');
