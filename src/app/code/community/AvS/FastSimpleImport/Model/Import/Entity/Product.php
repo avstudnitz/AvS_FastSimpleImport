@@ -112,7 +112,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
 
                 $options = $this->_getAttributeOptions($attribute);
 
-                if (!in_array(trim($rowData[$attributeCode]), $options)) {
+                if (!in_array(trim($rowData[$attributeCode]), $options, true)) {
                     $this->_createAttributeOption($attribute, trim($rowData[$attributeCode]));
                 }
             }
@@ -144,7 +144,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
 
                 $options = $this->_getAttributeOptions($attribute);
 
-                if (!in_array(trim($rowData[$attributeCode]), $options)) {
+                if (!in_array(trim($rowData[$attributeCode]), $options, true)) {
                     $this->_createAttributeOption($attribute, trim($rowData[$attributeCode]));
                 }
             }
