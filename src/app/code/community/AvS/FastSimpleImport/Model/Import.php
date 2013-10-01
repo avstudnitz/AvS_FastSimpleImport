@@ -33,6 +33,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $this->setDropdownAttributes(array());
         $this->setMultiselectAttributes(array());
         $this->setAllowRenameFiles(true);
+        $this->setImageAttributes(array());
     }
 
     /**
@@ -400,6 +401,10 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     {
         if (!is_array($attributeCodes)) {
             $attributeCodes = array($attributeCodes);
+            $attributes = Mage::getResourceModel('catalog/product_attribute_collection')->addFieldToFilter('frontend_input', 'media_image');
+            foreach ($attributes as $attribute) {
+                $attributeCodes[] = $attribute->getAttributeCode();
+            }
         }
         $this->setData('image_attributes', $attributeCodes);
         return $this;

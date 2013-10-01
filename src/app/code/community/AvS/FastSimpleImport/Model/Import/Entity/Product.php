@@ -38,6 +38,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         return $this->_allowRenameFiles;
     }
 
+
     /**
      * Source model setter.
      *
