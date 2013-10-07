@@ -385,7 +385,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             Mage::getResourceSingleton('catalog/product_indexer_eav')->catalogProductMassAction($event);
             Mage::getResourceSingleton('catalogsearch/fulltext')->rebuildIndex(null, $entityIds);
 
-            if (Mage::getResourceSingleton('ecomdev_urlrewrite/indexer')) {
+            if (Mage::getResourceModel('ecomdev_urlrewrite/indexer')) {
                 Mage::getResourceSingleton('ecomdev_urlrewrite/indexer')->updateProductRewrites($entityIds);
             } else {
                 /* @var $urlModel Mage_Catalog_Model_Url */
