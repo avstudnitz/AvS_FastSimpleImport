@@ -33,6 +33,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $this->setDropdownAttributes(array());
         $this->setMultiselectAttributes(array());
         $this->setAllowRenameFiles(true);
+        $this->setImageAttributes(array());
     }
 
     /**
@@ -56,6 +57,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setIsDryrun(false);
         $entityAdapter->setDropdownAttributes($this->getDropdownAttributes());
         $entityAdapter->setMultiselectAttributes($this->getMultiselectAttributes());
+        $entityAdapter->setImageAttributes($this->getImageAttributes());
         $entityAdapter->setAllowRenameFiles($this->getAllowRenameFiles());
         $this->setEntityAdapter($entityAdapter);
 
@@ -386,6 +388,25 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
             $attributeCodes = array($attributeCodes);
         }
         $this->setData('multiselect_attributes', $attributeCodes);
+        return $this;
+    }
+
+    /**
+     * Set Attributes which will be handled as images
+     *
+     * @param string|array $attributeCodes
+     * @return AvS_FastSimpleImport_Model_Import
+     */
+    public function setImageAttributes($attributeCodes)
+    {
+        if (!is_array($attributeCodes)) {
+            $attributeCodes = array($attributeCodes);
+            $attributes = Mage::getResourceModel('catalog/product_attribute_collection')->addFieldToFilter('frontend_input', 'media_image');
+            foreach ($attributes as $attribute) {
+                $attributeCodes[] = $attribute->getAttributeCode();
+            }
+        }
+        $this->setData('image_attributes', $attributeCodes);
         return $this;
     }
 }
