@@ -784,6 +784,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
 
     /**
      * Save product media gallery.
+     * Overwritten in order to provide default value for media_attribute_id
      *
      * @param array $mediaGalleryData
      * @return Mage_ImportExport_Model_Import_Entity_Product
