@@ -11,16 +11,17 @@ class AvS_FastSimpleImport_Model_System_Config_Source_Product_Taxclass
 {
     public static function toOptionArray()
     {
-        $options = array(array('value' => '', 'label' => Mage::helper('fastsimpleimport')->__('Please Select')));
+        $options = array(array('value' => '', 'label' => ''));
 
-        $tax_classes = Mage::getModel('tax/class')
-            ->getCollection();
+        $taxClasses = Mage::getModel('tax/class')
+            ->getCollection()
+            ->addFieldToFilter('class_type', Mage_Tax_Model_Class::TAX_CLASS_TYPE_PRODUCT);
 
-        foreach ($tax_classes as $tax_class)
+        foreach ($taxClasses as $taxClass)
         {
             $options[] = array(
-                'value' => $tax_class['class_id'],
-                'label' => $tax_class['class_name'],
+                'value' => $taxClass['class_id'],
+                'label' => $taxClass['class_name'],
             );
         }
         return $options;

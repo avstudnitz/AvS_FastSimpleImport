@@ -27,7 +27,7 @@
                     <show_in_website>0</show_in_website>
                     <show_in_store>0</show_in_store>
                     <fields>
-                        <attribute_set translate="label" module="fastsimpleimport">
+                        <!--<attribute_set translate="label" module="fastsimpleimport">
                             <label>Default Attribute Set</label>
                             <frontend_type>select</frontend_type>
                             <source_model>fastsimpleimport/system_config_source_product_attributeset</source_model>
@@ -35,8 +35,8 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                        </attribute_set>
-                        <website translate="label">
+                        </attribute_set>-->
+                        <!--<website translate="label">
                             <label>Default Website</label>
                             <frontend_type>select</frontend_type>
                             <source_model>fastsimpleimport/system_config_source_product_website</source_model>
@@ -44,7 +44,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                        </website>
+                        </website>-->
                         <status translate="label">
                             <label>Default Status</label>
                             <frontend_type>select</frontend_type>

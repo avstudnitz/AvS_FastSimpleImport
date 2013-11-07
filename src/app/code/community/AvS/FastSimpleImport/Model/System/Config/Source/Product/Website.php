@@ -11,7 +11,7 @@ class AvS_FastSimpleImport_Model_System_Config_Source_Product_Website
 {
     public static function toOptionArray()
     {
-        $options = array(array('value' => '', 'label' => Mage::helper('fastsimpleimport')->__('Please Select')));
+        $options = array(array('value' => '', 'label' => ''));
 
         $websites = Mage::getModel('core/website')
             ->getCollection();

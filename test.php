@@ -34,7 +34,7 @@ echo 'Elapsed time: ' . round(microtime(true) - $time, 2) . 's' . "\n";
 
 // Create/Update products
 $data = array();
-for ($i = 1; $i <= 6000; $i++) {
+for ($i = 1; $i <= 6; $i++) {
 
     $randomString = getUniqueCode(20);
     $data[] = array(
@@ -52,10 +52,10 @@ for ($i = 1; $i <= 6000; $i++) {
         'meta_title' => 'Default',
         'meta_description' => 'Default',
         'meta_keywords' => 'Default',
-        'weight' => 11,
+        //'weight' => 11,
         'status' => 1,
-        'visibility' => 4,
-        'tax_class_id' => 2,
+        //'visibility' => 4,
+        //'tax_class_id' => 2,
         'qty' => 0,
         'is_in_stock' => 0,
         'enable_googlecheckout' => '1',
