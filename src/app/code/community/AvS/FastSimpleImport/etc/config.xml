@@ -20,6 +20,11 @@
                 <class>AvS_FastSimpleImport_Model</class>
             </fastsimpleimport>
         </models>
+		<helpers>
+			<fastsimpleimport>
+				<class>AvS_FastSimpleImport_Helper</class>
+			</fastsimpleimport>
+		</helpers>
         <importexport module="importexport">
             <import_entities>
                 <catalog_category translate="label">
@@ -38,4 +43,14 @@
             </import_product_types>
         </importexport>
 	</global>
+
+	<default>
+		<fastsimpleimport>
+			<product>
+				<status>1</status>
+				<visibility>4</visibility>
+				<weight>0</weight>
+			</product>
+		</fastsimpleimport>
+	</default>
 </config>
