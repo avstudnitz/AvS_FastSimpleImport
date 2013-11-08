@@ -287,7 +287,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                     $path = array();
                     $this->_categories[implode('/', $path)] = $category->getId();
                     for ($i = 1; $i < $pathSize; $i++) {
-                        $path[] = $collection->getItemById($structure[$i])->getName();
+                        $item = $collection->getItemById($structure[$i]);
+                        if ($item instanceof Varien_Object) {
+                            $path[] = $item->getName();
+                        }
                     }
 
                     // additional options for category referencing: name starting from base category, or category id
