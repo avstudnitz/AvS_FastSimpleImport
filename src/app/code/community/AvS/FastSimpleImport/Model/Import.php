@@ -22,8 +22,6 @@
  * @method boolean getIgnoreDuplicates()
  * @method AvS_FastSimpleImport_Model_Import setErrorLimit(boolean $value)
  * @method boolean getErrorLimit()
- * @method array getDropdownAttributes()
- * @method array getMultiselectAttributes()
  */
 class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 {
@@ -417,5 +415,23 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         }
         $this->setData('image_attributes', $attributeCodes);
         return $this;
+    }
+
+    /**
+     * get dropdown attributes
+     *
+     * @return array
+     */
+    public function getDropdownAttributes() {
+        return (array)$this->getData('dropdown_attributes');
+    }
+
+    /**
+     * get multiselect attributes
+     *
+     * @return array
+     */
+    public function getMultiselectAttributes() {
+        return (array)$this->getData('multiselect_attributes');
     }
 }
