@@ -15,9 +15,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Simple
      * Prepare attributes values for save: remove non-existent, remove empty values, remove static.
      *
      * @param array $rowData
+     * @param bool $withDefaultValue
      * @return array
      */
-    public function prepareAttributesForSave(array $rowData)
+    public function prepareAttributesForSave(array $rowData, $withDefaultValue = true)
     {
         $resultAttrs = array();
 
@@ -30,7 +31,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Simple
                             : $rowData[$attrCode];
                 } elseif (array_key_exists($attrCode, $rowData)) {
                     $resultAttrs[$attrCode] = $rowData[$attrCode];
-                } elseif (null !== $attrParams['default_value']) {
+                } elseif ($withDefaultValue && null !== $attrParams['default_value']) {
                     if ($this->_isSkuNew($rowData['sku'])) {
                         $resultAttrs[$attrCode] = $attrParams['default_value'];
                     }
