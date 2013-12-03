@@ -174,7 +174,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      * @param array       $data
      * @param string|null $behavior
      *
-     * @return AvS_FastSimpleImport_Model_Import
+     * @return bool
      */
     public function dryrunCustomerImport($data, $behavior = null)
     {
