@@ -688,6 +688,16 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     }
 
     /**
+     * Returns boolean TRUE if row scope is default (fundamental) scope.
+     *
+     * @param array $rowData
+     * @return bool
+     */
+    protected function _isRowScopeDefault(array $rowData) {
+        return strlen(trim($rowData[self::COL_CATEGORY])) ? true : false;
+    }
+
+    /**
      * Obtain scope of the row from row data.
      *
      * @param array $rowData
