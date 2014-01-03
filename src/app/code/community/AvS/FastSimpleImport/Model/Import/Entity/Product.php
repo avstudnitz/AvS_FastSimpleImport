@@ -444,13 +444,17 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     protected function _getUpdatedProductsSkus()
     {
         $skus = array();
-        foreach ($this->_validatedRows as $rowIndex => $rowValidated) {
-            if (!$rowValidated) {
-                continue;
+
+        $this->getSource()->rewind();
+        while ($this->getSource()->valid()) {
+            $current = $this->getSource()->current();
+            $key = $this->getSource()->key();
+
+            if (! empty($current['sku']) && $this->_validatedRows[$key]) {
+                $skus[] = $current['sku'];
             }
-            $this->getSource()->seek($rowIndex);
-            $rowData = $this->getSource()->current();
-            $skus[] = (string)$rowData['sku'];
+
+            $this->getSource()->next();
         }
         return $skus;
     }
