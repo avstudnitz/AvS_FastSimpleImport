@@ -380,7 +380,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         /* @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
         $productCollection = Mage::getModel('catalog/product')
             ->getCollection()
-            ->addAttributeToFilter('sku', array('in' => $this->_getUpdatedProductsSkus()));
+            ->addAttributeToFilter('sku', array('in' => $this->_getProcessedProductSkus()));
         Mage::dispatchEvent('fastsimpleimport_reindex_products_before', array('collection' => $productCollection));
         $entityIds = $productCollection->getAllIds();
 
@@ -441,20 +441,21 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      *
      * @return array
      */
-    protected function _getUpdatedProductsSkus()
+    protected function _getProcessedProductSkus()
     {
         $skus = array();
+        $source = $this->getSource();
 
-        $this->getSource()->rewind();
-        while ($this->getSource()->valid()) {
-            $current = $this->getSource()->current();
-            $key = $this->getSource()->key();
+        $source->rewind();
+        while ($source->valid()) {
+            $current = $source->current();
+            $key = $source->key();
 
-            if (! empty($current['sku']) && $this->_validatedRows[$key]) {
-                $skus[] = $current['sku'];
+            if (! empty($current[self::COL_SKU]) && $this->_validatedRows[$key]) {
+                $skus[] = $current[self::COL_SKU];
             }
 
-            $this->getSource()->next();
+            $source->next();
         }
         return $skus;
     }
