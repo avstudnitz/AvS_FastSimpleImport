@@ -315,7 +315,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             return $this;
         }
 
-        $skus = $this->_getDeletedProductsSkus();
+        $skus = $this->_getProcessedProductSkus();
 
         $productCollection = Mage::getModel('catalog/product')
             ->getCollection()
@@ -331,20 +331,25 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     }
 
     /**
-     * Archive SKUs of products which are to be deleted
+     * SKUs of products which have been created, updated
      *
      * @return array
      */
-    protected function _getDeletedProductsSkus()
+    protected function _getProcessedProductSkus()
     {
         $skus = array();
-        foreach ($this->_validatedRows as $rowIndex => $rowValidated) {
-            if (!$rowValidated) {
-                continue;
+        $source = $this->getSource();
+
+        $source->rewind();
+        while ($source->valid()) {
+            $current = $source->current();
+            $key = $source->key();
+
+            if (! empty($current[self::COL_SKU]) && $this->_validatedRows[$key]) {
+                $skus[] = $current[self::COL_SKU];
             }
-            $this->getSource()->seek($rowIndex);
-            $rowData = $this->getSource()->current();
-            $skus[] = (string)$rowData['sku'];
+
+            $source->next();
         }
         return $skus;
     }
@@ -491,12 +496,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      */
     protected function _indexDeleteEvents()
     {
+        Mage::dispatchEvent('fastsimpleimport_reindex_products_delete_before');
         Mage::getSingleton('index/indexer')->indexEvents(
             Mage_CatalogInventory_Model_Stock_Item::ENTITY, Mage_Index_Model_Event::TYPE_DELETE
         );
         Mage::getSingleton('index/indexer')->indexEvents(
             Mage_Catalog_Model_Product::ENTITY, Mage_Index_Model_Event::TYPE_DELETE
         );
+        Mage::dispatchEvent('fastsimpleimport_reindex_products_delete_after');
     }
 
     /**
