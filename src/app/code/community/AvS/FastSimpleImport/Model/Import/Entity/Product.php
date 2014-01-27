@@ -377,12 +377,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      */
     protected function _reindexUpdatedProducts()
     {
-        /* @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
-        $productCollection = Mage::getModel('catalog/product')
-            ->getCollection()
-            ->addAttributeToFilter('sku', array('in' => $this->_getProcessedProductSkus()));
-        Mage::dispatchEvent('fastsimpleimport_reindex_products_before', array('collection' => $productCollection));
-        $entityIds = $productCollection->getAllIds();
+        $entityIds = $this->_getProcessedProductIds();
 
         /*
          * Generate a fake mass update event that we pass to our indexers.
@@ -436,28 +431,30 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         return $this;
     }
 
+
     /**
-     * Archive SKUs of products which have been created
+     * Ids of products which have been created, updated or deleted
      *
      * @return array
      */
-    protected function _getProcessedProductSkus()
+    protected function _getProcessedProductIds()
     {
-        $skus = array();
+        $productIds = array();
         $source = $this->getSource();
 
         $source->rewind();
         while ($source->valid()) {
             $current = $source->current();
-            $key = $source->key();
-
-            if (! empty($current[self::COL_SKU]) && $this->_validatedRows[$key]) {
-                $skus[] = $current[self::COL_SKU];
+            if (! empty($current['sku']) && isset($this->_oldSku[$current[self::COL_SKU]])) {
+                $productIds[] = $this->_oldSku[$current[self::COL_SKU]]['entity_id'];
+            } elseif (! empty($current['sku']) && isset($this->_newSku[$current[self::COL_SKU]])) {
+                $productIds[] = $this->_newSku[$current[self::COL_SKU]]['entity_id'];
             }
 
             $source->next();
         }
-        return $skus;
+
+        return $productIds;
     }
 
 
