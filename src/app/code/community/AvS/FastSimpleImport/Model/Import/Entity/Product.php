@@ -807,4 +807,20 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         }
         return $this->_fileUploader;
     }
+
+    /**
+     * Removes empty keys in case value is null or empty string
+     *
+     * @param array $rowData
+     */
+    protected function _filterRowData(&$rowData)
+    {
+        $rowData = array_filter($rowData, 'strlen');
+        if (!isset($rowData[self::COL_SKU])) {
+            $rowData[self::COL_SKU] = null;
+        }
+        if (!isset($rowData[self::COL_ATTR_SET])) {
+            $rowData[self::COL_ATTR_SET] = null;
+        }
+    }
 }
