@@ -197,6 +197,38 @@ try {
 }
 ```
 
+* **NEW:** Import category product relation:
+
+```php
+$data = array();
+$data[] = array(
+    '_root' => 'Default Category',
+    '_category' => 'Test2',
+    '_sku' => '4711',
+    'position' => 1
+);
+$data[] = array(
+    '_root' => 'Default Category',
+    '_category' => 'Test2',
+    '_sku' => '0815',
+    'position' => 2
+);
+$data[] = array(
+    '_root' => 'Default Category',
+    '_category' => 'Test2/Test3',
+    '_sku' => '0815',
+    'position' => 1
+);
+
+/** @var $import AvS_FastSimpleImport_Model_Import */
+$import = Mage::getModel('fastsimpleimport/import');
+try {
+    $import->processCategoryProductImport($data);
+} catch (Exception $e) {
+    print_r($import->getErrorMessages());
+}
+```
+
 ### Limitations / Wiki
 
 Refer to the [project wiki](https://github.com/avstudnitz/AvS_FastSimpleImport/wiki) for more information on known issues or limitations.
