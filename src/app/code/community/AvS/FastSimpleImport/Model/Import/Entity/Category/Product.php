@@ -16,20 +16,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
     const BUNCH_SIZE = 20;
 
     /**
-     * Data row scopes.
-     */
-    const SCOPE_DEFAULT = 1;
-    const SCOPE_WEBSITE = 2;
-    const SCOPE_STORE   = 0;
-    const SCOPE_NULL    = -1;
-
-    /**
      * Permanent column names.
      *
      * Names that begins with underscore is not an attribute. This name convention is for
      * to avoid interference with same attribute name.
      */
-    const COL_STORE    = '_store';
     const COL_ROOT     = '_root';
     const COL_CATEGORY = '_category';
     const COL_SKU      = '_sku';
@@ -37,18 +28,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
     /**
      * Error codes.
      */
-    const ERROR_INVALID_SCOPE                 = 'invalidScope';
-    const ERROR_INVALID_WEBSITE               = 'invalidWebsite';
-    const ERROR_INVALID_STORE                 = 'invalidStore';
     const ERROR_INVALID_ROOT                  = 'invalidRoot';
     const ERROR_CATEGORY_IS_EMPTY             = 'categoryIsEmpty';
     const ERROR_PARENT_NOT_FOUND              = 'parentNotFound';
     const ERROR_NO_DEFAULT_ROW                = 'noDefaultRow';
-    const ERROR_DUPLICATE_CATEGORY            = 'duplicateCategory';
-    const ERROR_DUPLICATE_SCOPE               = 'duplicateScope';
     const ERROR_ROW_IS_ORPHAN                 = 'rowIsOrphan';
-    const ERROR_VALUE_IS_REQUIRED             = 'valueIsRequired';
-    const ERROR_CATEGORY_NOT_FOUND_FOR_DELETE = 'categoryNotFoundToDelete';
 
     /**
      * Categories text-path to ID hash with roots checking.
@@ -82,18 +66,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
      * @var array
      */
     protected $_messageTemplates = array(
-        self::ERROR_INVALID_SCOPE                 => 'Invalid value in Scope column',
-        self::ERROR_INVALID_WEBSITE               => 'Invalid value in Website column (website does not exists?)',
-        self::ERROR_INVALID_STORE                 => 'Invalid value in Store column (store does not exists?)',
         self::ERROR_INVALID_ROOT                  => 'Root category doesn\'t exist',
         self::ERROR_CATEGORY_IS_EMPTY             => 'Category is empty',
         self::ERROR_PARENT_NOT_FOUND              => 'Parent Category is not found, add parent first',
         self::ERROR_NO_DEFAULT_ROW                => 'Default values row does not exists',
-        self::ERROR_DUPLICATE_CATEGORY            => 'Duplicate category',
-        self::ERROR_DUPLICATE_SCOPE               => 'Duplicate scope',
         self::ERROR_ROW_IS_ORPHAN                 => 'Orphan rows that will be skipped due default row errors',
-        self::ERROR_VALUE_IS_REQUIRED             => 'Required attribute \'%s\' has an empty value',
-        self::ERROR_CATEGORY_NOT_FOUND_FOR_DELETE => 'Category not found for delete'
     );
 
     /**
@@ -102,7 +79,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
      * @var array
      */
     protected $_particularAttributes = array(
-        self::COL_STORE, self::COL_ROOT, self::COL_CATEGORY, self::COL_SKU
+        self::COL_ROOT, self::COL_CATEGORY, self::COL_SKU
     );
 
     /**
@@ -426,24 +403,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
     }
 
     /**
-     * Obtain scope of the row from row data.
-     *
-     * @param array $rowData
-     *
-     * @return int
-     */
-    public function getRowScope(array $rowData)
-    {
-        if (strlen(trim($rowData[self::COL_CATEGORY]))) {
-            return self::SCOPE_DEFAULT;
-        } elseif (empty($rowData[self::COL_STORE])) {
-            return self::SCOPE_NULL;
-        } else {
-            return self::SCOPE_STORE;
-        }
-    }
-
-    /**
      * Get the categorie's parent ID
      *
      * @param array $rowData
@@ -486,42 +445,36 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
         }
         $this->_validatedRows[$rowNum] = TRUE;
 
-        $rowScope = $this->getRowScope($rowData);
+        $this->_processedEntitiesCount++;
 
-        // common validation
-        if (self::SCOPE_DEFAULT == $rowScope) { // category is specified, row is SCOPE_DEFAULT, new category block begins
+        $root     = $rowData[self::COL_ROOT];
+        $category = $rowData[self::COL_CATEGORY];
 
-            $this->_processedEntitiesCount++;
+        //check if parent category exists
+        if ($this->_getParentCategory($rowData) === FALSE) {
+            $this->addRowError(self::ERROR_PARENT_NOT_FOUND, $rowNum);
+            return FALSE;
+        }
 
-            $root     = $rowData[self::COL_ROOT];
-            $category = $rowData[self::COL_CATEGORY];
-
-            //check if parent category exists
-            if ($this->_getParentCategory($rowData) === FALSE) {
-                $this->addRowError(self::ERROR_PARENT_NOT_FOUND, $rowNum);
-                return FALSE;
-            }
-
-            if (!isset($this->_categoriesWithRoots[$root][$category])) {
-                // validate new category type and attribute set
-                if (isset($this->_invalidRows[$rowNum])) {
-                    // mark SCOPE_DEFAULT row as invalid for future child rows if category not in DB already
-                    $category = FALSE;
-                }
-            }
-
-            //check if the root exists
-            if (!isset($this->_categoriesWithRoots[$root])) {
-                $this->addRowError(self::ERROR_INVALID_ROOT, $rowNum);
-                return FALSE;
-            }
-        } else {
-            if (NULL === $category) {
-                $this->addRowError(self::ERROR_CATEGORY_IS_EMPTY, $rowNum);
-            } elseif (FALSE === $category) {
-                $this->addRowError(self::ERROR_ROW_IS_ORPHAN, $rowNum);
+        if (!isset($this->_categoriesWithRoots[$root][$category])) {
+            // validate new category type and attribute set
+            if (isset($this->_invalidRows[$rowNum])) {
+                $category = FALSE;
             }
         }
+
+        //check if the root exists
+        if (!isset($this->_categoriesWithRoots[$root])) {
+            $this->addRowError(self::ERROR_INVALID_ROOT, $rowNum);
+            return FALSE;
+        }
+
+        if (NULL === $category) {
+            $this->addRowError(self::ERROR_CATEGORY_IS_EMPTY, $rowNum);
+        } elseif (FALSE === $category) {
+            $this->addRowError(self::ERROR_ROW_IS_ORPHAN, $rowNum);
+        }
+
         return !isset($this->_invalidRows[$rowNum]);
     }
 
