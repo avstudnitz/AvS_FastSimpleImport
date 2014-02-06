@@ -51,6 +51,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         }
 
         $this->setEntity(Mage_Catalog_Model_Product::ENTITY);
+        $partialIndexing = $this->getPartialIndexing();
 
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Product */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_product');
@@ -80,7 +81,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
             }
 
             if ($this->getProcessedRowsCount() > $this->getInvalidRowsCount()) {
-                if ($this->getPartialIndexing()) {
+                if (!empty($partialIndexing)) {
 
                     $this->_prepareDeletedProductsReindex();
                     $this->importSource();
@@ -210,7 +211,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         }
 
         $this->setEntity(Mage_Catalog_Model_Category::ENTITY);
-
+        $partialIndexing = $this->getPartialIndexing();
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Category */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_category');
         $entityAdapter->setBehavior($this->getBehavior());
@@ -237,7 +238,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 
                 $this->getEntityAdapter()->updateChildrenCount();
 
-                if ($this->getPartialIndexing()) {
+                if (!empty($partialIndexing)) {
                     $this->getEntityAdapter()->reindexImportedCategories();
                 } else {
                     $this->invalidateIndex();
@@ -287,8 +288,8 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         if (!is_null($behavior)) {
             $this->setBehavior($behavior);
         }
-
         $this->setEntity('category_product');
+        $partialIndexing = $this->getPartialIndexing();
 
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Category_Product */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_category_product');
@@ -311,10 +312,10 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
                 }
             }
 
-            if ($this->getProcessedRowsCount() > $this->getInvalidRowsCount()) {
 
-                $this->importSource();
-                if ($this->getPartialIndexing()) {
+            if ($this->getProcessedRowsCount() > $this->getInvalidRowsCount()) {
+                $this->importSource(); // this resets the internal previously set _data array :-( that's why $partialIndexing is needed
+                if (!empty($partialIndexing)) {
                     $this->getEntityAdapter()->reindexImportedCategoryProduct();
                 }
             }

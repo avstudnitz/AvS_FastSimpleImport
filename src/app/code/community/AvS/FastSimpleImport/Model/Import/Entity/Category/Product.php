@@ -21,6 +21,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
      * Names that begins with underscore is not an attribute. This name convention is for
      * to avoid interference with same attribute name.
      */
+    const COL_STORE    = '_store';
     const COL_ROOT     = '_root';
     const COL_CATEGORY = '_category';
     const COL_SKU      = '_sku';
@@ -28,11 +29,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
     /**
      * Error codes.
      */
-    const ERROR_INVALID_ROOT                  = 'invalidRoot';
-    const ERROR_CATEGORY_IS_EMPTY             = 'categoryIsEmpty';
-    const ERROR_PARENT_NOT_FOUND              = 'parentNotFound';
-    const ERROR_NO_DEFAULT_ROW                = 'noDefaultRow';
-    const ERROR_ROW_IS_ORPHAN                 = 'rowIsOrphan';
+    const ERROR_INVALID_ROOT      = 'invalidRoot';
+    const ERROR_CATEGORY_IS_EMPTY = 'categoryIsEmpty';
+    const ERROR_PARENT_NOT_FOUND  = 'parentNotFound';
+    const ERROR_NO_DEFAULT_ROW    = 'noDefaultRow';
+    const ERROR_ROW_IS_ORPHAN     = 'rowIsOrphan';
 
     /**
      * Categories text-path to ID hash with roots checking.
@@ -66,11 +67,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
      * @var array
      */
     protected $_messageTemplates = array(
-        self::ERROR_INVALID_ROOT                  => 'Root category doesn\'t exist',
-        self::ERROR_CATEGORY_IS_EMPTY             => 'Category is empty',
-        self::ERROR_PARENT_NOT_FOUND              => 'Parent Category is not found, add parent first',
-        self::ERROR_NO_DEFAULT_ROW                => 'Default values row does not exists',
-        self::ERROR_ROW_IS_ORPHAN                 => 'Orphan rows that will be skipped due default row errors',
+        self::ERROR_INVALID_ROOT      => 'Root category doesn\'t exist',
+        self::ERROR_CATEGORY_IS_EMPTY => 'Category is empty',
+        self::ERROR_PARENT_NOT_FOUND  => 'Parent Category is not found, add parent first',
+        self::ERROR_NO_DEFAULT_ROW    => 'Default values row does not exists',
+        self::ERROR_ROW_IS_ORPHAN     => 'Orphan rows that will be skipped due default row errors',
     );
 
     /**
@@ -79,7 +80,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
      * @var array
      */
     protected $_particularAttributes = array(
-        self::COL_ROOT, self::COL_CATEGORY, self::COL_SKU
+        self::COL_STORE, self::COL_ROOT, self::COL_CATEGORY, self::COL_SKU
     );
 
     /**
@@ -510,26 +511,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
      */
     public function reindexImportedCategoryProduct()
     {
-        switch ($this->getBehavior()) {
-            case Mage_ImportExport_Model_Import::BEHAVIOR_DELETE:
-                $this->_indexDeleteEvents();
-                break;
-            case Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE:
-            case Mage_ImportExport_Model_Import::BEHAVIOR_APPEND:
-
-                $this->_reindexUpdatedCategories();
-                break;
-        }
-    }
-
-    protected function _indexDeleteEvents()
-    {
-        //not yet implemented
-    }
-
-    protected function _reindexUpdatedCategories()
-    {
         $indexProcess = Mage::getSingleton('index/indexer')->getProcessByCode('catalog_category_product');
+        Zend_Debug::dump($indexProcess);
+
         if ($indexProcess) {
             $indexProcess->changeStatus(Mage_Index_Model_Process::STATUS_REQUIRE_REINDEX);
         }
