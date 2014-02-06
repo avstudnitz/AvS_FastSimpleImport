@@ -8,18 +8,25 @@
  */
 -->
 <config>
-	<modules>
-		<AvS_FastSimpleImport>
-			<version>0.3.0</version>
-		</AvS_FastSimpleImport>
-	</modules>
+    <modules>
+        <AvS_FastSimpleImport>
+            <version>0.3.0</version>
+        </AvS_FastSimpleImport>
+    </modules>
 
-	<global>
-		<models>
+    <global>
+        <models>
             <fastsimpleimport>
                 <class>AvS_FastSimpleImport_Model</class>
             </fastsimpleimport>
         </models>
+
+        <helpers>
+            <fastsimpleimport>
+                <class>AvS_FastSimpleImport_Helper</class>
+            </fastsimpleimport>
+        </helpers>
+
         <importexport module="importexport">
             <import_entities>
                 <catalog_category translate="label">
@@ -27,8 +34,7 @@
                     <label>Category</label>
                 </catalog_category>
             </import_entities>
-        </importexport>
-        <importexport>
+
             <import_product_types>
                 <simple>fastsimpleimport/import_entity_product_type_simple</simple>
                 <configurable>fastsimpleimport/import_entity_product_type_configurable</configurable>
@@ -37,5 +43,27 @@
                 <bundle>fastsimpleimport/import_entity_product_type_bundle</bundle>
             </import_product_types>
         </importexport>
-	</global>
+    </global>
+
+    <adminhtml>
+        <translate>
+            <modules>
+                <avs_fastsimpleimport>
+                    <files>
+                        <default>AvS_FastSimpleImport.csv</default>
+                    </files>
+                </avs_fastsimpleimport>
+            </modules>
+        </translate>
+    </adminhtml>
+
+    <default>
+        <fastsimpleimport>
+            <product>
+                <status>1</status>
+                <visibility>4</visibility>
+                <weight>0</weight>
+            </product>
+        </fastsimpleimport>
+    </default>
 </config>

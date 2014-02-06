@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category   AvS
+ * @package    AvS_FastSimpleImport
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software Licence 3.0 (OSL-3.0)
+ * @author     Volker Thiel <v.thiel@loewenstark.de>
+ */
+-->
+<config>
+    <sections>
+        <fastsimpleimport translate="label" module="fastsimpleimport">
+            <class>separator-top</class>
+            <label>Fast Simple Import</label>
+            <tab>service</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>40</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>0</show_in_website>
+            <show_in_store>0</show_in_store>
+            <groups>
+                <product>
+                    <label>Product Import</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>100</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <!--<attribute_set translate="label" module="fastsimpleimport">
+                            <label>Default Attribute Set</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>fastsimpleimport/system_config_source_product_attributeset</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </attribute_set>-->
+                        <!--<website translate="label">
+                            <label>Default Website</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>fastsimpleimport/system_config_source_product_website</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </website>-->
+                        <status translate="label">
+                            <label>Default Status</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>fastsimpleimport/system_config_source_product_status</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </status>
+                        <visibility translate="label">
+                            <label>Default Visibility</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>fastsimpleimport/system_config_source_product_visibility</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </visibility>
+                        <tax_class_id translate="label">
+                            <label>Default Tax Class</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>fastsimpleimport/system_config_source_product_taxclass</source_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </tax_class_id>
+                        <weight translate="label">
+                            <label>Default Weight</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-number</validate>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </weight>
+                    </fields>
+                </product>
+            </groups>
+        </fastsimpleimport>
+    </sections>
+</config>
