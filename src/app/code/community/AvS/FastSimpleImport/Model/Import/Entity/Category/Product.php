@@ -512,8 +512,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
     public function reindexImportedCategoryProduct()
     {
         $indexProcess = Mage::getSingleton('index/indexer')->getProcessByCode('catalog_category_product');
-        Zend_Debug::dump($indexProcess);
-
         if ($indexProcess) {
             $indexProcess->changeStatus(Mage_Index_Model_Process::STATUS_REQUIRE_REINDEX);
         }
