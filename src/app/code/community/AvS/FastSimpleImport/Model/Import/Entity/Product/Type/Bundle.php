@@ -234,9 +234,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
      * Prepare attributes values for save: remove non-existent, remove empty values, remove static.
      *
      * @param array $rowData
+     * @param bool $withDefaultValue
      * @return array
      */
-    public function prepareAttributesForSave(array $rowData)
+    public function prepareAttributesForSave(array $rowData, $withDefaultValue = true)
     {
         $resultAttrs = array();
 

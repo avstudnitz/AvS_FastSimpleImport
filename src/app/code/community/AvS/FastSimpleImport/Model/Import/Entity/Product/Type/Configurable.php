@@ -31,7 +31,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
                             : $rowData[$attrCode];
                 } elseif (array_key_exists($attrCode, $rowData)) {
                     $resultAttrs[$attrCode] = $rowData[$attrCode];
-                } elseif ($withDefaultValue || $this->_isSkuNew($rowData['sku'])) {
+                } elseif ($this->_isSkuNew($rowData['sku'])) {
                     $defaultValue = $this->_getDefaultValue($attrParams);
                     if (null !== $defaultValue) {
                         $resultAttrs[$attrCode] = $defaultValue;
@@ -43,6 +43,71 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
     }
 
     /**
+     * Validate row attributes. Pass VALID row data ONLY as argument.
+     *
+     * @param array $rowData
+     * @param int $rowNum
+     * @param boolean $checkRequiredAttributes OPTIONAL Flag which can disable validation required values.
+     * @return boolean
+     */
+    public function isRowValid(array $rowData, $rowNum, $checkRequiredAttributes = true)
+    {
+        $error    = false;
+        $rowScope = $this->_entityModel->getRowScope($rowData);
+
+        if (Mage_ImportExport_Model_Import_Entity_Product::SCOPE_NULL != $rowScope) {
+            foreach ($this->_getProductAttributes($rowData) as $attrCode => $attrParams) {
+                // check value for non-empty in the case of required attribute?
+                if (isset($rowData[$attrCode]) && strlen($rowData[$attrCode])) {
+                    $error |= !$this->_entityModel->isAttributeValid($attrCode, $attrParams, $rowData, $rowNum);
+                } elseif (
+                    $this->_isAttributeRequiredCheckNeeded($attrCode)
+                    && $checkRequiredAttributes
+                    && Mage_ImportExport_Model_Import_Entity_Product::SCOPE_DEFAULT == $rowScope
+                    && $attrParams['is_required']
+                    && is_null($this->_getDefaultValue($attrParams))
+                ) {
+                    $this->_entityModel->addRowError(
+                        Mage_ImportExport_Model_Import_Entity_Product::ERROR_VALUE_IS_REQUIRED, $rowNum, $attrCode
+                    );
+                    $error = true;
+                }
+            }
+        }
+        $error |= !$this->_isParticularAttributesValid($rowData, $rowNum);
+
+        return !$error;
+    }
+
+    /**
+     * Get configured default value for attribute
+     *
+     * @param array $attrParams
+     * @return mixed|null
+     */
+    protected function _getDefaultValue($attrParams)
+    {
+        switch ($attrParams['code']) {
+
+            case 'tax_class_id':
+            case 'status':
+            case 'visibility':
+            case 'weight':
+                $defaultValue = Mage::getStoreConfig('fastsimpleimport/product/' . $attrParams['code']);
+                if (strlen($defaultValue)) {
+                    return $defaultValue;
+                }
+                break;
+        }
+
+        if (null !== $attrParams['default_value']) {
+            return $attrParams['default_value'];
+        }
+
+        return null;
+    }
+
+    /**
      * Check if the given sku belongs to a new product or an existing one
      *
      * @param $sku
@@ -50,6 +115,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
      */
     protected function _isSkuNew($sku)
     {
+        if ($sku == '') {
+            return false;
+        }
         $oldSkus = $this->_entityModel->getOldSku();
         return !isset($oldSkus[$sku]);
     }

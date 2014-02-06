@@ -898,7 +898,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                     'store_id' => Mage_Catalog_Model_Abstract::DEFAULT_STORE_ID,
                     'label'    => $insertValue['label'],
                     'position' => $insertValue['position'],
-		    'disabled' => isset($insertValue['disabled']) ? $insertValue['disabled'] : 0,
+		            'disabled' => isset($insertValue['disabled']) ? $insertValue['disabled'] : 0,
                 );
 
                 try {
