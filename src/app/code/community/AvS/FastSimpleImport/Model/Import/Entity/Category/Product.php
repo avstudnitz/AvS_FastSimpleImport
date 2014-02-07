@@ -62,6 +62,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
     protected $_skuEntityIds = array();
 
     /**
+     * Checks if a category has already been cleaned out (delete from catalog_category_product where category_id=X
+     *
+     * @var array
+     */
+    protected $_categoryCleaned = array();
+
+    /**
      * Validation failure message template definitions
      *
      * @var array
@@ -238,7 +245,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
                     $path[] = $collection->getItemById($structure[$i])->getName();
                 }
                 $rootCategoryName = array_shift($path);
-                if (!isset($this->_categoriesWithRoots[$rootCategoryName])) {
+                if (FALSE === isset($this->_categoriesWithRoots[$rootCategoryName])) {
                     $this->_categoriesWithRoots[$rootCategoryName] = array();
                 }
                 $index = $this->_implodeEscaped('/', $path);
@@ -269,12 +276,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
         $categoryIds         = array();
         foreach ($bunch as $rowNum => $rowData) {
             if ($this->validateRow($rowData, $rowNum)) {
-                $skus[] = $rowData[self::COL_SKU];
-                $catId  = isset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]])
+                $skus[$rowData[self::COL_SKU]] = $rowData[self::COL_SKU];
+                $catId                         = isset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]])
                     ? (int)$this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]]['entity_id']
                     : 0;
-                if ($catId > 0) {
-                    $categoryIds[] = $catId;
+                if ($catId > 0 && FALSE === isset($this->_categoryCleaned[$catId])) {
+                    $categoryIds[$catId]            = $catId;
+                    $this->_categoryCleaned[$catId] = TRUE;
                 }
             }
         }
@@ -334,12 +342,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
 
                 if ($catId > 0 && $prodId > 0) {
                     $entityRowsIn[] = $entityRow;
-                } else {
-                    // product or category not found
-                    // echo $rowData[self::COL_SKU] . "\n";
                 }
             }
-
             $this->_saveCategoryProductRelation($entityRowsIn);
         }
         return $this;
