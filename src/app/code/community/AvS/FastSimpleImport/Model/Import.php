@@ -33,11 +33,12 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $this->setPartialIndexing(Mage::getStoreConfigFlag('fastsimpleimport/general/partial_indexing'));
         $this->setContinueAfterErrors(Mage::getStoreConfigFlag('fastsimpleimport/general/continue_after_errors'));
         $this->setErrorLimit(Mage::getStoreConfig('fastsimpleimport/general/error_limit'));
+        $this->setUseNestedArrays(Mage::getStoreConfigFlag('fastsimpleimport/general/support_nested_arrays'));
+        $this->setIgnoreDuplicates(Mage::getStoreConfigFlag('fastsimpleimport/general/ignore_duplicates'));
         $this->setDropdownAttributes(explode(',', Mage::getStoreConfig('fastsimpleimport/product/select_attributes')));
         $this->setMultiselectAttributes(explode(',', Mage::getStoreConfig('fastsimpleimport/product/multiselect_attributes')));
-        $this->setAllowRenameFiles(true);
-        $this->setImageAttributes(array());
-        $this->setUseNestedArrays(Mage::getStoreConfigFlag('fastsimpleimport/general/support_nested_arrays'));
+        $this->setAllowRenameFiles(Mage::getStoreConfigFlag('fastsimpleimport/product/allow_rename_files'));
+        $this->setImageAttributes(explode(',', Mage::getStoreConfig('fastsimpleimport/product/additional_image_attributes')));
     }
 
     /**

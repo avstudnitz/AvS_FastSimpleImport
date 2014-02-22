@@ -1,6 +1,6 @@
 <?php
 /**
- * Attribute Set Source Model
+ * Multiselect Attributes Source Model
  *
  * @category   AvS
  * @package    AvS_FastSimpleImport
