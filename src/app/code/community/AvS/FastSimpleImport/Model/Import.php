@@ -16,14 +16,14 @@
  * @method boolean getPartialIndexing()
  * @method AvS_FastSimpleImport_Model_Import setContinueAfterErrors(boolean $value)
  * @method boolean getContinueAfterErrors()
- * @method AvS_FastSimpleImport_Model_Import setAllowRenameFiles(boolean $value)
- * @method boolean getAllowRenameFiles()
- * @method AvS_FastSimpleImport_Model_Import setIgnoreDuplicates(boolean $value)
- * @method boolean getIgnoreDuplicates()
  * @method AvS_FastSimpleImport_Model_Import setErrorLimit(boolean $value)
  * @method boolean getErrorLimit()
  * @method AvS_FastSimpleImport_Model_Import setUseNestedArrays(boolean $value)
  * @method boolean getUseNestedArrays()
+ * @method AvS_FastSimpleImport_Model_Import setIgnoreDuplicates(boolean $value)
+ * @method boolean getIgnoreDuplicates()
+ * @method AvS_FastSimpleImport_Model_Import setAllowRenameFiles(boolean $value)
+ * @method boolean getAllowRenameFiles()
  */
 class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 {
