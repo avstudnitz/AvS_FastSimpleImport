@@ -2,15 +2,15 @@
 layout: default
 title: FastSimpleImport - Usage
 ---
-
-<h2>Basic Usage</h2>
+<h2>Usage</h2>
+        
+<h3>Basic Usage</h3>
 
 <p>After installation, call the module like this to import a single product:</p>
 
 <div class="highlight highlight-php">
-    <pre>
-    // Import product:
-    $data = array(
+    <pre>// Import product:
+$data = array(
     array(
         'sku' => '1234567',
         '_type' => 'simple',
@@ -25,16 +25,15 @@ title: FastSimpleImport - Usage
         'visibility' => 4,
         'tax_class_id' => 2,
         'qty' => 76,
-        ),
-        // add more products here
-    );
-        
-    /** @var $import AvS_FastSimpleImport_Model_Import */
-    $import = Mage::getModel('fastsimpleimport/import');
-    try {
-        $import->processProductImport($data);
-    } catch (Exception $e) {
-        print_r($import->getErrorMessages());
-    }
-    </pre>
+    ),
+    // add more products here
+);
+    
+/** @var $import AvS_FastSimpleImport_Model_Import */
+$import = Mage::getModel('fastsimpleimport/import');
+try {
+    $import->processProductImport($data);
+} catch (Exception $e) {
+    print_r($import->getErrorMessages());
+}</pre>
 </div>
