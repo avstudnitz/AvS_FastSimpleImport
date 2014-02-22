@@ -165,13 +165,13 @@ header .page-navigation {
 
 header .page-navigation p {
     margin-bottom: 0;
-    padding: 3px 0;
 }
 
 header .page-navigation p a {
     font-weight: bold;
     width: 100%;
     display: block;
+    padding: 3px 0;
 }
 
 header .page-navigation p a:hover {
