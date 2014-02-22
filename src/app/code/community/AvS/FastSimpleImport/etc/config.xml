@@ -66,4 +66,13 @@
             </product>
         </fastsimpleimport>
     </default>
+
+
+    <phpunit>
+        <suite>
+            <modules>
+                <AvS_FastSimpleImport/>
+            </modules>
+        </suite>
+    </phpunit>
 </config>
