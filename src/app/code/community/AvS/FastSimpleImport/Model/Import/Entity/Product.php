@@ -630,7 +630,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             case 'varchar':
                 $val   = Mage::helper('core/string')->cleanString($rowData[$attrCode]);
                 $valid = Mage::helper('core/string')->strlen($val) < self::DB_MAX_VARCHAR_LENGTH;
-                $message = 'String is too long, only ' . self::DB_MAX_VARCHAR_LENGTH . ' characters allowed. Your Input: '.$rowData[$attrCode]. ' Length: '.strlen($val);
+                $message = 'String is too long, only ' . self::DB_MAX_VARCHAR_LENGTH . ' characters allowed. Your input: '.$rowData[$attrCode]. ', length: '.strlen($val);
                 break;
             case 'decimal':
                 $val   = trim($rowData[$attrCode]);
@@ -645,7 +645,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                     break;
                 }
                 $valid = isset($attrParams['options'][strtolower($rowData[$attrCode])]);
-                $message = 'Possible options are: ' . implode(', ', array_keys($attrParams['options'])).' Your Input: '.$rowData[$attrCode];
+                $message = 'Possible options are: ' . implode(', ', array_keys($attrParams['options'])).'. Your input: '.$rowData[$attrCode];
                 break;
             case 'int':
                 $val   = trim($rowData[$attrCode]);
@@ -661,7 +661,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             case 'text':
                 $val   = Mage::helper('core/string')->cleanString($rowData[$attrCode]);
                 $valid = Mage::helper('core/string')->strlen($val) < self::DB_MAX_TEXT_LENGTH;
-                $message = 'String is too long, only ' . self::DB_MAX_TEXT_LENGTH . ' characters allowed. Your Input: '.$rowData[$attrCode]. ' Length: '.strlen($val);;
+                $message = 'String is too long, only ' . self::DB_MAX_TEXT_LENGTH . ' characters allowed. Your input: '.$rowData[$attrCode]. ', length: '.strlen($val);;
                 break;
             default:
                 $valid = true;
