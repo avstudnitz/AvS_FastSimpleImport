@@ -1,0 +1,30 @@
+1234567-1:
+  type_id: simple
+  attribute_set_id: 4
+  name: Default
+  price: 0.99
+  description: Default
+  short_description: Default
+  weight: 0
+  status: 1
+  visibility: 4
+  tax_class_id: 2
+1234567-stock:
+  qty: 76
+  manage_stock: 1
+  is_in_stock: 1
+rokko-11-sku-1:
+  type_id: simple
+  attribute_set_id: 4
+  name: Default
+  price: 99.99
+  description: This is a <strong>süper</strong> description just for SEO
+  short_description: This is a short description! Surprised?
+  weight: 0
+  status: 2
+  visibility: 1
+  tax_class_id: 4
+rokko-11-sku-stock:
+  qty: 11
+  manage_stock: 0
+  is_in_stock: 1

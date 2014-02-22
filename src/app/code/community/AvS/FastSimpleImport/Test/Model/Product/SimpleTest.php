@@ -5,7 +5,7 @@
  * Time: 11:42
  */
 
-class AvS_FastSimpleImport_Test_Model_Import extends EcomDev_PHPUnit_Test_Case
+class AvS_FastSimpleImport_Test_Model_Product_SimpleTest extends EcomDev_PHPUnit_Test_Case
 {
 
     /**
@@ -13,9 +13,9 @@ class AvS_FastSimpleImport_Test_Model_Import extends EcomDev_PHPUnit_Test_Case
      * @loadExpectation
      * @dataProvider dataProvider
      */
-    public function simpleProduct($values)
+    public function createProduct($values)
     {
-        Mage::getSingleton('fastsimpleimport/import')->processProductImport($values);
+        Mage::getModel('fastsimpleimport/import')->processProductImport($values);
 
         $sku = (string) $values[0]['sku'];
         $product = Mage::getModel('catalog/product');
@@ -32,6 +32,6 @@ class AvS_FastSimpleImport_Test_Model_Import extends EcomDev_PHPUnit_Test_Case
             $this->assertEquals($value, $stock->getData($key),null,0);
         }
 
-
+        $this->assertNull($product->getNotExistingAttribute());
     }
 }
