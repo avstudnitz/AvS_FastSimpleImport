@@ -22,18 +22,22 @@
  * @method boolean getIgnoreDuplicates()
  * @method AvS_FastSimpleImport_Model_Import setErrorLimit(boolean $value)
  * @method boolean getErrorLimit()
+ * @method AvS_FastSimpleImport_Model_Import setUseNestedArrays(boolean $value)
+ * @method boolean getUseNestedArrays()
  */
 class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 {
     protected function _construct()
     {
-        $this->setBehavior(self::BEHAVIOR_REPLACE);
-        $this->setPartialIndexing(FALSE);
-        $this->setContinueAfterErrors(FALSE);
+        $this->setBehavior(Mage::getStoreConfig('fastsimpleimport/general/import_behavior'));
+        $this->setPartialIndexing(Mage::getStoreConfigFlag('fastsimpleimport/general/partial_indexing'));
+        $this->setContinueAfterErrors(Mage::getStoreConfigFlag('fastsimpleimport/general/continue_after_errors'));
+        $this->setErrorLimit(Mage::getStoreConfig('fastsimpleimport/general/error_limit'));
         $this->setDropdownAttributes(array());
         $this->setMultiselectAttributes(array());
-        $this->setAllowRenameFiles(TRUE);
+        $this->setAllowRenameFiles(true);
         $this->setImageAttributes(array());
+        $this->setUseNestedArrays(Mage::getStoreConfigFlag('fastsimpleimport/general/support_nested_arrays'));
     }
 
     /**
@@ -56,7 +60,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Product */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_product');
         $entityAdapter->setBehavior($this->getBehavior());
-        $entityAdapter->setIsDryrun(FALSE);
+        $entityAdapter->setIsDryrun(false);
         $entityAdapter->setErrorLimit($this->getErrorLimit());
         $entityAdapter->setDropdownAttributes($this->getDropdownAttributes());
         $entityAdapter->setMultiselectAttributes($this->getMultiselectAttributes());
@@ -115,7 +119,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Product */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_product');
         $entityAdapter->setBehavior($this->getBehavior());
-        $entityAdapter->setIsDryRun(TRUE);
+        $entityAdapter->setIsDryRun(true);
         $entityAdapter->setErrorLimit($this->getErrorLimit());
         $entityAdapter->setDropdownAttributes($this->getDropdownAttributes());
         $entityAdapter->setMultiselectAttributes($this->getMultiselectAttributes());
@@ -358,7 +362,8 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     protected function _getSourceAdapter($sourceData)
     {
         if (is_array($sourceData)) {
-            return Mage::getModel('fastsimpleimport/arrayAdapter', $sourceData);
+            $sourceAdapter = Mage::getModel('fastsimpleimport/arrayAdapter', array('data' => $sourceData, 'use_nested_arrays' => $this->getUseNestedArrays()));
+            return $sourceAdapter;
         }
 
         return parent::_getSourceAdapter($sourceData);

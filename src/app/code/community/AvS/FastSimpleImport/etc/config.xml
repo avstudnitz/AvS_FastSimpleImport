@@ -59,6 +59,13 @@
 
     <default>
         <fastsimpleimport>
+            <general>
+                <import_behavior>replace</import_behavior>
+                <partial_indexing>0</partial_indexing>
+                <continue_after_errors>0</continue_after_errors>
+                <error_limit>100</error_limit>
+                <support_nested_arrays>0</support_nested_arrays>
+            </general>
             <product>
                 <status>1</status>
                 <visibility>4</visibility>
