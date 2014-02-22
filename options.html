@@ -6,14 +6,14 @@ title: FastSimpleImport - Options
 
 You can find the configuration options at
 <div class="highlight">
-    System -&gt; Configuration -&gt; Services -&gt; FastSimpleImport     
+    <pre>System -&gt; Configuration -&gt; Services -&gt; FastSimpleImport</pre>     
 </div>
 
-<img src="images/config_menu.PNG" alt="configuration menu" />        
+<p><img src="images/config_menu.PNG" alt="configuration menu" /></p>        
 
 <h3>General Settings</h3>
 
-<img src="images/config_general.PNG" alt="configuration general settings" />
+<p><img src="images/config_general.PNG" alt="configuration general settings" /></p>
         
 <h4>Import Behavior</h4>
 <p>Select from:</p>
@@ -23,4 +23,78 @@ You can find the configuration options at
     <li><strong>Delete Entities</strong>: delete given products, only &quot;sku&quot; column needed</li>
 </ul>
         
+<h4>Partial Indexing</h4>
+<p>If set to <strong>Yes</strong>, imported products are indexed on thy fly so they can directly be accessed in the shop.
+If you set it to <strong>No</strong>, you have to do a full index update afterwards.</p>
+        
+<h4>Continue after errors</h4>
+<p>If set to <strong>No</strong>, the import is stopped when an error with the import data has occured. 
+If set to <strong>Yes</strong>, the import is continued anyways unless the <strong>Error Limit</strong> is reached. 
+Entities with errors will be skipped.</p>
+        
+<h4>Error Limit</h4>
+<p>Up to this number of error will be ignored. When this number of errors is reached in one import, the import is stopped
+and no entities will be imported.</p>
+        
+<h4>Support Nested Arrays for Import</h4>
+<p>If you have multiple values for one field, you have the possibility to provide them as an array instead of seperate lines 
+if this option is set to <strong>Yes</strong>. Example:</p>
+<div class="highlight highlight-php">
+    <pre>$data = array(
+    array(
+        'sku' => '1234567',
+        '_type' => 'simple',
+        '_attribute_set' => 'Default',
+        '_product_websites' => <strong>array('base', 'additional')</strong>,
+        'name' => 'Default',
+        'price' => 0.99,
+        'description' => 'Default',
+        'short_description' => 'Default',
+        'colors' => <strong>array('green', 'silver')</strong>
+        'weight' => 0,
+        'status' => 1,
+        'visibility' => 4,
+        'tax_class_id' => 2,
+        'qty' => 76,
+    ),</pre>
+</div>
+<p>This can for example be used for <pre>_product_websites</pre>, <pre>_category</pre>, <pre>_super_products_sku</pre>
+or arbitrary multiselect attributes.</p>
+        
+<h4>Ignore Duplicates</h4>
+<p>With this option set to <strong>Yes</strong>, you can have the same entity twice in your import data. 
+Otherwise, the import stops with an error.</p>
+        
+        
+<h3>Product setting</h3>
+
+<p><img src="images/config_product1.PNG" alt="configuration product 1" /></p>
+        
+<h4>Create new options for the following select attributes</h4>
+<p>You can select dropdown attributes here. If you import attribute options which don't exist yet, they will be created for 
+the selected attributes.</p>
+
+<h4>Create new options for the following multiselect attributes</h4>
+<p>Same as above but for multiselect attributes.</p>
+
+<p><img src="images/config_product2.PNG" alt="configuration product 2" /></p>
+
+<h4>Allow renaming of files</h4>
+<p>If set to <strong>Yes</strong>, product images don't get overwritten. For example if there is already a file named 
+<pre>example.jpg</pre>, it is renamed to <pre>example_1.jpg</pre> in order to avoid overwriting.</p>
+
+<h4>Additional Image Attributes</h4>
+<p>Select additional image attributes for import here so they get filled correctly by the import.</p>
+        
+<h4>Default Status</h4>
+<p>Default value for the <strong>Status</strong> field if it is not included in the import.</p>
+        
+<h4>Default Visibility</h4>
+<p>Default value for the <strong>Visibility</strong> field if it is not included in the import.</p>
+        
+<h4>Default Tax Class</h4>
+<p>Default value for the <strong>Tax Class</strong> field if it is not included in the import.</p>
+        
+<h4>Default Weight</h4>
+<p>Default value for the <strong>Weight</strong> field if it is not included in the import.</p>
         
