@@ -1,0 +1,19 @@
+-
+  -
+    - sku: 43 # For creating Product
+      _type: configurable
+      _attribute_set: Default
+      _product_websites: base
+      name: Default
+      price: 0.99
+      description: Default
+      short_description: Default
+      status: 1
+      visibility: 4
+      tax_class_id: 2
+      is_in_stock: 1
+    - sku: 43 # For updating Product
+      name: Default 2
+      price: 1.99
+      description: This is a new Description
+

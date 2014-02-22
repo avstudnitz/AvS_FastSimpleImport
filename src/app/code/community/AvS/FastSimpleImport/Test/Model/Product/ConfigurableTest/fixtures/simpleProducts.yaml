@@ -1,0 +1,32 @@
+eav:
+  catalog_product:
+    - entity_id: 1
+      type_id: simple
+      sku: 'simple1'
+      name: 'name1'
+      price: "1.00"
+      short_description: 'short desc 1'
+      description: 'desc 1'
+      status: 1
+      stock:
+        qty: 10.00
+        is_in_stock: 1
+        manage_stock: 0
+        status: 1
+      website_ids:
+        - 1
+    - entity_id: 2
+      type_id: simple
+      sku: 'simple 2'
+      name: 'name 2'
+      short_description: 'short desc 2'
+      description: 'desc 2'
+      price: "1.00"
+      status: 1
+      stock:
+        qty: 10.00
+        is_in_stock: 1
+        manage_stock: 0
+        status: 1
+      website_ids:
+        - 1

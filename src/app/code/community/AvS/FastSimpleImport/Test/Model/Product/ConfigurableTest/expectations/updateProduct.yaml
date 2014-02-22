@@ -1,0 +1,14 @@
+43-create:
+  type_id: configurable
+  attribute_set_id: 4
+  name: Default
+  price: 0.99
+  description: Default
+  short_description: Default
+  status: 1
+  visibility: 4
+  tax_class_id: 2
+43-update:
+  name: Default 2
+  price: 1.99
+  description: This is a new Description
