@@ -164,11 +164,18 @@ header .page-navigation {
 }
 
 header .page-navigation p {
-    margin-bottom: 5px;
+    margin-bottom: 0;
+    padding: 3px 0;
 }
 
 header .page-navigation p a {
     font-weight: bold;
+    width: 100%;
+    display: block;
+}
+
+header .page-navigation p a:hover {
+    color: #777777;
 }
 
 section {
