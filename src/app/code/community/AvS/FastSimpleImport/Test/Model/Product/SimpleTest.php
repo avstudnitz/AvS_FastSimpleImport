@@ -59,4 +59,31 @@ class AvS_FastSimpleImport_Test_Model_Product_SimpleTest extends EcomDev_PHPUnit
     }
 
 
+    /**
+     * @test
+     * @loadExpectation
+     * @dataProvider dataProvider
+     */
+    public function updateProduct($values)
+    {
+        $origData = $values[0];
+        $sku = (string) $values[0]['sku'];
+        Mage::getModel('fastsimpleimport/import')->processProductImport(array($origData));
+
+        $updateData = $values[1];
+        Mage::getModel('fastsimpleimport/import')->processProductImport(array($updateData));
+
+        $product = Mage::getModel('catalog/product');
+        $product->load($product->getIdBySku($sku));
+        $afterCreate = $this->expected('%s-%s', $sku, 'create');
+        $afterUpdate = $this->expected('%s-%s', $sku, 'update');
+        $afterMerge = array_merge($afterCreate->getData(),$afterUpdate->getData());
+        foreach ($afterMerge as $key => $value) {
+            $this->assertEquals($value, $product->getData($key));
+        }
+
+    }
+
+
+
 }
