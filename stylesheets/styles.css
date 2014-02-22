@@ -159,6 +159,18 @@ header ul a strong {
   color:#222;
 }
 
+header .page-navigation {
+    margin: 20px 0;
+}
+
+header .page-navigation p {
+    margin-bottom: 5px;
+}
+
+header .page-navigation p a {
+    font-weight: bold;
+}
+
 section {
   width:500px;
   float:right;
