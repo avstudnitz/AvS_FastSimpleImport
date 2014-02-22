@@ -45,12 +45,12 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
      */
     public function __construct($data)
     {
-        if ($this->_useMultiArrays()) {
+        if ($data['use_nested_arrays']) {
 
-            $numberLines = sizeof($data);
+            $numberLines = sizeof($data['data']);
             for ($lineNumber = 0; $lineNumber < $numberLines; $lineNumber++) {
                 
-                $line = $data[$lineNumber];
+                $line = $data['data'][$lineNumber];
                 
                 $newLines = $this->_getNewLines($line);
                 
@@ -59,11 +59,11 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
                     $this->_array[] = $newLine;
                 }
                 
-                unset($data[$lineNumber]);
+                unset($data['data'][$lineNumber]);
             }
         } else {
             
-            $this->_array = $data;
+            $this->_array = $data['data'];
         }
                 
         $this->_position = 0;
@@ -144,14 +144,6 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
         }
 
         $this->_array[$this->_position][$key] = $value;
-    }
-
-    /**
-     * @return bool
-     */
-    protected function _useMultiArrays()
-    {
-        return true;
     }
 
     /**
