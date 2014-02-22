@@ -29,9 +29,10 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 {
     protected function _construct()
     {
-        $this->setBehavior(self::BEHAVIOR_REPLACE);
-        $this->setPartialIndexing(false);
-        $this->setContinueAfterErrors(false);
+        $this->setBehavior(Mage::getStoreConfig('fastsimpleimport/general/import_behavior'));
+        $this->setPartialIndexing(Mage::getStoreConfigFlag('fastsimpleimport/general/partial_indexing'));
+        $this->setContinueAfterErrors(Mage::getStoreConfigFlag('fastsimpleimport/general/continue_after_errors'));
+        $this->setErrorLimit(Mage::getStoreConfig('fastsimpleimport/general/error_limit'));
         $this->setDropdownAttributes(array());
         $this->setMultiselectAttributes(array());
         $this->setAllowRenameFiles(true);
