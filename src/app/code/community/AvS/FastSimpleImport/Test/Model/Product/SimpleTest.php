@@ -43,7 +43,19 @@ class AvS_FastSimpleImport_Test_Model_Product_SimpleTest extends EcomDev_PHPUnit
      */
     public function createProductWithDefault($values)
     {
-        $this->assertEquals(Mage::getStoreConfig('meine/tolle/konfiguration'), 'abc');
+        $this->assertEquals(2, Mage::getStoreConfig('fastsimpleimport/product/status'));
+        $this->assertEquals(4, Mage::getStoreConfig('fastsimpleimport/product/tax_class_id'));
+        $this->assertEquals(3, Mage::getStoreConfig('fastsimpleimport/product/visibility'));
+        $this->assertEquals(12345, Mage::getStoreConfig('fastsimpleimport/product/weight'));
+        Mage::getModel('fastsimpleimport/import')->processProductImport($values);
+        $sku = (string) $values[0]['sku'];
+        $product = Mage::getModel('catalog/product');
+        $product->load($product->getIdBySku($sku));
+        $expected = $this->expected('%s-%s', $sku, 1);
+
+        foreach ($expected as $key => $value) {
+            $this->assertEquals($value, $product->getData($key));
+        }
     }
 
 
