@@ -4,14 +4,20 @@
  * User: tb
  * Date: 2/22/14
  * Time: 6:57 PM
- */
+*/
 class AvS_FastSimpleImport_Model_Import_Entity_AttributeOptions
 {
     const COL_VALUE  = 'value';
     const COL_ORDER  = 'order';
     const COL_DELETE = 'delete';
 
-
+    /**
+     * createOrUpdateAttributeValue
+     *
+     * @param array|string $attValue
+     * @param string $attCode
+     *
+     */
     public function createOrUpdateAttributeValue($attCode, $attValue) {
         $attribute_code=Mage::getModel('eav/entity_attribute')->getIdByCode('catalog_product', $attCode);
         $attributeInfo = Mage::getModel('eav/entity_attribute')->load($attribute_code);
@@ -67,6 +73,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_AttributeOptions
         $attributeInfo->setOption($option);
         $attributeInfo->save();
     }
+
+    /**
+     * deleteAttributeValue
+     *
+     * @param string $attValue
+     * @param string $attCode
+     *
+     */
 
     public function deleteAttributeValue($attCode, $attValue) {
         $attribute_code=Mage::getModel('eav/entity_attribute')->getIdByCode('catalog_product', $attCode);
