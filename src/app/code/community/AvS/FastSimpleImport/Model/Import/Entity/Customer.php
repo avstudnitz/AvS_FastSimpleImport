@@ -83,27 +83,27 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
             case 'decimal':
                 $val   = trim($rowData[$attrCode]);
                 $valid = (float)$val == $val;
-                $message = 'Decimal value expected.';
+                $message = 'Decimal value expected. Your Input: '.$rowData[$attrCode];
                 break;
             case 'select':
                 $valid = isset($attrParams['options'][strtolower($rowData[$attrCode])]);
-                $message = 'Possible options are: ' . implode(', ', array_keys($attrParams['options']));
+                $message = 'Possible options are: ' . implode(', ', array_keys($attrParams['options'])).' Your Input: '.$rowData[$attrCode];
                 break;
             case 'int':
                 $val   = trim($rowData[$attrCode]);
                 $valid = (int)$val == $val;
-                $message = 'Integer value expected.';
+                $message = 'Integer value expected. Your Input: '.$rowData[$attrCode];
                 break;
             case 'datetime':
                 $val   = trim($rowData[$attrCode]);
                 $valid = strtotime($val) !== false
                     || preg_match('/^\d{2}.\d{2}.\d{2,4}(?:\s+\d{1,2}.\d{1,2}(?:.\d{1,2})?)?$/', $val);
-                $message = 'Datetime value expected.';
+                $message = 'Datetime value expected. Your Input: '.$rowData[$attrCode];
                 break;
             case 'text':
                 $val   = Mage::helper('core/string')->cleanString($rowData[$attrCode]);
                 $valid = Mage::helper('core/string')->strlen($val) < self::DB_MAX_TEXT_LENGTH;
-                $message = 'String is too long, only ' . self::DB_MAX_TEXT_LENGTH . ' characters allowed.';
+                $message = 'String is too long, only ' . self::DB_MAX_TEXT_LENGTH . ' characters allowed. Your Input: '.$rowData[$attrCode]. ' Length: '.strlen($val);;
                 break;
             default:
                 $valid = true;
