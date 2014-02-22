@@ -38,7 +38,7 @@
             <import_product_types>
                 <simple>fastsimpleimport/import_entity_product_type_simple</simple>
                 <configurable>fastsimpleimport/import_entity_product_type_configurable</configurable>
-                <virtual>fastsimpleimport/import_entity_product_type_simple</virtual>
+                <virtual>fastsimpleimport/import_entity_product_type_virtual</virtual>
                 <grouped>fastsimpleimport/import_entity_product_type_grouped</grouped>
                 <bundle>fastsimpleimport/import_entity_product_type_bundle</bundle>
             </import_product_types>
