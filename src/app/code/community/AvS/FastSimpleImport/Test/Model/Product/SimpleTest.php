@@ -28,10 +28,23 @@ class AvS_FastSimpleImport_Test_Model_Product_SimpleTest extends EcomDev_PHPUnit
 
         $stockExpectedItem = $this->expected('%s-%s', $sku, 'stock');
         $stock = $product->getStockItem();
-        foreach($stockExpectedItem as $key => $value) {
-            $this->assertEquals($value, $stock->getData($key),null,0);
+        foreach ($stockExpectedItem as $key => $value) {
+            $this->assertEquals($value, $stock->getData($key), null, 0);
         }
 
         $this->assertNull($product->getNotExistingAttribute());
     }
+
+    /**
+     * @test
+     * @loadExpectation
+     * @loadFixture defaultValues.yaml
+     * @dataProvider dataProvider
+     */
+    public function createProductWithDefault($values)
+    {
+        $this->assertEquals(Mage::getStoreConfig('meine/tolle/konfiguration'), 'abc');
+    }
+
+
 }
