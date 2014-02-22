@@ -46,14 +46,16 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
     public function __construct($data)
     {
         if ($this->_useMultiArrays()) {
-            
-            for ($lineNumber = 0; $lineNumber < sizeof($data); $lineNumber++) {
+
+            $numberLines = sizeof($data);
+            for ($lineNumber = 0; $lineNumber < $numberLines; $lineNumber++) {
                 
                 $line = $data[$lineNumber];
                 
                 $newLines = $this->_getNewLines($line);
                 
                 foreach($newLines as $newLine) {
+                    $newLine['fsi_line_number'] = $lineNumber;
                     $this->_array[] = $newLine;
                 }
                 
@@ -63,7 +65,7 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
             
             $this->_array = $data;
         }
-        
+                
         $this->_position = 0;
     }
 

@@ -914,4 +914,20 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
 
         return $this;
     }
+
+    /**
+     * Validate data row.
+     *
+     * @param array $rowData
+     * @param int $rowNum
+     * @return boolean
+     */
+    public function validateRow(array $rowData, $rowNum)
+    {
+        if (isset($rowData['fsi_line_number'])) {
+            $rowNum = $rowData['fsi_line_number'];
+        }
+        
+        return parent::validateRow($rowData, $rowNum);
+    }    
 }

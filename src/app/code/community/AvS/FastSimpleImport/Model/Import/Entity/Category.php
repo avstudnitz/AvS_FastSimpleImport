@@ -769,6 +769,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     public function validateRow(array $rowData, $rowNum)
     {
+        if (isset($rowData['fsi_line_number'])) {
+            $rowNum = $rowData['fsi_line_number'];
+        }
+
         static $root = null;
         static $category = null;
 

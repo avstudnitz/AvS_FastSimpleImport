@@ -131,6 +131,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
      */
     public function validateRow(array $rowData, $rowNum)
     {
+        if (isset($rowData['fsi_line_number'])) {
+            $rowNum = $rowData['fsi_line_number'];
+        }
+
         static $email   = null; // e-mail is remembered through all customer rows
         static $website = null; // website is remembered through all customer rows
 
