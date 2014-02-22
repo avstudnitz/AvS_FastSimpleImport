@@ -39,13 +39,31 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
     /* Methods required for Iterator interface */
 
     /**
-     * Initialize data and position
+     * Initialize data and position; transferm multi arrays if activated
      *
      * @param array $data
      */
     public function __construct($data)
     {
-        $this->_array = $data;
+        if ($this->_useMultiArrays()) {
+            
+            for ($lineNumber = 0; $lineNumber < sizeof($data); $lineNumber++) {
+                
+                $line = $data[$lineNumber];
+                
+                $newLines = $this->_getNewLines($line);
+                
+                foreach($newLines as $newLine) {
+                    $this->_array[] = $newLine;
+                }
+                
+                unset($data[$lineNumber]);
+            }
+        } else {
+            
+            $this->_array = $data;
+        }
+        
         $this->_position = 0;
     }
 
@@ -124,5 +142,40 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
         }
 
         $this->_array[$this->_position][$key] = $value;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function _useMultiArrays()
+    {
+        return true;
+    }
+
+    /**
+     * Transform nested array to multi-line array (ImportExport format) 
+     * 
+     * @param array $line
+     * @return array
+     */
+    protected function _getNewLines($line)
+    {
+        $newLines = array(
+            0 => $line
+        );
+        
+        foreach ($line as $fieldName => $fieldValue) {
+            if (is_array($fieldValue)) {
+                $newLineNumber = 0;
+                foreach ($fieldValue as $singleFieldValue) {
+                    if ($newLineNumber > 0) {
+                        $newLines[$newLineNumber]['sku'] = null;
+                    }
+                    $newLines[$newLineNumber++][$fieldName] = $singleFieldValue;
+                }
+            }
+        }
+        
+        return $newLines;
     }
 }
