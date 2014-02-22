@@ -1,0 +1,40 @@
+---
+layout: default
+title: FastSimpleImport - Usage
+---
+
+<h2>Basic Usage</h2>
+
+<p>After installation, call the module like this to import a single product:</p>
+
+<div class="highlight highlight-php">
+    <pre>
+    // Import product:
+    $data = array(
+    array(
+        'sku' => '1234567',
+        '_type' => 'simple',
+        '_attribute_set' => 'Default',
+        '_product_websites' => 'base',
+        'name' => 'Default',
+        'price' => 0.99,
+        'description' => 'Default',
+        'short_description' => 'Default',
+        'weight' => 0,
+        'status' => 1,
+        'visibility' => 4,
+        'tax_class_id' => 2,
+        'qty' => 76,
+        ),
+        // add more products here
+    );
+        
+    /** @var $import AvS_FastSimpleImport_Model_Import */
+    $import = Mage::getModel('fastsimpleimport/import');
+    try {
+        $import->processProductImport($data);
+    } catch (Exception $e) {
+        print_r($import->getErrorMessages());
+    }
+    </pre>
+</div>
