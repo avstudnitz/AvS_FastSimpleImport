@@ -165,6 +165,73 @@ try {
     print_r($import->getErrorMessages());
 }</pre>
 </div>
+
+<h3>Bundle Products</h3>
+<p>Sample code:</p>
+<div class="highlight highlight-php">
+    <pre>$data = array(
+    array(
+        'sku' => 'simple1',
+        '_type' => 'simple',
+        '_attribute_set' => 'Default',
+        '_product_websites' => 'base',
+        'name' => 'Simple Product 1',
+        'description' => 'Default',
+        'short_description' => 'Default',
+        'price' => 10,
+        'weight' => 0,
+        'status' => 1,
+        'visibility' => 4,
+        'tax_class_id' => 2,
+        'qty' => 99,
+        'is_in_stock' => 1,
+        'color' => 'red',
+    ),
+    array(
+        'sku' => 'simple2',
+        '_type' => 'simple',
+        '_attribute_set' => 'Default',
+        '_product_websites' => 'base',
+        'name' => 'Simple Product 2',
+        'description' => 'Default',
+        'short_description' => 'Default',
+        'price' => 20,
+        'weight' => 0,
+        'status' => 1,
+        'visibility' => 4,
+        'tax_class_id' => 2,
+        'qty' => 99,
+        'is_in_stock' => 1,
+        'color' => 'green',
+    ),
+    array(
+        'sku' => 'bundle',
+        '_type' => 'bundle',
+        '_attribute_set' => 'Default',
+        '_product_websites' => 'base',
+        'price' => 10,
+        'name' => 'Bundle Product',
+        'description' => 'Default',
+        'short_description' => 'Default',
+        'status' => 1,
+        'visibility' => 4,
+        'tax_class_id' => 2,
+        'is_in_stock' => 1,
+        'price_view' => 'as low as',
+        'price_type' => 1,
+        '_bundle_option_title' => array('Option 1', 'Option 1'),
+        '_bundle_option_type' => 'select',
+        '_bundle_option_position' => 1,
+        '_bundle_option_required' => 1,
+        '_bundle_product_sku' => array('simple1', 'simple2'), 
+        '_bundle_product_position' => array(1, 2), 
+        '_bundle_product_is_default' => array(true, false), 
+        '_bundle_product_qty' => array(1, 2), 
+        '_bundle_product_price_value' => array(10, 20), 
+        '_bundle_product_can_change_qty' => array(1, 0), 
+    )
+);</pre>
+</div>
         
 
 <h3>Deletion of products</h3>
