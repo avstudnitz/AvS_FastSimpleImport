@@ -429,7 +429,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             }
 
             Mage::dispatchEvent('fastsimpleimport_reindex_products_before_flat', array('entity_id' => &$entityIds));
-            // Mage::getSingleton('catalog/product_flat_indexer')->saveProduct($entityIds);
+            Mage::getSingleton('catalog/product_flat_indexer')->saveProduct($entityIds);
 
             Mage::dispatchEvent('fastsimpleimport_reindex_products_after', array('entity_id' => &$entityIds));
         } catch (Exception $e) {
