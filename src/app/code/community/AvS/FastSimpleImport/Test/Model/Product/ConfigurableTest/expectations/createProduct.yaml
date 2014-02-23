@@ -1,0 +1,17 @@
+123456789-1:
+  type_id: configurable
+  attribute_set_id: 4
+  name: Default
+  price: 0.99
+  description: Default
+  short_description: Default
+  weight: 0
+  status: 1
+  visibility: 4
+  tax_class_id: 2
+123456789-stock:
+  manage_stock: 1
+  is_in_stock: 1
+123456789-children:
+  codes: [color]
+  skus: [simple1, simple2]
