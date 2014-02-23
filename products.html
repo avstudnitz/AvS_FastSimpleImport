@@ -43,7 +43,37 @@ try {
     <li>Configurable products</li>
     <li>Bundle products</li>
 </ul>
-<p>For details about the import fields please see the <a href="http://www.integer-net.de/download/ImportExport_EN.pdf" target="_blank">import format documentation</a>.</p>        
+<p>For details about the import fields please see the 
+    <a href="http://www.integer-net.de/download/ImportExport_EN.pdf" target="_blank">import format documentation</a>.</p>        
 
-<h3>Notes</h3>
+<h3>Deletion of products</h3>
+<div class="highlight highlight-php">
+    <pre>// Simple product:
+$data = array(
+    array(
+        'sku' => '1234567',
+    ),
+    array(
+        'sku' => '1234568',
+    ),
+    // add more products here
+);
+
+/** @var $import AvS_FastSimpleImport_Model_Import */
+$import = Mage::getModel('fastsimpleimport/import');
+try {
+    $import
+        ->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_DELETE)
+        ->processProductImport($data);
+} catch (Exception $e) {
+    print_r($import->getErrorMessages());
+}</pre>
+</div> 
         
+<h3>Notes</h3>
+<ul>
+    <li>We suggest activating <strong>Partial Indexing</strong> (see the <a href="options.html">options page</a>).</li>
+    <li>If you are using <strong>Partial Indexing</strong>, we strongly recommend to use the improved URL Indexer 
+        <a href="https://github.com/EcomDev/EcomDev_UrlRewrite" target="_blank">EcomDev_UrlRewrite</a> due to much better
+        performance.</li>
+</ul>
