@@ -17,7 +17,7 @@ class AvS_FastSimpleImport_Test_Model_Category_MainTest extends EcomDev_PHPUnit_
     public function createCategoryTree($values)
     {
         Mage::getSingleton('core/resource')->getConnection('core_write')
-        ->query('delete from catalog_category_entity where entity_id > 3');
+        ->query('delete from catalog_category_entity where entity_id > 2');
 
         $collection = Mage::getModel('catalog/category')->getCollection();
         $this->assertCount(self::CATEGORY_BASIC_COUNT, $collection->getAllIds());
