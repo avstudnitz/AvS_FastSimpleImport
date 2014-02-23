@@ -42,7 +42,7 @@ for ($i = 1; $i <= 10; $i++) {
         '_type' => 'simple',
         '_attribute_set' => 'Default',
         '_product_websites' => 'base',
-        // '_category' => rand(1, 3),
+        '_category' => array(1, 3),
         'name' => $randomString,
         'price' => 0.99,
         'special_price' => 0.90,
@@ -69,13 +69,9 @@ $time = microtime(true);
 try {
     /** @var $import AvS_FastSimpleImport_Model_Import */
     $import = Mage::getModel('fastsimpleimport/import');
-    $import
-        ->setPartialIndexing(true)
-        ->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_APPEND)
-        ->processProductImport($data);
+    $import->processProductImport($data);
 } catch (Exception $e) {
     print_r($import->getErrorMessages());
 }
 
 echo 'Elapsed time: ' . round(microtime(true) - $time, 2) . 's' . "\n";
-?>
