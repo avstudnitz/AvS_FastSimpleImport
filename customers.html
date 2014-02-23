@@ -1,0 +1,50 @@
+---
+layout: default
+title: FastSimpleImport - Customers
+---
+<h2>Customer Import</h2>
+<p>This import is basically using the core functionality to import customers with the ImportExport module.</p>
+        
+<h3>Example Code</h3>
+<div class="highlight highlight-php">
+    <pre>$data = array(
+    array(
+        'email' => 'customer@company.com',
+        '_website' => 'base',
+        'group_id' => 1,
+        'firstname' => 'John',
+        'lastname' => 'Doe',
+        '_address_firstname' => 'John',
+        '_address_lastname' => 'Doe',
+        '_address_street' => 'Main Street 1',
+        '_address_postcode' => '12345',
+        '_address_city' => 'Springfield',
+        '_address_country_id' => 'US',
+        '_address_telephone' => '+1 2345 6789',
+        '_address_default_billing_' => 1,
+        '_address_default_shipping_' => 0,
+	),
+    array(
+        'email' => null,
+        '_website' => null,
+        '_address_firstname' => 'John',
+        '_address_lastname' => 'Doe',
+        '_address_street' => 'Countryside 99',
+        '_address_postcode' => '98765',
+        '_address_city' => 'Cape Cod',
+        '_address_country_id' => 'US',
+        '_address_telephone' => '+1 9876 54321',
+        '_address_default_billing_' => 0,
+        '_address_default_shipping_' => 1,
+	),
+);
+
+/** @var $import AvS_FastSimpleImport_Model_Import */
+$import = Mage::getModel('fastsimpleimport/import');
+try {
+    $import->processCustomerImport($data);
+} catch (Exception $e) {
+    print_r($import->getErrorMessages());
+}</pre>
+</div>
+<p>This example imports one customer with two addresses.</p>

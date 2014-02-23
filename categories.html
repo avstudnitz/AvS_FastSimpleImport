@@ -1,0 +1,59 @@
+---
+layout: default
+title: FastSimpleImport - Categories
+---
+<h2>Category Import</h2>
+
+<h3>Example Code</h3>
+<div class="highlight highlight-php">
+    <pre>$data = array();
+$data[] = array(
+    '_root' => 'Default Category',
+    '_category' => 'Test2',
+    'name' => 'Test2',
+    'description' => 'Test2',
+    'is_active' => 'yes',
+    'include_in_menu' => 'yes',
+    'meta_description' => 'Meta Test',
+    'available_sort_by' => 'position',
+    'default_sort_by' => 'position',
+);
+$data[] = array(
+    '_root' => 'Default Category',
+    '_category' => 'Test2/Test3',
+    'name' => 'TestTest',
+    'description' => 'Test3',
+    'is_active' => 'yes',
+    'include_in_menu' => 'yes',
+    'meta_description' => 'Meta Test',
+    'available_sort_by' => 'position',
+    'default_sort_by' => 'position',
+);
+$data[] = array(
+    '_root' => 'Default Category',
+    '_category' => 'Test2/Test4 \/ WithSlash',
+    'name' => 'Test4 / WithSlash',
+    'description' => 'When specifying a category path for a category with a slash (/) in the name, escape the slash with a backslash (Test \/ WithSlash).',
+    'is_active' => 'yes',
+    'include_in_menu' => 'yes',
+    'meta_description' => 'Meta Test',
+    'available_sort_by' => 'position',
+    'default_sort_by' => 'position',
+);
+
+/** @var $import AvS_FastSimpleImport_Model_Import */
+$import = Mage::getModel('fastsimpleimport/import');
+try {
+    $import->processCategoryImport($data);
+} catch (Exception $e) {
+    print_r($import->getErrorMessages());
+}</pre>
+</div>
+        
+<h3>Notes</h3>
+<ul>
+    <li>You can escape slashes(/) in category names with a backslash (\/).</li>
+    <li>Importing categories with activated configuration option &quot;Use Flat Catalog Category&quot; isn't possible at the 
+    moment. We recommend switching it off before import and switching it on again after that, followed by a manual
+    reindexing of the category flat index.</li>
+</ul>

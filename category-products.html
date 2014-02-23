@@ -1,0 +1,43 @@
+---
+layout: default
+title: FastSimpleImport - Category-Product Relations
+---
+<h2>Category-Product Relation Import</h2>
+<p>You can import the categories which a product is in with the product import by using the column &quot;_category&quot;. 
+This has some limitations though:</p>
+<ul>
+    <li>You cannot set a position of a product inside a category</li>
+    <li>Single relations can't simply be added or removed.</li>
+</ul>
+<p>For this there is a seperate import with which you can import those relations.</p>
+        
+<h3>Example Code</h3>
+<div class="highlight highlight-php">
+    <pre>$data = array();
+$data[] = array(
+    '_root' => 'Default Category',
+    '_category' => 'Test2',
+    '_sku' => '4711',
+    'position' => 1
+);
+$data[] = array(
+    '_root' => 'Default Category',
+    '_category' => 'Test2',
+    '_sku' => '0815',
+    'position' => 2
+);
+$data[] = array(
+    '_root' => 'Default Category',
+    '_category' => 'Test2/Test3',
+    '_sku' => '0815',
+    'position' => 1
+);
+
+/** @var $import AvS_FastSimpleImport_Model_Import */
+$import = Mage::getModel('fastsimpleimport/import');
+try {
+    $import->processCategoryProductImport($data);
+} catch (Exception $e) {
+    print_r($import->getErrorMessages());
+}</pre>
+</div>

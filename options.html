@@ -45,7 +45,7 @@ if this option is set to <strong>Yes</strong>. Example:</p>
         'sku' => '1234567',
         '_type' => 'simple',
         '_attribute_set' => 'Default',
-        '_product_websites' => <strong>array('base', 'additional')</strong>,
+        '_product_websites' => <strong>array('de', 'en', 'fr')</strong>,
         'name' => 'Default',
         'price' => 0.99,
         'description' => 'Default',
@@ -56,7 +56,38 @@ if this option is set to <strong>Yes</strong>. Example:</p>
         'visibility' => 4,
         'tax_class_id' => 2,
         'qty' => 76,
-    ),</pre>
+    ),
+);</pre>
+</div>
+<p>If this option isn't activated, the same import data should look like this:</p>
+<div class="highlight highlight-php">
+    <pre>$data = array(
+    array(
+        'sku' => '1234567',
+        '_type' => 'simple',
+        '_attribute_set' => 'Default',
+        '_product_websites' => <strong>'de'</strong>,
+        'name' => 'Default',
+        'price' => 0.99,
+        'description' => 'Default',
+        'short_description' => 'Default',
+        'colors' => <strong>'green'</strong>
+        'weight' => 0,
+        'status' => 1,
+        'visibility' => 4,
+        'tax_class_id' => 2,
+        'qty' => 76,
+    ),
+    array(
+        'sku' => null,
+        '_product_websites' => <strong>'en'</strong>,
+        'colors' => <strong>'silver'</strong>
+    ),
+    array(
+        'sku' => null,
+        '_product_websites' => <strong>'fr'</strong>,
+    ),
+);</pre>
 </div>
 <p>This can for example be used for <code>_product_websites</code>, <code>_category</code>, <code>_super_products_sku</code>
 or arbitrary multiselect attributes.</p>
@@ -98,3 +129,14 @@ the selected attributes.</p>
 <h4>Default Weight</h4>
 <p>Default value for the <strong>Weight</strong> field if it is not included in the import.</p>
         
+<h3>Notes</h3>
+<p>All options (except default values) can be overwritten in the import call. For example:</p>
+<div class="highlight highlight-php">
+    <pre>/** @var $import AvS_FastSimpleImport_Model_Import */
+$import = Mage::getModel('fastsimpleimport/import');
+$import
+    ->setPartialIndexing(true)
+    ->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_APPEND)
+    ->processProductImport($data);</pre>
+</div>
+<p>You can find all options on top of the file <a href="https://github.com/avstudnitz/AvS_FastSimpleImport/blob/master/src/app/code/community/AvS/FastSimpleImport/Model/Import.php">app/code/community/AvS/FastSimpleImport/Model/Import.php</a></p>

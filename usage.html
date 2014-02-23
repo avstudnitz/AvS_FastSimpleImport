@@ -5,9 +5,7 @@ title: FastSimpleImport - Usage
 <h2>Usage</h2>
         
 <h3>Basic Usage</h3>
-
 <p>After installation, call the module like this to import a single product:</p>
-
 <div class="highlight highlight-php">
     <pre>// Import product:
 $data = array(
@@ -37,3 +35,29 @@ try {
     print_r($import->getErrorMessages());
 }</pre>
 </div>
+    
+<h3>Dry run</h3>
+<p>You can check if your import data is correct with the following code:</p>
+<div class="highlight highlight-php">
+    <pre>$importer = Mage::getModel('fastsimpleimport/import');
+
+$result = $importer->dryrunProductImport($data);
+
+echo ($result  ? 'Input is OK' : 'Input has Errors');
+
+echo "Messages: " . PHP_EOL;
+echo $importer->getErrorMessage();
+
+# for categories
+Mage::getModel('fastsimpleimport/import')
+    ->dryrunCategoryImport($data);
+
+# for customers
+Mage::getModel('fastsimpleimport/import')
+    ->dryrunCustomerImport($data);</pre>
+</div>
+<p>Just replace the word &quot;process&quot; in the above calls with &quot;dryrun&quot;.</p>
+        
+<h3>Where to add this code?</h3>
+<p>The above code is designed to be included into your own module. It can be called from a shell script as well, 
+    see our <a href="https://github.com/avstudnitz/AvS_FastSimpleImport/blob/master/test.php">example</a>.</p>
