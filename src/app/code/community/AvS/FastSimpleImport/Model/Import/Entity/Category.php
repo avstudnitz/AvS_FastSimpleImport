@@ -998,7 +998,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
     public function updateChildrenCount() {
         //we only need to update the children count when we are updating, not when we are deleting.
-        if (! in_array($this->getBehavior(), array(Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE, Mage_ImportExport_Model_Import::BEHAVIOR_APPEND))) {
+        if (! in_array($this->getBehavior(), array(Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE, Mage_ImportExport_Model_Import::BEHAVIOR_DELETE, Mage_ImportExport_Model_Import::BEHAVIOR_APPEND))) {
             return;
         }
 
@@ -1007,6 +1007,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
         $categoryTable = Mage::getSingleton('core/resource')->getTableName('catalog/category');
         $categoryTableTmp = $categoryTable . '_tmp';
+        $connection->query('DROP TEMPORARY TABLE IF EXISTS ' . $categoryTableTmp);
         $connection->query("CREATE TEMPORARY TABLE {$categoryTableTmp} LIKE {$categoryTable};
             INSERT INTO {$categoryTableTmp} SELECT * FROM {$categoryTable};
             UPDATE {$categoryTable} cce

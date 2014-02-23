@@ -1,0 +1,17 @@
+-
+  -
+    - sku: 1234567
+      _type: simple
+      _attribute_set: Default
+      _product_websites: base
+      name: Default
+      price: 0.99
+      description: Default
+      short_description: Default
+      weight: 12345
+      status: 2
+      visibility: 3
+      tax_class_id: 4
+      qty: 76
+      is_in_stock: 1
+      not_existing_attribute: 42
