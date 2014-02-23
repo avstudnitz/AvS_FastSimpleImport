@@ -15,11 +15,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_AttributeOptions
      * createOrUpdateAttributeValue
      *
      * @param array|string $attValue
-     * @param string $attCode
+     * @param string $attrCode
      *
      */
-    public function createOrUpdateAttributeValue($attCode, $attValue) {
-        $attribute_code=Mage::getModel('eav/entity_attribute')->getIdByCode('catalog_product', $attCode);
+
+    public function createOrUpdateAttributeValue($attrCode, $attValue) {
+        $this->isAttributeCodeValid($attrCode);
+        $attribute_code=Mage::getModel('eav/entity_attribute')->getIdByCode('catalog_product', $attrCode);
         $attributeInfo = Mage::getModel('eav/entity_attribute')->load($attribute_code);
         $attribute_table = Mage::getModel('eav/entity_attribute_source_table')->setAttribute($attributeInfo);
         $aopt = $attribute_table->getAllOptions(false);
@@ -35,7 +37,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_AttributeOptions
                     }
                     $attributeInfo->setOption($option);
                     $attributeInfo->save();
-                    return;
+                    return true;
                 }
             }
         } else {
@@ -45,12 +47,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_AttributeOptions
                     $option[self::COL_VALUE][$ao['value']][0] = $attValue;
                     $attributeInfo->setOption($option);
                     $attributeInfo->save();
-                    return;
+                    return true;
                 }
             }
         }
-
-
         foreach ($aopt as $ao) {
             if ($ao['label'] == $attValue[0]) {
                 $option[self::COL_VALUE][$ao['value']][0] = $attValue[0];
@@ -58,7 +58,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_AttributeOptions
                 print_r($option);
                 $attributeInfo->setOption($option);
                 $attributeInfo->save();
-                return;
+                return true;
             }
         }
         if (is_array($opt)) {
@@ -78,12 +78,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_AttributeOptions
      * deleteAttributeValue
      *
      * @param string $attValue
-     * @param string $attCode
+     * @param string $attrCode
      *
      */
 
-    public function deleteAttributeValue($attCode, $attValue) {
-        $attribute_code=Mage::getModel('eav/entity_attribute')->getIdByCode('catalog_product', $attCode);
+    public function deleteAttributeValue($attrCode, $attValue) {
+        $this->isAttributeCodeValid($attrCode);
+        $attribute_code=Mage::getModel('eav/entity_attribute')->getIdByCode('catalog_product', $attrCode);
         $attributeInfo = Mage::getModel('eav/entity_attribute')->load($attribute_code);
         $attribute_table = Mage::getModel('eav/entity_attribute_source_table')->setAttribute($attributeInfo);
         $opt = $attribute_table->getAllOptions(false);
@@ -96,6 +97,28 @@ class AvS_FastSimpleImport_Model_Import_Entity_AttributeOptions
         }
         $attributeInfo->setOption($option);
         $attributeInfo->save();
+        return true;
+    }
+
+    /**
+     * Check one attributecode. Can be overridden in child.
+     *
+     * @param string $attrCode Attribute code
+     * @return boolean
+     */
+
+    public function isAttributeCodeValid($attrCode) {
+        $valid = true;
+        $attribute_code=Mage::getModel('eav/entity_attribute')->getIdByCode('catalog_product', $attrCode);
+        $attributeInfo = Mage::getModel('eav/entity_attribute')->load($attribute_code);
+        if ($attributeInfo->getFrontendInput() != 'multiselect' && $attributeInfo->getFrontendInput() != 'select') {
+            $valid = false;
+            $message = "Attribute: '".$attrCode."'. Not multiselect nor select \n'";
+        }
+        if (!$valid) {
+            Mage::throwException($message);
+        }
+        return (bool) $valid;
     }
 
 
