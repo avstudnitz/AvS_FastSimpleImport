@@ -34,7 +34,7 @@ echo 'Elapsed time: ' . round(microtime(true) - $time, 2) . 's' . "\n";
 
 // Create/Update products
 $data = array();
-for ($i = 1; $i <= 6000; $i++) {
+for ($i = 1; $i <= 10; $i++) {
 
     $randomString = getUniqueCode(20);
     $data[] = array(
