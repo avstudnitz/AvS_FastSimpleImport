@@ -1,7 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:300italic,700italic,300,700);
 
 body {
-  padding:50px;
+  padding:10px 50px;
   font:15px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color:#777;
   font-weight:300;
@@ -171,7 +171,7 @@ header .page-navigation p a {
     font-weight: bold;
     width: 100%;
     display: block;
-    padding: 3px 0;
+    padding: 1px 0;
 }
 
 header .page-navigation p a:hover {
@@ -199,7 +199,7 @@ footer {
   width:270px;
   float:left;
   position:fixed;
-  bottom:50px;
+  bottom:0;
 }
 
 @media print, screen and (max-width: 960px) {
