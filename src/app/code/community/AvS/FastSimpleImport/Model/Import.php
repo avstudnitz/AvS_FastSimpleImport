@@ -144,6 +144,8 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
             $this->setBehavior($behavior);
         }
 
+        $this->setUseNestedArrays(false);
+
         $this->setEntity('customer');
 
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Customer */
@@ -189,6 +191,8 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
             $this->setBehavior($behavior);
         }
 
+        $this->setUseNestedArrays(false);
+
         $this->setEntity('customer');
 
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Customer */
@@ -215,7 +219,10 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
             $this->setBehavior($behavior);
         }
 
+        $this->setUseNestedArrays(false);
+
         $this->setEntity(Mage_Catalog_Model_Category::ENTITY);
+
         $partialIndexing = $this->getPartialIndexing();
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Category */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_category');
@@ -268,6 +275,8 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
             $this->setBehavior($behavior);
         }
 
+        $this->setUseNestedArrays(false);
+
         $this->setEntity(Mage_Catalog_Model_Category::ENTITY);
 
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Category */
@@ -293,7 +302,10 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         if (!is_null($behavior)) {
             $this->setBehavior($behavior);
         }
+        $this->setUseNestedArrays(false);
+
         $this->setEntity('category_product');
+
         $partialIndexing = $this->getPartialIndexing();
 
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Category_Product */
@@ -342,6 +354,8 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
             $this->setBehavior($behavior);
         }
 
+        $this->setUseNestedArrays(false);
+
         $this->setEntity('category_product');
 
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Category_Product */
@@ -363,8 +377,11 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     protected function _getSourceAdapter($sourceData)
     {
         if (is_array($sourceData)) {
-            $sourceAdapter = Mage::getModel('fastsimpleimport/arrayAdapter', array('data' => $sourceData, 'use_nested_arrays' => $this->getUseNestedArrays()));
-            return $sourceAdapter;
+            if ($this->getUseNestedArrays()) {
+                return Mage::getModel('fastsimpleimport/nestedArrayAdapter', $sourceData);
+            } else {
+                return Mage::getModel('fastsimpleimport/arrayAdapter', $sourceData);
+            }
         }
 
         return parent::_getSourceAdapter($sourceData);
@@ -405,7 +422,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     }
 
     /**
-     * Get error messages which information in which rows the errors occured
+     * Get error messages with information in which rows the errors occured
      *
      * @return array
      */
