@@ -13,7 +13,7 @@ title: FastSimpleImport - Options
         '_type' => 'simple',
         '_attribute_set' => 'Default',
         '_product_websites' => 'base',
-        'name' => 'Default',
+        'name' => 'Simple Product',
         'price' => 0.99,
         'description' => 'Default',
         'short_description' => 'Default',
@@ -85,7 +85,74 @@ try {
         'is_in_stock' => 1,
         '_associated_sku' => array('simple1', 'simple2'),
         '_associated_position' => array('1', '2'),
-    )
+    ),
+);
+
+try {
+    /** @var $import AvS_FastSimpleImport_Model_Import */
+    $import = Mage::getModel('fastsimpleimport/import');
+    $import
+        ->setUseNestedArrays(true)
+        ->processProductImport($data);
+} catch (Exception $e) {
+    print_r($import->getErrorMessages());
+}</pre>
+</div>
+
+<h3>Configurable Products</h3>
+<p>Sample code:</p>
+<div class="highlight highlight-php">
+    <pre>$data = array(
+        array(
+        'sku' => 'simple1',
+        '_type' => 'simple',
+        '_attribute_set' => 'Default',
+        '_product_websites' => 'base',
+        'name' => 'Simple Product 1',
+        'description' => 'Default',
+        'short_description' => 'Default',
+        'price' => 10,
+        'weight' => 0,
+        'status' => 1,
+        'visibility' => 4,
+        'tax_class_id' => 2,
+        'qty' => 99,
+        'is_in_stock' => 1,
+        'color' => 'red',
+    ),
+    array(
+        'sku' => 'simple2',
+        '_type' => 'simple',
+        '_attribute_set' => 'Default',
+        '_product_websites' => 'base',
+        'name' => 'Simple Product 2',
+        'description' => 'Default',
+        'short_description' => 'Default',
+        'price' => 10,
+        'weight' => 0,
+        'status' => 1,
+        'visibility' => 4,
+        'tax_class_id' => 2,
+        'qty' => 99,
+        'is_in_stock' => 1,
+        'color' => 'green',
+    ),
+    array(
+        'sku' => 'configurable',
+        '_type' => 'configurable',
+        '_attribute_set' => 'Default',
+        '_product_websites' => 'base',
+        'price' => 10,
+        'name' => 'Configurable Product',
+        'description' => 'Default',
+        'short_description' => 'Default',
+        'status' => 1,
+        'visibility' => 4,
+        'tax_class_id' => 2,
+        'is_in_stock' => 1,
+        '_super_products_sku' => array('simple1', 'simple2'),
+        '_super_attribute_code' => 'color',
+    ),
 );
 
 try {
