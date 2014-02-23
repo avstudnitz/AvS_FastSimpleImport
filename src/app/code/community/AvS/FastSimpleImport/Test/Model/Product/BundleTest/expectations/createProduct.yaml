@@ -19,3 +19,16 @@
     position: 1
     required: 1
     title: Option 1
+    product-simple1:
+      position: 1
+      selection_price_value: 10
+      selection_qty: 1
+      selection_can_change_qty: 1
+      is_default: 1
+    product-simple2:
+      position: 2
+      selection_price_value: 20
+      selection_qty: 2
+      selection_can_change_qty: 0
+      is_default: 0
+      

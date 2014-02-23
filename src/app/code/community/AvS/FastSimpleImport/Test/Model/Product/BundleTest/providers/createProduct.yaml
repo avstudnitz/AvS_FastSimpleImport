@@ -48,11 +48,11 @@
       _bundle_option_title: Option 1
       _bundle_option_type: select
       _bundle_option_position: 1
-        _bundle_option_required: 1
+      _bundle_option_required: 1
       _bundle_product_sku: 'simple2'
       _bundle_product_position: 2
       _bundle_product_is_default: false 
-      _bundle_product_qty: 1, 
+      _bundle_product_qty: 2, 
       _bundle_product_price_value: 20, 
       _bundle_product_can_change_qty: 0, 
     - sku: null
@@ -62,7 +62,7 @@
       _bundle_product_sku: 'simple1'
       _bundle_product_position: 1
       _bundle_product_is_default: true 
-      _bundle_product_qty: 2, 
+      _bundle_product_qty: 1, 
       _bundle_product_price_value: 10, 
       _bundle_product_can_change_qty: 1, 
 

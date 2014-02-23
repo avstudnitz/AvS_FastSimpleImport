@@ -48,10 +48,23 @@ class AvS_FastSimpleImport_Test_Model_Product_BundleTest extends EcomDev_PHPUnit
         $expectedOptions = $this->expected('%s-%s', $sku, 'options');
         $i = 0;
         foreach($options as $option) {
-
+            /** @var Mage_Bundle_Model_Option $option */
+            
             $expectedOption = $expectedOptions->getData($i++);
             $this->assertEquals($expectedOption['type'], $option->getType());
             $this->assertEquals($expectedOption['title'], $option->getDefaultTitle());
+            
+            /** @var $selections Mage_Bundle_Model_Resource_Selection_Collection */
+            $selections = Mage::getResourceModel('bundle/selection_collection')->setOptionIdsFilter($option->getId());
+            
+            foreach($selections as $selection) {
+                $expectedSelection = $expectedOption['product-' . $selection->getSku()];
+                $this->assertEquals($expectedSelection['position'], $selection->getData('position'));
+                $this->assertEquals($expectedSelection['is_default'], $selection->getData('is_default'));
+                $this->assertEquals($expectedSelection['selection_price_value'], $selection->getData('selection_price_value'));
+                $this->assertEquals($expectedSelection['selection_qty'], $selection->getData('selection_qty'));
+                $this->assertEquals($expectedSelection['selection_can_change_qty'], $selection->getData('selection_can_change_qty'));
+            }
         }
     }
 }
