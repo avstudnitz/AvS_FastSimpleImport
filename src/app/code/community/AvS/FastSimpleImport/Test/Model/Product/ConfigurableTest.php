@@ -34,7 +34,7 @@ class AvS_FastSimpleImport_Test_Model_Product_ConfigurableTest extends EcomDev_P
         $this->assertCount(3, $productBaseModel->getCollection()->getAllIds());
 
         $configurableProducts = $productBaseModel->getCollection()->addFieldToFilter('type_id' ,array('eq' => 'configurable'))->load();
-        $this->assertCount(1, $configurableProducts);
+        $this->assertCount(1, $configurableProducts->getAllIds());
 
         $sku = $configurableProducts->getFirstItem()->getSku();
 
