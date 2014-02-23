@@ -1,256 +1,70 @@
-## FastSimpleImport - Array Adapter for Magento ImportExport
+AvS_FastSimpleImport
+=====================
+Wrapper for Magento ImportExport functionality which imports data from arrays
 
-### Import products and customers into Magento, using the new fast ImportExport core module.
+Facts
+-----
+- version: 0.5.0
+- extension key: AvS_FastSimpleImport
+- extension on Magento Connect: n/a
+- Magento Connect 1.0 extension key: n/a
+- Magento Connect 2.0 extension key: n/a
+- Composer name: avstudnitz/fast-simple-import (included in http://packages.firegento.com/)
+- [Extension on GitHub](https://github.com/avstudnitz/AvS_FastSimpleImport)
+- [Direct download link](https://github.com/avstudnitz/AvS_FastSimpleImport/tarball/master)
+- [Documentation](http://avstudnitz.github.io/AvS_FastSimpleImport/)
 
-This module allows to import from arrays and thus using any import source, while the Magento module only imports from files.
-ImportExport exists since Magento 1.5 CE / 1.10 EE, image import since 1.6 CE / 1.11 EE. Thus, this module needs at least one of those versions.
+Description
+-----------
+This module allows to import from arrays and thus using any import source, while the Magento module only imports from files. 
+ImportExport exists since Magento 1.5 CE / 1.10 EE, image import since 1.6 CE / 1.11 EE. Thus, this module needs at least 
+one of those versions.
+ImportExport has a special import format. See [specifications](http://www.integer-net.de/download/ImportExport_EN.pdf) about the expected format.
 
-### Basic Usage
+Main Features:
 
-Call it like this:
-```php
-// Import product:
-$data = array(
-    array(
-        'sku' => '1234567',
-        '_type' => 'simple',
-        '_attribute_set' => 'Default',
-        '_product_websites' => 'base',
-        'name' => 'Default',
-        'price' => 0.99,
-        'description' => 'Default',
-        'short_description' => 'Default',
-        'weight' => 0,
-        'status' => 1,
-        'visibility' => 4,
-        'tax_class_id' => 2,
-        'qty' => 76,
-    ),
-    // add more products here
-);
-Mage::getSingleton('fastsimpleimport/import')
-    ->processProductImport($data);
+- Fast Import using the built in Magento module ImportExport
+- Partial Indexing of only the imported products available
+- Unit tests for many test cases included
+- Importing of additional entities: Categories, Category-Product relations, attribute options (coming soon)
+- Improved error messages stating which values are expected instead of a given value
 
-// Import customer:
-$data = array(
-    array(
-        'email' => 'customer@company.com',
-        '_website' => 'base',
-        'group_id' => 1,
-        'firstname' => 'John',
-        'lastname' => 'Doe',
-        '_address_firstname' => 'John',
-        '_address_lastname' => 'Doe',
-        '_address_street' => 'Main Street 1',
-        '_address_postcode' => '12345',
-        '_address_city' => 'Springfield',
-        '_address_country_id' => 'US',
-        '_address_telephone' => '+1 2345 6789',
-        '_address_default_billing_' => 1,
-        '_address_default_shipping_' => 0,
-	),
-    array(
-        'email' => '',
-        '_website' => '',
-        '_address_firstname' => 'John',
-        '_address_lastname' => 'Doe',
-        '_address_street' => 'Countryside 99',
-        '_address_postcode' => '98765',
-        '_address_city' => 'Cape Cod',
-        '_address_country_id' => 'US',
-        '_address_telephone' => '+1 9876 54321',
-        '_address_default_billing_' => 0,
-        '_address_default_shipping_' => 1,
-	),
-);
-Mage::getSingleton('fastsimpleimport/import')
-    ->processCustomerImport($data);
-```
+Please see our [**documentation**](http://avstudnitz.github.io/AvS_FastSimpleImport/) for a full list of features.
 
-You can see the [test file](https://github.com/avstudnitz/AvS_FastSimpleImport/blob/master/test.php) for more examples.
+Requirements
+------------
+- PHP >= 5.3.0
+- Mage_ImportExport
 
-See [specifications about the expected format](http://www.integer-net.de/download/ImportExport_EN.pdf).
+Compatibility
+-------------
+- Magento >= 1.6.0.0 / Magento EE >= 1.11.0.0
 
-### Features
+Installation Instructions
+-------------------------
+1. Install the extension via GitHub, composer or a similar method.
+2. Clear the cache, logout from the admin panel and then login again.
+3. Read the [documentation](http://avstudnitz.github.io/AvS_FastSimpleImport/)
+4. Configure the extension under System -> Configuration -> Services -> FastSimpleImport.
 
-* Check data without importing it
+Uninstallation
+--------------
+1. Remove all extension files from your Magento installation
 
-Just replace the word "process" in the above calls with "dryrun":
+Support
+-------
+If you have any issues with this extension, open an issue on [GitHub](https://github.com/avstudnitz/AvS_FastSimpleImport/issues).
 
-```php
-$importer = Mage::getSingleton('fastsimpleimport/import');
+Contribution
+------------
+Any contribution is highly appreciated. The best way to contribute code is to open a [pull request on GitHub](https://help.github.com/articles/using-pull-requests).
 
-$result = $importer->dryrunProductImport($data);
+Lead Developer
+---------
+Andreas von Studnitz 
+http://www.integer-net.de/agentur/andreas-von-studnitz/
+[@avstudnitz](https://twitter.com/avstudnitz)
 
-echo ($result  ? 'Input is OK' : 'Input has Errors');
-
-echo "Messages: " . PHP_EOL;
-echo $importer->getErrorMessage();
-
-# for categories
-Mage::getSingleton('fastsimpleimport/import')
-    ->dryrunCategoryImport($data);
-
-# for customers
-Mage::getSingleton('fastsimpleimport/import')
-    ->dryrunCustomerImport($data);
-```
-
-* Import products and customers from php arrays (see above)
-* Bugfix for ImportExport: default values were set on updates when the attribute was not given (only when a default value was present, i.e. with visibility)
-* Choose Import Behavior: "Replace" (default), "Append" or "Delete" like this:
-
-```php
-Mage::getSingleton('fastsimpleimport/import')
-    ->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_DELETE)
-    ->processProductImport($data);
-```
-
-* Activate Indexing of imported (or deleted) products only (Partial Indexing)
-
-```php
-Mage::getSingleton('fastsimpleimport/import')
-    ->setPartialIndexing(true)
-    ->processProductImport($data);
-```
-
-* Improved assigning of categories. In default, you can assign the category by giving the breadcrumb path below the root category, i.e. "Electronics/Cameras/Digital Cameras". Now, you can add the root category for uniqueness ("Root Catalog/Electronics/Cameras/Digital Cameras") or just the category id ("26").
-* Download images with http. Just enter the URL in the field *_media_image*, while *image*, *small_image* und *thumbnail* get the filename only.
-* **NEW:** Stop creating image duplicates (_1, _2, _3, etc.)
-
-```php
-Mage::getSingleton('fastsimpleimport/import')
-    ->setAllowRenameFiles(false);
-```
-
-* Create options for predefined **DROPDOWN** attributes automatically.
-
-```php
-Mage::getSingleton('fastsimpleimport/import')
-    ->setDropdownAttributes('color')
-    ->processProductImport($data);
-```
-
-or
-```php
-Mage::getSingleton('fastsimpleimport/import')
-    ->setDropdownAttributes(array('manufacturer', 'color'))
-    ->processProductImport($data);
-```
-
-* Create options for predefined **MULTI-SELECT** attributes automatically.
-
-```php
-Mage::getSingleton('fastsimpleimport/import')
-    ->setMultiselectAttributes('my_multi_select_attribute')
-    ->processProductImport($data);
-```
-
-or
-```php
-Mage::getSingleton('fastsimpleimport/import')
-    ->setMultiselectAttributes(array('my_multi_select_attribute_1', 'my_multi_select_attribute_2'))
-    ->processProductImport($data);
-```
-
-* Continue import after error in parts of import data:
-
-```php
-Mage::getSingleton('fastsimpleimport/import')
-    ->setContinueAfterErrors(true)
-    ->processProductImport($data);
-```
-
-* **NEW:** Import categories:
-
-```php
-$data = array();
-$data[] = array(
-    '_root' => 'Default Category',
-    '_category' => 'Test2',
-    'name' => 'Test2',
-    'description' => 'Test2',
-    'is_active' => 'yes',
-    'include_in_menu' => 'yes',
-    'meta_description' => 'Meta Test',
-    'available_sort_by' => 'position',
-    'default_sort_by' => 'position',
-);
-$data[] = array(
-    '_root' => 'Default Category',
-    '_category' => 'Test2/Test3',
-    'name' => 'TestTest',
-    'description' => 'Test3',
-    'is_active' => 'yes',
-    'include_in_menu' => 'yes',
-    'meta_description' => 'Meta Test',
-    'available_sort_by' => 'position',
-    'default_sort_by' => 'position',
-);
-$data[] = array(
-    '_root' => 'Default Category',
-    '_category' => 'Test2/Test4 \/ WithSlash',
-    'name' => 'Test4 / WithSlash',
-    'description' => 'When specifying a category path for a category with a slash (/) in the name, escape the slash with a backslash (Test \/ WithSlash).',
-    'is_active' => 'yes',
-    'include_in_menu' => 'yes',
-    'meta_description' => 'Meta Test',
-    'available_sort_by' => 'position',
-    'default_sort_by' => 'position',
-);
-
-/** @var $import AvS_FastSimpleImport_Model_Import */
-$import = Mage::getModel('fastsimpleimport/import');
-try {
-    $import->processCategoryImport($data);
-} catch (Exception $e) {
-    print_r($import->getErrorMessages());
-}
-```
-
-* **NEW:** Import category product relation:
-
-```php
-$data = array();
-$data[] = array(
-    '_root' => 'Default Category',
-    '_category' => 'Test2',
-    '_sku' => '4711',
-    'position' => 1
-);
-$data[] = array(
-    '_root' => 'Default Category',
-    '_category' => 'Test2',
-    '_sku' => '0815',
-    'position' => 2
-);
-$data[] = array(
-    '_root' => 'Default Category',
-    '_category' => 'Test2/Test3',
-    '_sku' => '0815',
-    'position' => 1
-);
-
-/** @var $import AvS_FastSimpleImport_Model_Import */
-$import = Mage::getModel('fastsimpleimport/import');
-try {
-    $import->processCategoryProductImport($data);
-} catch (Exception $e) {
-    print_r($import->getErrorMessages());
-}
-```
-
-### Limitations / Wiki
-
-Refer to the [project wiki](https://github.com/avstudnitz/AvS_FastSimpleImport/wiki) for more information on known issues or limitations.
-
-### License
-
+License
+-------
 [OSL - Open Software Licence 3.0](http://opensource.org/licenses/osl-3.0.php)
-
-
-**NEW:** Import categories option:
-
-```php
-$import->setIgnoreDuplicates(true); //if a row is encountered more than once it will be ignored and wont throw an error
-```
