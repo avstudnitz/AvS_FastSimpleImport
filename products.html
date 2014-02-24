@@ -228,7 +228,17 @@ try {
         '_bundle_product_price_value' => array(10, 20), 
         '_bundle_product_can_change_qty' => array(1, 0), 
     )
-);</pre>
+);
+        
+try {
+    /** @var $import AvS_FastSimpleImport_Model_Import */
+    $import = Mage::getModel('fastsimpleimport/import');
+    $import
+        ->setUseNestedArrays(true)
+        ->processProductImport($data);
+} catch (Exception $e) {
+    print_r($import->getErrorMessages());
+}</pre>
 </div>
         
 
