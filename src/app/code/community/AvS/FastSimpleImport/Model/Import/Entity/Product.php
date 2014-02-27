@@ -231,10 +231,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                 && strpos($rowData['_media_image'], 'http') === 0
                 && strpos($rowData['_media_image'], '://') !== false
             ) {
-                if (!is_file($this->_getUploader()->getTmpDir() . DS . basename($rowData['_media_image']))) {
+                if (!is_file($this->_getUploader()->getTmpDir() . DS . parse_url(basename($rowData['_media_image']),PHP_URL_PATH))) {
                     $this->_copyExternalImageFile($rowData['_media_image']);
                 }
-                $this->_getSource()->setValue('_media_image', basename($rowData['_media_image']));
+                $this->_getSource()->setValue('_media_image', parse_url(basename($rowData['_media_image']),PHP_URL_PATH));
             }
             $this->_getSource()->next();
         }
@@ -252,7 +252,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             if (!is_dir($dir)) {
                 mkdir($dir);
             }
-            $fileHandle = fopen($dir . DS . basename($url), 'w+');
+            $fileName = parse_url(basename($url),PHP_URL_PATH);
+            $fileHandle = fopen($dir . DS . $fileName, 'w+');
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_TIMEOUT, 50);
             curl_setopt($ch, CURLOPT_FILE, $fileHandle);
