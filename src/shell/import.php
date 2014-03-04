@@ -26,6 +26,12 @@ class AvS_FastSimpleImport_Shell_Import extends Mage_Shell_Abstract
                     return;
                 }
 
+                //initialize the translations so that we are able to translate things.
+                Mage::app()->loadAreaPart(
+                    Mage_Core_Model_App_Area::AREA_ADMINHTML,
+                    Mage_Core_Model_App_Area::PART_TRANSLATE
+                );
+
                 $importMethod = $importMethods[$importTypeCode];
 
                 $data = $this->_getImportArray();
