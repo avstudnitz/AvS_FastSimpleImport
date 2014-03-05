@@ -126,4 +126,13 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
 
         $this->_array[$this->_position][$key] = $value;
     }
+
+    public function unsetValue($key)
+    {
+        if (!$this->valid()) {
+            return;
+        }
+
+        unset($this->_array[$this->_position][$key]);
+    }
 }

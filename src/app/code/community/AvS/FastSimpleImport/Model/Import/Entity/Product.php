@@ -85,9 +85,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     {
         if (!$this->_dataValidated) {
             $this->_createAttributeOptions();
-            $this->_importExternalImageFiles();
+            $this->_preprocessImageData();
 
-            if (! $this->getAllowRenameFiles()) {
+            if (!$this->getAllowRenameFiles()) {
                 $this->_getUploader()->setAllowRenameFiles(false);
             }
         }
@@ -220,7 +220,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      * Autofill the fields "_media_attribute_id", "_media_is_disabled", "_media_position" and "_media_lable",
      * Check field "_media_image" for http links to images; download them
      */
-    protected function _importExternalImageFiles()
+    protected function _preprocessImageData()
     {
         $mediaAttributeId = Mage::getSingleton('catalog/product')->getResource()->getAttribute('media_gallery')->getAttributeId();
         
@@ -238,14 +238,22 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                 if (!isset($rowData['_media_position']) || !$rowData['_media_position']) {
                     $this->_getSource()->setValue('_media_position', 0);
                 }
-                if (!isset($rowData['_media_lable']) || !$rowData['_media_lable']) {
+                if (!isset($rowData['_media_lable'])) {
                     $this->_getSource()->setValue('_media_lable', '');
                 }
                 if (strpos($rowData['_media_image'], 'http') === 0 && strpos($rowData['_media_image'], '://') !== false) {
-                    if (!is_file($this->_getUploader()->getTmpDir() . DS . basename($rowData['_media_image']))) {
-                        $this->_copyExternalImageFile($rowData['_media_image']);
+                    
+                    if (isset($rowData['_media_target_filename']) && $rowData['_media_target_filename']) {
+                        $targetFilename = $rowData['_media_target_filename'];
+                    } else {
+                        $targetFilename = basename(parse_url($rowData['_media_image'], PHP_URL_PATH));
                     }
-                    $this->_getSource()->setValue('_media_image', basename($rowData['_media_image']));
+                    $this->_getSource()->unsetValue('_media_target_filename');
+                    
+                    if (!is_file($this->_getUploader()->getTmpDir() . DS . $targetFilename)) {
+                        $this->_copyExternalImageFile($rowData['_media_image'], $targetFilename);
+                    }
+                    $this->_getSource()->setValue('_media_image',$targetFilename);
                 }
             }
             $this->_getSource()->next();
@@ -256,15 +264,16 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      * Download given file to ImportExport Tmp Dir (usually media/import)
      *
      * @param string $url
+     * @param string $targetFilename
      */
-    protected function _copyExternalImageFile($url)
+    protected function _copyExternalImageFile($url, $targetFilename)
     {
         try {
             $dir = $this->_getUploader()->getTmpDir();
             if (!is_dir($dir)) {
                 mkdir($dir);
             }
-            $fileHandle = fopen($dir . DS . basename($url), 'w+');
+            $fileHandle = fopen($dir . DS . $targetFilename, 'w+');
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_TIMEOUT, 50);
             curl_setopt($ch, CURLOPT_FILE, $fileHandle);
