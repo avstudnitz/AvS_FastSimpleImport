@@ -1,0 +1,5 @@
+config:
+  default/fastsimpleimport/product/weight: 12345
+  default/fastsimpleimport/product/visibility: 3
+  default/fastsimpleimport/product/status: 2
+  default/fastsimpleimport/product/tax_class_id: 4

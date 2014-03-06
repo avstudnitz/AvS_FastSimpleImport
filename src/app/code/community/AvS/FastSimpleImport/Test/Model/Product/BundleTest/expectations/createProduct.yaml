@@ -1,0 +1,34 @@
+123456789-1:
+  type_id: bundle
+  attribute_set_id: 4
+  name: Default
+  price: 0.99
+  description: Default
+  short_description: Default
+  weight: 0
+  status: 1
+  visibility: 4
+  tax_class_id: 2
+123456789-stock:
+  manage_stock: 1
+  is_in_stock: 1
+123456789-children:
+  skus: [simple1, simple2]
+123456789-options:
+  - type: select
+    position: 1
+    required: 1
+    title: Option 1
+    product-simple1:
+      position: 1
+      selection_price_value: 10
+      selection_qty: 1
+      selection_can_change_qty: 1
+      is_default: 1
+    product-simple2:
+      position: 2
+      selection_price_value: 20
+      selection_qty: 2
+      selection_can_change_qty: 0
+      is_default: 0
+      

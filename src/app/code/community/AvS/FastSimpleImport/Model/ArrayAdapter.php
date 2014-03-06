@@ -39,13 +39,14 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
     /* Methods required for Iterator interface */
 
     /**
-     * Initialize data and position
+     * Initialize data and position; transferm multi arrays if activated
      *
      * @param array $data
      */
     public function __construct($data)
     {
         $this->_array = $data;
+                
         $this->_position = 0;
     }
 
@@ -124,5 +125,14 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
         }
 
         $this->_array[$this->_position][$key] = $value;
+    }
+
+    public function unsetValue($key)
+    {
+        if (!$this->valid()) {
+            return;
+        }
+
+        unset($this->_array[$this->_position][$key]);
     }
 }
