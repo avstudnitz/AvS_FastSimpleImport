@@ -888,8 +888,12 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      * Uploading files into the "catalog/product" media folder.
      * Return a new file name if the same file is already exists.
      *
-     * @param string $fileName
-     * @return string
+     * @see https://github.com/avstudnitz/AvS_FastSimpleImport/issues/109
+     * In some cases the moving of files doesn't work because it is already
+     * moved in a previous entity. We try and find the product in the destination folder.
+     *
+     * @param  string $fileName ex: /abc.jpg
+     * @return string           ex: /a/b/abc.jpg
      */
     protected function _uploadMediaFiles($fileName)
     {
@@ -897,7 +901,17 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             $res = $this->_getUploader()->move($fileName);
             return $res['file'];
         } catch (Exception $e) {
+            //added additional logging
             Mage::logException($e);
+
+            //find new target
+            $dispretionPath = Mage_ImportExport_Model_Import_Uploader::getDispretionPath(substr($fileName, 1));
+            $destDir = $this->_getUploader()->getDestDir();
+            $targetFile = $destDir.$dispretionPath.$fileName;
+
+            if (file_exists($targetFile)) {
+                return $targetFile;
+            }
             return '';
         }
     }
