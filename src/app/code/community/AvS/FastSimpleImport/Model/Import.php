@@ -41,7 +41,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $this->setMultiselectAttributes(array_filter(explode(',', Mage::getStoreConfig('fastsimpleimport/product/multiselect_attributes'))));
         $this->setAllowRenameFiles(Mage::getStoreConfigFlag('fastsimpleimport/product/allow_rename_files'));
         $this->setImageAttributes(array_filter(explode(',', Mage::getStoreConfig('fastsimpleimport/product/additional_image_attributes'))));
-        $this->getDisablePreprocessImageData(Mage::getStoreConfigFlag('fastsimpleimport/product/disable_preprocess_images'));
+        $this->setDisablePreprocessImageData(Mage::getStoreConfigFlag('fastsimpleimport/product/disable_preprocess_images'));
     }
 
     /**

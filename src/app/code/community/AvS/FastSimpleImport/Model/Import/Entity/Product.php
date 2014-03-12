@@ -245,7 +245,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      */
     protected function _preprocessImageData()
     {
-        if (!$this->getDisablePreprocessImageData()) {
+        if ($this->getDisablePreprocessImageData()) {
             return;
         }
 
