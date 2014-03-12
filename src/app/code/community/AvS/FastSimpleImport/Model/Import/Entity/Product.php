@@ -108,9 +108,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     {
         if (!$this->_dataValidated) {
             $this->_createAttributeOptions();
-            if (!$this->getDisablePreprocessImageData()) {
-                $this->_preprocessImageData();
-            }
+            $this->_preprocessImageData();
 
             if (!$this->getAllowRenameFiles()) {
                 $this->_getUploader()->setAllowRenameFiles(false);
@@ -247,6 +245,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      */
     protected function _preprocessImageData()
     {
+        if (!$this->getDisablePreprocessImageData()) {
+            return;
+        }
+
         $mediaAttributeId = Mage::getSingleton('catalog/product')->getResource()->getAttribute('media_gallery')->getAttributeId();
         
         $this->_getSource()->rewind();
