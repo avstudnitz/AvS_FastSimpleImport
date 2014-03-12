@@ -28,6 +28,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     /** @var bool */
     protected $_isDryRun = false;
 
+    protected $_disablePreprocessImageData = false;
+
     /**
      * Set the error limit when the importer will stop
      * @param $limit
@@ -43,11 +45,32 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     public function setAllowRenameFiles($allow)
     {
         $this->_allowRenameFiles = (boolean) $allow;
+        return $this;
     }
 
     public function getAllowRenameFiles()
     {
         return $this->_allowRenameFiles;
+    }
+
+
+    /**
+     * @return boolean
+     */
+    public function getDisablePreprocessImageData()
+    {
+        return $this->_disablePreprocessImageData;
+    }
+
+
+    /**
+     * @param boolean $disablePreprocessImageData
+     * @return $this
+     */
+    public function setDisablePreprocessImageData($disablePreprocessImageData)
+    {
+        $this->_disablePreprocessImageData = (boolean) $disablePreprocessImageData;
+        return $this;
     }
 
 
@@ -85,7 +108,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     {
         if (!$this->_dataValidated) {
             $this->_createAttributeOptions();
-            $this->_preprocessImageData();
+            if (!$this->getDisablePreprocessImageData()) {
+                $this->_preprocessImageData();
+            }
 
             if (!$this->getAllowRenameFiles()) {
                 $this->_getUploader()->setAllowRenameFiles(false);

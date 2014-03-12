@@ -24,6 +24,8 @@
  * @method boolean getIgnoreDuplicates()
  * @method AvS_FastSimpleImport_Model_Import setAllowRenameFiles(boolean $value)
  * @method boolean getAllowRenameFiles()
+ * @method AvS_FastSimpleImport_Model_Import setDisablePreprocessImageData(boolean $value)
+ * @method boolean getDisablePreprocessImageData()
  */
 class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 {
@@ -67,6 +69,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setMultiselectAttributes($this->getMultiselectAttributes());
         $entityAdapter->setImageAttributes($this->getImageAttributes());
         $entityAdapter->setAllowRenameFiles($this->getAllowRenameFiles());
+        $entityAdapter->setDisablePreprocessImageData($this->getDisablePreprocessImageData());
         $this->setEntityAdapter($entityAdapter);
 
         $validationResult = $this->validateSource($data);
