@@ -907,10 +907,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             //find new target
             $dispretionPath = Mage_ImportExport_Model_Import_Uploader::getDispretionPath(substr($fileName, 1));
             $destDir = $this->_getUploader()->getDestDir();
-            $targetFile = $destDir.$dispretionPath.$fileName;
 
-            if (file_exists($targetFile)) {
-                return $targetFile;
+            if (file_exists($destDir.$dispretionPath.$fileName)) {
+                return $dispretionPath.$fileName;
             }
             return '';
         }
