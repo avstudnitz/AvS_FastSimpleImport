@@ -443,46 +443,40 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             'reindex_eav_product_ids'   => &$entityIds  // for product_indexer_eav
         ));
 
-        /*
-         * Index our product entities.
-         */
-        try {
-            Mage::dispatchEvent('fastsimpleimport_reindex_products_before_indexer_stock', array('entity_id' => &$entityIds));
-            Mage::getResourceSingleton('cataloginventory/indexer_stock')->catalogProductMassAction($event);
+        // Index our product entities.
+        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_indexer_stock', array('entity_id' => &$entityIds));
+        Mage::getResourceSingleton('cataloginventory/indexer_stock')->catalogProductMassAction($event);
 
-            Mage::dispatchEvent('fastsimpleimport_reindex_products_before_product_indexer_price', array('entity_id' => &$entityIds));
-            Mage::getResourceSingleton('catalog/product_indexer_price')->catalogProductMassAction($event);
+        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_product_indexer_price', array('entity_id' => &$entityIds));
+        Mage::getResourceSingleton('catalog/product_indexer_price')->catalogProductMassAction($event);
 
-            Mage::dispatchEvent('fastsimpleimport_reindex_products_before_category_indexer_product', array('entity_id' => &$entityIds));
-            Mage::getResourceSingleton('catalog/category_indexer_product')->catalogProductMassAction($event);
+        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_category_indexer_product', array('entity_id' => &$entityIds));
+        Mage::getResourceSingleton('catalog/category_indexer_product')->catalogProductMassAction($event);
 
-            Mage::dispatchEvent('fastsimpleimport_reindex_products_before_product_indexer_eav', array('entity_id' => &$entityIds));
-            Mage::getResourceSingleton('catalog/product_indexer_eav')->catalogProductMassAction($event);
+        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_product_indexer_eav', array('entity_id' => &$entityIds));
+        Mage::getResourceSingleton('catalog/product_indexer_eav')->catalogProductMassAction($event);
 
-            Mage::dispatchEvent('fastsimpleimport_reindex_products_before_fulltext', array('entity_id' => &$entityIds));
-            Mage::getResourceSingleton('catalogsearch/fulltext')->rebuildIndex(null, $entityIds);
+        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_fulltext', array('entity_id' => &$entityIds));
+        Mage::getResourceSingleton('catalogsearch/fulltext')->rebuildIndex(null, $entityIds);
 
-            if (Mage::getResourceModel('ecomdev_urlrewrite/indexer')) {
-                Mage::dispatchEvent('fastsimpleimport_reindex_products_before_ecomdev_urlrewrite', array('entity_id' => &$entityIds));
-                Mage::getResourceSingleton('ecomdev_urlrewrite/indexer')->updateProductRewrites($entityIds);
-            } else {
-                Mage::dispatchEvent('fastsimpleimport_reindex_products_before_urlrewrite', array('entity_id' => &$entityIds));
-                /* @var $urlModel Mage_Catalog_Model_Url */
-                $urlModel = Mage::getSingleton('catalog/url');
+        if (Mage::getResourceModel('ecomdev_urlrewrite/indexer')) {
+            Mage::dispatchEvent('fastsimpleimport_reindex_products_before_ecomdev_urlrewrite', array('entity_id' => &$entityIds));
+            Mage::getResourceSingleton('ecomdev_urlrewrite/indexer')->updateProductRewrites($entityIds);
+        } else {
+            Mage::dispatchEvent('fastsimpleimport_reindex_products_before_urlrewrite', array('entity_id' => &$entityIds));
+            /* @var $urlModel Mage_Catalog_Model_Url */
+            $urlModel = Mage::getSingleton('catalog/url');
 
-                $urlModel->clearStoreInvalidRewrites(); // Maybe some products were moved or removed from website
-                foreach ($entityIds as $productId) {
-                    $urlModel->refreshProductRewrite($productId);
-                }
+            $urlModel->clearStoreInvalidRewrites(); // Maybe some products were moved or removed from website
+            foreach ($entityIds as $productId) {
+                $urlModel->refreshProductRewrite($productId);
             }
-
-            Mage::dispatchEvent('fastsimpleimport_reindex_products_before_flat', array('entity_id' => &$entityIds));
-            Mage::getSingleton('catalog/product_flat_indexer')->saveProduct($entityIds);
-
-            Mage::dispatchEvent('fastsimpleimport_reindex_products_after', array('entity_id' => &$entityIds));
-        } catch (Exception $e) {
-            echo $e->getMessage();
         }
+
+        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_flat', array('entity_id' => &$entityIds));
+        Mage::getSingleton('catalog/product_flat_indexer')->saveProduct($entityIds);
+
+        Mage::dispatchEvent('fastsimpleimport_reindex_products_after', array('entity_id' => &$entityIds));
 
         return $this;
     }
