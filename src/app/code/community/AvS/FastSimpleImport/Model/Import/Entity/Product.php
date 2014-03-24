@@ -613,6 +613,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      */
     public function setImageAttributes($attributeCodes)
     {
+        if (! is_array($attributeCodes)) {
+            return;
+        }
         $this->_imagesArrayKeys = $this->_imageAttributes = array_merge($this->_imagesArrayKeys, $attributeCodes);
     }
 
