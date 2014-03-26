@@ -85,7 +85,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
 
     public function saveData()
     {
-        if($this->isSuitable())
+        if(!$this->isSuitable())
         {
             return $this;
         }
