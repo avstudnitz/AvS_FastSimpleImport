@@ -352,7 +352,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
      */
     public function isSuitable()
     {
-        if(Mage::getConfig()->getModuleConfig('Mage_Bundle')->is('active', 'true'))
+        if(!Mage::getConfig()->getModuleConfig('Mage_Bundle')->is('active', 'true'))
         {
             return false;
         }
