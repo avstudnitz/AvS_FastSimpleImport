@@ -85,6 +85,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
 
     public function saveData()
     {
+        if(!$this->isSuitable())
+        {
+            return $this;
+        }
         $connection       = $this->_entityModel->getConnection();
         $newSku           = $this->_entityModel->getNewSku();
         $oldSku           = $this->_entityModel->getOldSku();
@@ -339,5 +343,15 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
         }
         $oldSkus = $this->_entityModel->getOldSku();
         return !isset($oldSkus[$sku]);
+    }
+    
+    /**
+     * check if Mage_Bundle module is enabled
+     * 
+     * @return boolean
+     */
+    public function isSuitable()
+    {
+        return Mage::getConfig()->getModuleConfig('Mage_Bundle')->is('active', 'true');
     }
 }
