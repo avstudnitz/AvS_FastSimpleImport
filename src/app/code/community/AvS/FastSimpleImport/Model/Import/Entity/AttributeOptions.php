@@ -11,6 +11,55 @@ class AvS_FastSimpleImport_Model_Import_Entity_AttributeOptions
     const COL_ORDER  = 'order';
     const COL_DELETE = 'delete';
 
+
+    public function updateAttributeOptions($data)
+    {
+        $this->isAttributeCodeValid($data['attribute_code']);
+        $id = Mage::getModel('eav/entity_attribute')->getIdByCode('catalog_product', $data['attribute_code']);
+        $attr = Mage::getModel('eav/entity_attribute')->load($id);
+//        var_dump(Mage::app()->getStore()->setId(0));
+        $allOptions = $attr->setStoreId(0)->getSource()->getAllOptions(false);
+        //Mage::app()->getWebsites());
+        foreach (Mage::app()->getStores() as $store) {
+            $stores[$store->getName()] = $store->getId();
+        }
+
+        foreach ($allOptions as $option) {
+            if ($option['label'] == $data['admin']) {
+                if (isset($data['view']) && is_array($data['view'])) {
+                    if (isset($data['admin_new'])) {
+                        $values[] = $data['admin_new'];
+                    } else {
+                        $values[] = $data['admin'];
+                    }
+                    foreach ($data['view'] as $viewKey => $view) {
+                        $values[$stores[$viewKey]] = $view;
+                    }
+
+                }
+                $updated = array(self::COL_ORDER => array($option['value'] => $data['order']),
+                                 self::COL_VALUE => array($option['value'] => $values),
+                );
+            }
+        }
+        if (isset($data['label']));
+        $labels = array();
+        foreach ($attr->getStoreLabels() as $label) {
+            foreach ($data['label'] as $labelKey => $viewLabel) {
+                $labels[$stores[$labelKey]] = $viewLabel;
+            }
+        }
+        $attr->setData('store_labels', $labels);
+
+
+        $attr->setOption($updated);
+        $attr->save();
+
+
+
+    }
+
+
     /**
      * createOrUpdateAttributeValue
      *
