@@ -28,6 +28,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     /** @var bool */
     protected $_isDryRun = false;
 
+    /** @var bool */
     protected $_disablePreprocessImageData = false;
 
     /**
@@ -250,7 +251,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         }
 
         $mediaAttributeId = Mage::getSingleton('catalog/product')->getResource()->getAttribute('media_gallery')->getAttributeId();
-        
+
         $this->_getSource()->rewind();
         while ($this->_getSource()->valid()) {
 
@@ -269,20 +270,35 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                     $this->_getSource()->setValue('_media_lable', '');
                 }
                 if (strpos($rowData['_media_image'], 'http') === 0 && strpos($rowData['_media_image'], '://') !== false) {
-                    
+
                     if (isset($rowData['_media_target_filename']) && $rowData['_media_target_filename']) {
                         $targetFilename = $rowData['_media_target_filename'];
                     } else {
                         $targetFilename = basename(parse_url($rowData['_media_image'], PHP_URL_PATH));
                     }
-                    $this->_getSource()->unsetValue('_media_target_filename');
-                    
+
                     if (!is_file($this->_getUploader()->getTmpDir() . DS . $targetFilename)) {
                         $this->_copyExternalImageFile($rowData['_media_image'], $targetFilename);
                     }
-                    $this->_getSource()->setValue('_media_image',$targetFilename);
+                    $this->_getSource()->setValue('_media_image', $targetFilename);
+
+                } else {
+
+                    if (isset($rowData['_media_target_filename']) && $rowData['_media_target_filename']) {
+                        $targetFilename = $rowData['_media_target_filename'];
+
+                        if (!is_file($this->_getUploader()->getTmpDir() . DS . $targetFilename)) {
+                            if (is_file($this->_getUploader()->getTmpDir() . DS . $rowData['_media_image'])) {
+                                copy($this->_getUploader()->getTmpDir() . DS . $rowData['_media_image'], $this->_getUploader()->getTmpDir() . DS . $targetFilename);
+                            }
+                            $this->_getSource()->setValue('_media_image', $targetFilename);
+                        }
+                    }
                 }
+
+                $this->_getSource()->unsetValue('_media_target_filename');
             }
+
             $this->_getSource()->next();
         }
     }
@@ -563,7 +579,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             if (!$attributeCode) {
                 continue;
             }
-            
+
             /** @var $attribute Mage_Eav_Model_Entity_Attribute */
             $attribute = Mage::getSingleton('catalog/product')->getResource()->getAttribute($attributeCode);
             if (!is_object($attribute)) {
@@ -697,7 +713,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             case 'multiselect':
                 $isAutocreate = isset($this->_dropdownAttributes[$attrCode]) || isset($this->_multiselectAttributes[$attrCode]);
                 if ($this->getIsDryRun() && ($isAutocreate)) {
-                	$valid = true; // Force validation in case of dry run with options of dropdown or multiselect which doesn't yet exist
+                    $valid = true; // Force validation in case of dry run with options of dropdown or multiselect which doesn't yet exist
                     break;
                 }
                 $valid = isset($attrParams['options'][strtolower($rowData[$attrCode])]);
@@ -924,7 +940,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         if (isset($rowData['fsi_line_number'])) {
             $rowNum = $rowData['fsi_line_number'];
         }
-        
+
         return parent::validateRow($rowData, $rowNum);
-    }    
+    }
 }
