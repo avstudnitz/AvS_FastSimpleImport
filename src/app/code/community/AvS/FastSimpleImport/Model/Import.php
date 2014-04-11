@@ -54,6 +54,10 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      */
     public function processProductImport($data, $behavior = NULL)
     {
+        $transport = new Varien_Object(array('import_data' => $data));
+        Mage::dispatchEvent('fastsimpleimport_import_products_before', array('import_data' => $transport));
+        $data = $transport->getImportData();
+
         if (!is_null($behavior)) {
             $this->setBehavior($behavior);
         }
@@ -115,6 +119,10 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      */
     public function dryrunProductImport($data, $behavior = NULL)
     {
+        $transport = new Varien_Object(array('import_data' => $data));
+        Mage::dispatchEvent('fastsimpleimport_dryrun_products_before', array('import_data' => $transport));
+        $data = $transport->getImportData();
+
         if (!is_null($behavior)) {
             $this->setBehavior($behavior);
         }
@@ -144,6 +152,10 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      */
     public function processCustomerImport($data, $behavior = NULL)
     {
+        $transport = new Varien_Object(array('import_data' => $data));
+        Mage::dispatchEvent('fastsimpleimport_import_customers_before', array('import_data' => $transport));
+        $data = $transport->getImportData();
+
         if (!is_null($behavior)) {
             $this->setBehavior($behavior);
         }
@@ -191,6 +203,10 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      */
     public function dryrunCustomerImport($data, $behavior = NULL)
     {
+        $transport = new Varien_Object(array('import_data' => $data));
+        Mage::dispatchEvent('fastsimpleimport_dryrun_customers_before', array('import_data' => $transport));
+        $data = $transport->getImportData();
+
         if (!is_null($behavior)) {
             $this->setBehavior($behavior);
         }
@@ -219,6 +235,10 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      */
     public function processCategoryImport($data, $behavior = NULL)
     {
+        $transport = new Varien_Object(array('import_data' => $data));
+        Mage::dispatchEvent('fastsimpleimport_import_categories_before', array('import_data' => $transport));
+        $data = $transport->getImportData();
+
         if (!is_null($behavior)) {
             $this->setBehavior($behavior);
         }
@@ -275,6 +295,10 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      */
     public function dryrunCategoryImport($data, $behavior = NULL)
     {
+        $transport = new Varien_Object(array('import_data' => $data));
+        Mage::dispatchEvent('fastsimpleimport_dryrun_categories_before', array('import_data' => $transport));
+        $data = $transport->getImportData();
+
         if (!is_null($behavior)) {
             $this->setBehavior($behavior);
         }
@@ -303,6 +327,10 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      */
     public function processCategoryProductImport($data, $behavior = NULL)
     {
+        $transport = new Varien_Object(array('import_data' => $data));
+        Mage::dispatchEvent('fastsimpleimport_import_categoryproducts_before', array('import_data' => $transport));
+        $data = $transport->getImportData();
+
         if (!is_null($behavior)) {
             $this->setBehavior($behavior);
         }
@@ -354,6 +382,10 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      */
     public function dryrunCategoryProductImport($data, $behavior = NULL)
     {
+        $transport = new Varien_Object(array('import_data' => $data));
+        Mage::dispatchEvent('fastsimpleimport_dryrun_categoryproducts_before', array('import_data' => $transport));
+        $data = $transport->getImportData();
+
         if (!is_null($behavior)) {
             $this->setBehavior($behavior);
         }
