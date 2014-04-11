@@ -11,6 +11,13 @@
 class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExport_Model_Import_Entity_Abstract
 {
     /**
+     * Code of a primary attribute which identifies the entity group if import contains of multiple rows
+     *
+     * @var string
+     */
+    protected $masterAttributeCode = '_category';
+
+    /**
      * Size of bunch - part of entities to save in one step.
      */
     const BUNCH_SIZE = 20;
@@ -208,9 +215,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         parent::__construct();
 
         $this->_initWebsites()
-             ->_initStores()
-             ->_initCategories()
-             ->_initAttributes();
+            ->_initStores()
+            ->_initCategories()
+            ->_initAttributes();
 
         /* @var $categoryResource Mage_Catalog_Model_Resource_Category */
         $categoryResource = Mage::getModel('catalog/category')->getResource();
@@ -474,7 +481,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                         'parent_id'   => $parentCategory['entity_id'],
                         'level'       => $parentCategory['level'] + 1,
                         'created_at'  => empty($rowData['created_at']) ? now()
-                                         : gmstrftime($strftimeFormat, strtotime($rowData['created_at'])),
+                                : gmstrftime($strftimeFormat, strtotime($rowData['created_at'])),
                         'updated_at'  => now(),
                         'position'    => $rowData['position']
                     );
@@ -522,7 +529,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
                 foreach (array_intersect_key($rowData, $this->_attributes) as $attrCode => $attrValue) {
                     if (!$this->_attributes[$attrCode]['is_static'] && strlen($attrValue)) {
-                        
+
                         /** @var $attribute Mage_Eav_Model_Entity_Attribute */
                         $attribute = $this->_attributes[$attrCode]['attribute'];
 
@@ -1026,5 +1033,69 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
     protected function _reindexUpdatedCategories() {
         //not yet implemented
+    }
+
+    /**
+     * Validate data rows and save bunches to DB.
+     * Taken from https://github.com/tim-bezhashvyly/Sandfox_ImportExportFix
+     *
+     * @return Mage_ImportExport_Model_Import_Entity_Abstract
+     */
+    protected function _saveValidatedBunches()
+    {
+        $source = $this->_getSource();
+        $bunchRows = array();
+        $startNewBunch = false;
+        $maxDataSize = Mage::getResourceHelper('importexport')->getMaxDataSize();
+        $bunchSize = Mage::helper('importexport')->getBunchSize();
+
+        $source->rewind();
+        $this->_dataSourceModel->cleanBunches();
+
+        while ($source->valid() || count($bunchRows) || isset($entityGroup)) {
+            if ($startNewBunch || !$source->valid()) {
+                /* If the end approached add last validated entity group to the bunch */
+                if (!$source->valid() && isset($entityGroup)) {
+                    $bunchRows = array_merge($bunchRows, $entityGroup);
+                    unset($entityGroup);
+                }
+                $this->_dataSourceModel->saveBunch($this->getEntityTypeCode(), $this->getBehavior(), $bunchRows);
+                $bunchRows = array();
+                $startNewBunch = false;
+            }
+            if ($source->valid()) {
+                if ($this->_errorsCount >= $this->_errorsLimit) { // errors limit check
+                    return $this;
+                }
+                $rowData = $source->current();
+
+                $this->_processedRowsCount++;
+
+                if (isset($rowData[$this->masterAttributeCode]) && trim($rowData[$this->masterAttributeCode])) {
+                    /* Add entity group that passed validation to bunch */
+                    if (isset($entityGroup)) {
+                        $bunchRows = array_merge($bunchRows, $entityGroup);
+                        $productDataSize = strlen(serialize($bunchRows));
+
+                        /* Check if the nw bunch should be started */
+                        $isBunchSizeExceeded = ($bunchSize > 0 && count($bunchRows) >= $bunchSize);
+                        $startNewBunch = $productDataSize >= $maxDataSize || $isBunchSizeExceeded;
+                    }
+
+                    /* And start a new one */
+                    $entityGroup = array();
+                }
+
+                if (isset($entityGroup) && $this->validateRow($rowData, $source->key())) {
+                    /* Add row to entity group */
+                    $entityGroup[$source->key()] = $this->_prepareRowForDb($rowData);
+                } elseif (isset($entityGroup)) {
+                    /* In case validation of one line of the group fails kill the entire group */
+                    unset($entityGroup);
+                }
+                $source->next();
+            }
+        }
+        return $this;
     }
 }
