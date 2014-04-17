@@ -196,6 +196,51 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         return $validationResult;
     }
 
+
+    public function processAttributeOptionImport($data, $behavior = NULL)
+    {
+        if (!is_null($behavior)) {
+            $this->setBehavior($behavior);
+        }
+
+        $partialIndexing = $this->getPartialIndexing();
+
+        /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Attribute_Option */
+        $importAdapter = Mage::getModel('fastsimpleimport/import_attribute_option');
+        $importAdapter->setBehavior($this->getBehavior());
+        $importAdapter->setErrorLimit($this->getErrorLimit());
+        $this->setImporter($importAdapter);
+        $validationResult = $this->validateSource($data);
+        if ($this->getImporter()->getProcessedRowsCount() > 0) {
+            if (!$validationResult) {
+                if ($importAdapter->getErrorsCount() >= $importAdapter->getErrorsLimit()) {
+                    Mage::throwException(
+                        sprintf("Error Limit of %s Errors reached, stopping import.", $importAdapter->getErrorsLimit())
+                        . "\n" . $this->getImporter()->getErrorMessage()
+                    );
+                }
+
+                if (!$this->getContinueAfterErrors()) {
+                    Mage::throwException($this->getImporter()->getErrorMessage());
+                }
+            }
+
+            if ($this->getImporter()->getProcessedRowsCount() > $this->getImporter()->getInvalidRowsCount()) {
+                $this->getImporter()->importSource();
+
+/*
+                if (!empty($partialIndexing)) {
+                    $this->getEntityAdapter()->reindexImportedCategories();
+                } else {
+                    $this->invalidateIndex();
+                }
+*/
+            }
+        }
+
+        return $this;
+    }
+
     /**
      * Import categories
      *
@@ -408,6 +453,15 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         return $this->getEntityAdapter()->getErrorMessages();
     }
 
+    public function getImporter()
+    {
+        return $this->_importer;
+    }
+
+    public function setImporter($importer)
+    {
+        $this->_importer = $importer;
+    }
     /**
      * Validates source file and returns validation result.
      *
@@ -417,10 +471,15 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
      */
     public function validateSource($sourceData)
     {
-        $result = $this->_getEntityAdapter()
-            ->setArraySource($this->_getSourceAdapter($sourceData))
-            ->isDataValid();
-
+        if ($this->getEntityAdapter()) {
+            $result = $this->_getEntityAdapter()
+                ->setArraySource($this->_getSourceAdapter($sourceData))
+                ->isDataValid();
+        } else {
+            $result = $this->getImporter()
+                ->setArraySource($this->_getSourceAdapter($sourceData))
+                ->isDataValid();
+        }
         return $result;
     }
 

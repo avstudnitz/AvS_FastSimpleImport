@@ -33,6 +33,10 @@
                     <model_token>fastsimpleimport/import_entity_category</model_token>
                     <label>Category</label>
                 </catalog_category>
+                <attribute_option translate="label">
+                    <model_token>fastsimpleimport/import_entity_attribute_option</model_token>
+                    <label>Attribute Option</label>
+                </attribute_option>
             </import_entities>
 
             <import_product_types>
