@@ -901,13 +901,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
 
         if ($removeEmptyFields || $symbolForClearField) {
             foreach($rowData as $key => $fieldValue) {
-                if ($removeEmptyFields) {
-                    if (!strlen($fieldValue)) {
-                        unset($rowData[$key]);
-                    }
-                }
-
-                if ($symbolForClearField && trim($fieldValue) == $symbolForClearField) {
+                if ($removeEmptyFields && !strlen($fieldValue)) {
+                    unset($rowData[$key]);
+                } else if ($symbolForClearField && trim($fieldValue) == $symbolForClearField) {
                     $rowData[$key] = '';
                 }
             }
