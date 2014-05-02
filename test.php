@@ -51,7 +51,7 @@ for ($i = 1; $i <= 10; $i++) {
         'short_description' => 'Default',
         'meta_title' => 'Default',
         'meta_description' => 'Default',
-        'meta_keywords' => 'Default',
+        'meta_keyword' => 'Default',
         'weight' => 11,
         'status' => 1,
         'visibility' => 4,

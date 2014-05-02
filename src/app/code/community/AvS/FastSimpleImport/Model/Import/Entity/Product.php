@@ -889,20 +889,38 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
 
     /**
      * Removes empty keys in case value is null or empty string
+     * Behavior can be turned off with config setting "fastsimpleimport/product/clear_field_on_empty_string"
+     * You can define a string which can be used for clearing a field, configured in "fastsimpleimport/product/symbol_for_clear_field"
      *
      * @param array $rowData
      */
     protected function _filterRowData(&$rowData)
     {
-        $rowData = array_filter($rowData, 'strlen');
-        if (!isset($rowData[self::COL_SKU])) {
+        $removeEmptyFields = !Mage::getStoreConfigFlag('fastsimpleimport/product/clear_field_on_empty_string');
+        $symbolForClearField = trim(Mage::getStoreConfig('fastsimpleimport/product/symbol_for_clear_field'));
+
+        if ($removeEmptyFields || $symbolForClearField) {
+            foreach($rowData as $key => $fieldValue) {
+                if ($removeEmptyFields) {
+                    if (!strlen($fieldValue)) {
+                        unset($rowData[$key]);
+                    }
+                }
+
+                if ($symbolForClearField && trim($fieldValue) == $symbolForClearField) {
+                    $rowData[$key] = '';
+                }
+            }
+        }
+
+        if (!isset($rowData[self::COL_SKU]) || $rowData[self::COL_SKU] === '') {
             $rowData[self::COL_SKU] = null;
         }
-        if (!isset($rowData[self::COL_ATTR_SET])) {
+
+        if (!isset($rowData[self::COL_ATTR_SET]) || $rowData[self::COL_ATTR_SET] === '') {
             $rowData[self::COL_ATTR_SET] = null;
         }
     }
-
 
     /**
      * Uploading files into the "catalog/product" media folder.

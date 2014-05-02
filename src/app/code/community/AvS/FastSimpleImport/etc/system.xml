@@ -174,6 +174,23 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </disable_preprocess_images>
+                        <clear_field_on_empty_string translate="label">
+                            <label>Clear Field on Empty String</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>180</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </clear_field_on_empty_string>
+                        <symbol_for_clear_field translate="label">
+                            <label>Symbol for Clearing a Field</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>190</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </symbol_for_clear_field>
                     </fields>
                 </product>
             </groups>
