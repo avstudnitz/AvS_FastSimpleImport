@@ -15,7 +15,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
      *
      * @var string
      */
-    protected $masterAttributeCode = '_email';
+    protected $masterAttributeCode = 'email';
 
     /**
      * Set the error limit when the importer will stop
