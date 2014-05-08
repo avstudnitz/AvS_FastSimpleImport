@@ -38,6 +38,12 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     /** @var bool */
     protected $_disablePreprocessImageData = false;
 
+    /** @var null|bool */
+    protected $_unsetEmptyFields = null;
+
+    /** @var null|bool */
+    protected $_symbolEmptyFields = null;
+
     /**
      * Set the error limit when the importer will stop
      * @param $limit
@@ -148,6 +154,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         while ($this->_getSource()->valid()) {
 
             $rowData = $this->_getSource()->current();
+            $this->_filterRowData($rowData);
             foreach ($this->getDropdownAttributes() as $attribute) {
 
                 /** @var $attribute Mage_Eav_Model_Entity_Attribute */
@@ -180,6 +187,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         while ($this->_getSource()->valid()) {
 
             $rowData = $this->_getSource()->current();
+            $this->_filterRowData($rowData);
             foreach ($this->getMultiselectAttributes() as $attribute) {
 
                 /** @var $attribute Mage_Eav_Model_Entity_Attribute */
@@ -889,22 +897,23 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
 
     /**
      * Removes empty keys in case value is null or empty string
-     * Behavior can be turned off with config setting "fastsimpleimport/product/clear_field_on_empty_string"
+     * Behavior can be turned off with config setting "fastsimpleimport/general/clear_field_on_empty_string"
      * You can define a string which can be used for clearing a field, configured in "fastsimpleimport/product/symbol_for_clear_field"
      *
      * @param array $rowData
      */
     protected function _filterRowData(&$rowData)
     {
-        $removeEmptyFields = !Mage::getStoreConfigFlag('fastsimpleimport/product/clear_field_on_empty_string');
-        $symbolForClearField = trim(Mage::getStoreConfig('fastsimpleimport/product/symbol_for_clear_field'));
-
-        if ($removeEmptyFields || $symbolForClearField) {
+        if ($this->_unsetEmptyFields === null) {
+            $this->_unsetEmptyFields = !Mage::getStoreConfigFlag('fastsimpleimport/general/clear_field_on_empty_string');
+            $this->_symbolEmptyFields = trim(Mage::getStoreConfig('fastsimpleimport/general/symbol_for_clear_field'));
+        }
+        if ($this->_unsetEmptyFields || $this->_symbolEmptyFields) {
             foreach($rowData as $key => $fieldValue) {
-                if ($removeEmptyFields && !strlen($fieldValue)) {
+                if ($this->_unsetEmptyFields && !strlen($fieldValue)) {
                     unset($rowData[$key]);
-                } else if ($symbolForClearField && trim($fieldValue) == $symbolForClearField) {
-                    $rowData[$key] = '';
+                } else if ($this->_symbolEmptyFields && trim($fieldValue) == $this->_symbolEmptyFields) {
+                    $rowData[$key] = NULL;
                 }
             }
         }
@@ -962,6 +971,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             $rowNum = $rowData['fsi_line_number'];
         }
 
+        $this->_filterRowData($rowData);
         return parent::validateRow($rowData, $rowNum);
     }
 

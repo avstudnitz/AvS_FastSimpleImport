@@ -66,14 +66,14 @@
                 <error_limit>100</error_limit>
                 <support_nested_arrays>0</support_nested_arrays>
                 <ignore_duplicates>0</ignore_duplicates>
+                <clear_field_on_empty_string>0</clear_field_on_empty_string>
+                <symbol_for_clear_field>###EMPTY###</symbol_for_clear_field>
             </general>
             <product>
                 <allow_rename_files>1</allow_rename_files>
                 <status>1</status>
                 <visibility>4</visibility>
                 <weight>0</weight>
-                <clear_field_on_empty_string>0</clear_field_on_empty_string>
-                <symbol_for_clear_field>###EMPTY###</symbol_for_clear_field>
             </product>
         </fastsimpleimport>
     </default>

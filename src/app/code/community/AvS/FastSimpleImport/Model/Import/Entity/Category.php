@@ -17,6 +17,12 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     protected $masterAttributeCode = '_category';
 
+    /** @var null|bool */
+    protected $_unsetEmptyFields = null;
+
+    /** @var null|bool */
+    protected $_symbolEmptyFields = null;
+
     /**
      * Size of bunch - part of entities to save in one step.
      */
@@ -776,13 +782,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     public function validateRow(array $rowData, $rowNum)
     {
-        if (isset($rowData['fsi_line_number'])) {
-            $rowNum = $rowData['fsi_line_number'];
-        }
-
         static $root = null;
         static $category = null;
 
+        if (isset($rowData['fsi_line_number'])) {
+            $rowNum = $rowData['fsi_line_number'];
+        }
+        $this->_filterRowData($rowData);
 
         // check if row is already validated
         if (isset($this->_validatedRows[$rowNum])) {
@@ -1033,6 +1039,30 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
     protected function _reindexUpdatedCategories() {
         //not yet implemented
+    }
+
+    /**
+     * Removes empty keys in case value is null or empty string
+     * Behavior can be turned off with config setting "fastsimpleimport/general/clear_field_on_empty_string"
+     * You can define a string which can be used for clearing a field, configured in "fastsimpleimport/product/symbol_for_clear_field"
+     *
+     * @param array $rowData
+     */
+    protected function _filterRowData(&$rowData)
+    {
+        if ($this->_unsetEmptyFields === null) {
+            $this->_unsetEmptyFields = !Mage::getStoreConfigFlag('fastsimpleimport/general/clear_field_on_empty_string');
+            $this->_symbolEmptyFields = trim(Mage::getStoreConfig('fastsimpleimport/general/symbol_for_clear_field'));
+        }
+        if ($this->_unsetEmptyFields || $this->_symbolEmptyFields) {
+            foreach($rowData as $key => $fieldValue) {
+                if ($this->_unsetEmptyFields && !strlen($fieldValue)) {
+                    unset($rowData[$key]);
+                } else if ($this->_symbolEmptyFields && trim($fieldValue) == $this->_symbolEmptyFields) {
+                    $rowData[$key] = NULL;
+                }
+            }
+        }
     }
 
     /**
