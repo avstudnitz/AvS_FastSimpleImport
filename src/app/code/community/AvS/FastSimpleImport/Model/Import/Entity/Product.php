@@ -778,6 +778,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         $priceIsGlobal  = Mage::helper('catalog')->isPriceGlobal();
         $productLimit   = null;
         $productsQty    = null;
+        $rowSku         = null;
 
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
             $entityRowsIn = array();
