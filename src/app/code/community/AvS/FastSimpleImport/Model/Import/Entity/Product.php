@@ -845,6 +845,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                     $categories[$rowSku][$categoryId] = true;
                 } elseif (!empty($categoryPath)) {
                     $categories[$rowSku][$this->_categories[$categoryPath]] = true;
+                } else {
+                    $categories[$rowSku] = array();
                 }
 
                 if (!empty($rowData['_tier_price_website'])) { // 4.1. Tier prices phase
