@@ -15,7 +15,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      *
      * @var string
      */
-    protected $masterAttributeCode = 'sku';
+    protected $_masterAttributeCode = 'sku';
 
     /** @var array */
     protected $_dropdownAttributes = array();
@@ -1011,7 +1011,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
 
                 $this->_processedRowsCount++;
 
-                if (isset($rowData[$this->masterAttributeCode]) && trim($rowData[$this->masterAttributeCode])) {
+                if (isset($rowData[$this->_masterAttributeCode]) && trim($rowData[$this->_masterAttributeCode])) {
                     /* Add entity group that passed validation to bunch */
                     if (isset($entityGroup)) {
                         $bunchRows = array_merge($bunchRows, $entityGroup);

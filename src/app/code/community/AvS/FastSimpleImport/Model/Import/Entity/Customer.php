@@ -15,7 +15,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
      *
      * @var string
      */
-    protected $masterAttributeCode = 'email';
+    protected $_masterAttributeCode = 'email';
 
     /** @var null|bool */
     protected $_unsetEmptyFields = null;
@@ -278,7 +278,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
 
                 $this->_processedRowsCount++;
 
-                if (isset($rowData[$this->masterAttributeCode]) && trim($rowData[$this->masterAttributeCode])) {
+                if (isset($rowData[$this->_masterAttributeCode]) && trim($rowData[$this->_masterAttributeCode])) {
                     /* Add entity group that passed validation to bunch */
                     if (isset($entityGroup)) {
                         $bunchRows = array_merge($bunchRows, $entityGroup);
