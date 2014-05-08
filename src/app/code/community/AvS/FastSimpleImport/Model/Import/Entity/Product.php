@@ -870,12 +870,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                             ? 0 : $this->_websiteCodeToId[$rowData['_group_price_website']]
                     );
                 }
-                foreach ($this->_imagesArrayKeys as $imageCol) {
-                    if (!empty($rowData[$imageCol])) { // 5. Media gallery phase
-                        if (!array_key_exists($rowData[$imageCol], $uploadedGalleryFiles)) {
-                            $uploadedGalleryFiles[$rowData[$imageCol]] = $this->_uploadMediaFiles($rowData[$imageCol]);
+                if (is_array($this->_imagesArrayKeys)  && count($this->_imagesArrayKeys) > 0) {
+                    foreach ($this->_imagesArrayKeys as $imageCol) {
+                        if (!empty($rowData[$imageCol])) { // 5. Media gallery phase
+                            if (!array_key_exists($rowData[$imageCol], $uploadedGalleryFiles)) {
+                                $uploadedGalleryFiles[$rowData[$imageCol]] = $this->_uploadMediaFiles($rowData[$imageCol]);
+                            }
+                            $rowData[$imageCol] = $uploadedGalleryFiles[$rowData[$imageCol]];
                         }
-                        $rowData[$imageCol] = $uploadedGalleryFiles[$rowData[$imageCol]];
                     }
                 }
                 if (!empty($rowData['_media_image'])) {
