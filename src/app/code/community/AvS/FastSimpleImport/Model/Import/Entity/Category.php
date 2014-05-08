@@ -551,7 +551,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                             }
                         } elseif ('datetime' == $attribute->getBackendType() && strtotime($attrValue)) {
                             $attrValue = gmstrftime($strftimeFormat, strtotime($attrValue));
-                        } elseif ($backModel) {
+                        } elseif ($backModel && 'available_sort_by' != $attrCode) {
                             $attribute->getBackend()->beforeSave($category);
                             $attrValue = $category->getData($attribute->getAttributeCode());
                         }
