@@ -328,6 +328,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                 }
             }
         }
+
+        if (!isset($rowData[self::COL_EMAIL]) || $rowData[self::COL_EMAIL] === '') {
+            $rowData[self::COL_EMAIL] = null;
+        }
     }
 
     /**
