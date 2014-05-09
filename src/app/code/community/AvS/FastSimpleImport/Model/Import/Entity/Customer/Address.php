@@ -7,6 +7,9 @@
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software Licence 3.0 (OSL-3.0)
  * @author     Paul Hachmang <paul@h-o.nl>
  */
+/**
+ * @property AvS_FastSimpleImport_Model_Import_Entity_Customer $_customer
+ */
 class AvS_FastSimpleImport_Model_Import_Entity_Customer_Address
     extends Mage_ImportExport_Model_Import_Entity_Customer_Address {
     
@@ -39,6 +42,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer_Address
             $defaults   = array(); // customer default addresses (billing/shipping) data
 
             foreach ($bunch as $rowNum => $rowData) {
+                $this->_customer->filterRowData($rowData);
                 if (!empty($rowData[Mage_ImportExport_Model_Import_Entity_Customer::COL_EMAIL])
                         && !empty($rowData[Mage_ImportExport_Model_Import_Entity_Customer::COL_WEBSITE])
                 ) {
