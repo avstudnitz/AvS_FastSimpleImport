@@ -23,6 +23,18 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
     /** @var null|bool */
     protected $_symbolEmptyFields = null;
 
+
+    /**
+     * Constructor.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->_addressEntity = Mage::getModel('fastsimpleimport/import_entity_customer_address', $this);
+    }
+
     /**
      * Set the error limit when the importer will stop
      * @param $limit
