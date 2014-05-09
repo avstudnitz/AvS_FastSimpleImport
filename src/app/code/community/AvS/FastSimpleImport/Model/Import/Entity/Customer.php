@@ -18,10 +18,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
     protected $_masterAttributeCode = 'email';
 
     /** @var null|bool */
-    protected $_unsetEmptyFields = null;
+    protected $_unsetEmptyFields = false;
 
     /** @var null|bool */
-    protected $_symbolEmptyFields = null;
+    protected $_symbolEmptyFields = false;
 
 
     /**
@@ -59,6 +59,26 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
     public function getIgnoreDuplicates()
     {
         return $this->_ignoreDuplicates;
+    }
+
+
+    /**
+     * @param boolean $value
+     * @return $this
+     */
+    public function setUnsetEmptyFields($value) {
+        $this->_unsetEmptyFields = (boolean) $value;
+        return $this;
+    }
+
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setSymbolEmptyFields($value) {
+        $this->_symbolEmptyFields = $value;
+        return $this;
     }
 
     /**
@@ -331,10 +351,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
      */
     protected function _filterRowData(&$rowData)
     {
-        if ($this->_unsetEmptyFields === null) {
-            $this->_unsetEmptyFields = !Mage::getStoreConfigFlag('fastsimpleimport/general/clear_field_on_empty_string');
-            $this->_symbolEmptyFields = trim(Mage::getStoreConfig('fastsimpleimport/general/symbol_for_clear_field'));
-        }
         if ($this->_unsetEmptyFields || $this->_symbolEmptyFields) {
             foreach($rowData as $key => $fieldValue) {
                 if ($this->_unsetEmptyFields && !strlen($fieldValue)) {

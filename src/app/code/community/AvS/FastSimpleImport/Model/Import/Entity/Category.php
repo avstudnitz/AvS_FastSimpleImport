@@ -11,19 +11,6 @@
 class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExport_Model_Import_Entity_Abstract
 {
     /**
-     * Code of a primary attribute which identifies the entity group if import contains of multiple rows
-     *
-     * @var string
-     */
-    protected $_masterAttributeCode = '_category';
-
-    /** @var null|bool */
-    protected $_unsetEmptyFields = null;
-
-    /** @var null|bool */
-    protected $_symbolEmptyFields = null;
-
-    /**
      * Size of bunch - part of entities to save in one step.
      */
     const BUNCH_SIZE = 20;
@@ -62,6 +49,12 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     const ERROR_VALUE_IS_REQUIRED              = 'valueIsRequired';
     const ERROR_CATEGORY_NOT_FOUND_FOR_DELETE  = 'categoryNotFoundToDelete';
 
+    /**
+     * Code of a primary attribute which identifies the entity group if import contains of multiple rows
+     *
+     * @var string
+     */
+    protected $_masterAttributeCode = '_category';
 
     /**
      * Category attributes parameters.
@@ -189,6 +182,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     /** @var bool */
     protected $_ignoreDuplicates = false;
 
+    /** @var null|bool */
+    protected $_unsetEmptyFields = false;
+
+    /** @var null|bool */
+    protected $_symbolEmptyFields = false;
+
+
     public function setIgnoreDuplicates($ignore)
     {
         $this->_ignoreDuplicates = (boolean) $ignore;
@@ -199,6 +199,27 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     {
         return $this->_ignoreDuplicates;
     }
+
+
+    /**
+     * @param boolean $value
+     * @return $this
+     */
+    public function setUnsetEmptyFields($value) {
+        $this->_unsetEmptyFields = (boolean) $value;
+        return $this;
+    }
+
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setSymbolEmptyFields($value) {
+        $this->_symbolEmptyFields = $value;
+        return $this;
+    }
+
 
     /**
      * Set the error limit when the importer will stop
@@ -1053,10 +1074,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     protected function _filterRowData(&$rowData)
     {
-        if ($this->_unsetEmptyFields === null) {
-            $this->_unsetEmptyFields = !Mage::getStoreConfigFlag('fastsimpleimport/general/clear_field_on_empty_string');
-            $this->_symbolEmptyFields = trim(Mage::getStoreConfig('fastsimpleimport/general/symbol_for_clear_field'));
-        }
         if ($this->_unsetEmptyFields || $this->_symbolEmptyFields) {
             foreach($rowData as $key => $fieldValue) {
                 if ($this->_unsetEmptyFields && !strlen($fieldValue)) {
