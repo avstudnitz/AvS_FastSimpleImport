@@ -242,6 +242,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             $idToDelete = array();
 
             foreach ($bunch as $rowNum => $rowData) {
+                $this->_filterRowData($rowData);
                 if ($this->validateRow($rowData, $rowNum) && self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
                     $idToDelete[] = $this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]]['entity_id'];
                 }
@@ -476,6 +477,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 $rowScope = $this->getRowScope($rowData);
 
                 $rowData = $this->_prepareRowForDb($rowData);
+                $this->_filterRowData($rowData);
 
                 if (self::SCOPE_DEFAULT == $rowScope) {
                     $rowCategory = $rowData[self::COL_CATEGORY];
@@ -534,7 +536,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 $category = Mage::getModel('catalog/category', $rowData);
 
                 foreach (array_intersect_key($rowData, $this->_attributes) as $attrCode => $attrValue) {
-                    if (!$this->_attributes[$attrCode]['is_static'] && strlen($attrValue)) {
+                    if (!$this->_attributes[$attrCode]['is_static']) {
 
                         /** @var $attribute Mage_Eav_Model_Entity_Attribute */
                         $attribute = $this->_attributes[$attrCode]['attribute'];
@@ -889,6 +891,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         $categoryIds = array();
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
             foreach ($bunch as $rowNum => $rowData) {
+                $this->_filterRowData($rowData);
                 if (!$this->isRowAllowedToImport($rowData, $rowNum)) {
                     continue;
                 }

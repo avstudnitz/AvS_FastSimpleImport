@@ -99,6 +99,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                 if (!$this->validateRow($rowData, $rowNum)) {
                     continue;
                 }
+                $this->_filterRowData($rowData);
                 if (self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
                     // entity table data
                     $entityRow = array(
@@ -129,7 +130,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                     }
                     // attribute values
                     foreach (array_intersect_key($rowData, $this->_attributes) as $attrCode => $value) {
-                        if (!$this->_attributes[$attrCode]['is_static'] && strlen($value)) {
+                        if (!$this->_attributes[$attrCode]['is_static']) {
                             /** @var $attribute Mage_Customer_Model_Attribute */
                             $attribute  = $resource->getAttribute($attrCode);
                             $backModel  = $attribute->getBackendModel();

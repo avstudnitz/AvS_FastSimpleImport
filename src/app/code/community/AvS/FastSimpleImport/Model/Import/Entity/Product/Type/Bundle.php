@@ -22,6 +22,9 @@
 
 */
 
+/**
+ * @property AvS_FastSimpleImport_Model_Import_Entity_Product $_entityModel
+ */
 class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
     extends Mage_ImportExport_Model_Import_Entity_Product_Type_Abstract
 {
@@ -107,6 +110,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
                 if (!$this->_entityModel->isRowAllowedToImport($rowData, $rowNum)) {
                     continue;
                 }
+                $this->_entityModel->filterRowData($rowData);
                 $scope = $this->_entityModel->getRowScope($rowData);
                 if (Mage_ImportExport_Model_Import_Entity_Product::SCOPE_DEFAULT == $scope) {
                     $productData = $newSku[$rowData[Mage_ImportExport_Model_Import_Entity_Product::COL_SKU]];

@@ -8,6 +8,9 @@
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software Licence 3.0 (OSL-3.0)
  * @author     Andreas von Studnitz <avs@avs-webentwicklung.de>
  */
+/**
+ * @property AvS_FastSimpleImport_Model_Import_Entity_Product $_entityModel
+ */
 class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Grouped
     extends Mage_ImportExport_Model_Import_Entity_Product_Type_Grouped
 {
@@ -162,6 +165,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Grouped
                 'relation'         => array()
             );
             foreach ($bunch as $rowNum => $rowData) {
+                $this->_entityModel->filterRowData($rowData);
                 if (!$this->_entityModel->isRowAllowedToImport($rowData, $rowNum)
                     || empty($rowData['_associated_sku'])
                 ) {
