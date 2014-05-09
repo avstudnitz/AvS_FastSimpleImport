@@ -6,7 +6,7 @@
  * @category   AvS
  * @package    AvS_FastSimpleImport
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software Licence 3.0 (OSL-3.0)
- * @author     Andreas von Studnitz <avs@avs-webentwicklung.de>
+ * @author     Paul Hachmang <paul@h-o.nl>
  */
 class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExport_Model_Import_Entity_Abstract
 {
