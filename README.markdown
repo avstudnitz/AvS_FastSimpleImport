@@ -2,6 +2,9 @@ AvS_FastSimpleImport
 =====================
 Wrapper for Magento ImportExport functionality which imports data from arrays
 
+[Documentation](http://avstudnitz.github.io/AvS_FastSimpleImport/)
+-------------------------------
+
 Facts
 -----
 - version: 0.5.0
