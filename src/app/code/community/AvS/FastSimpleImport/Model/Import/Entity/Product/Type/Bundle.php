@@ -22,6 +22,9 @@
 
 */
 
+/**
+ * @property AvS_FastSimpleImport_Model_Import_Entity_Product $_entityModel
+ */
 class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
     extends Mage_ImportExport_Model_Import_Entity_Product_Type_Abstract
 {
@@ -85,6 +88,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
 
     public function saveData()
     {
+        if(!$this->isSuitable())
+        {
+            return $this;
+        }
         $connection       = $this->_entityModel->getConnection();
         $newSku           = $this->_entityModel->getNewSku();
         $oldSku           = $this->_entityModel->getOldSku();
@@ -103,6 +110,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
                 if (!$this->_entityModel->isRowAllowedToImport($rowData, $rowNum)) {
                     continue;
                 }
+                $this->_entityModel->filterRowData($rowData);
                 $scope = $this->_entityModel->getRowScope($rowData);
                 if (Mage_ImportExport_Model_Import_Entity_Product::SCOPE_DEFAULT == $scope) {
                     $productData = $newSku[$rowData[Mage_ImportExport_Model_Import_Entity_Product::COL_SKU]];
@@ -339,5 +347,15 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
         }
         $oldSkus = $this->_entityModel->getOldSku();
         return !isset($oldSkus[$sku]);
+    }
+    
+    /**
+     * check if Mage_Bundle module is enabled
+     * 
+     * @return boolean
+     */
+    public function isSuitable()
+    {
+        return Mage::getConfig()->getModuleConfig('Mage_Bundle')->is('active', 'true');
     }
 }

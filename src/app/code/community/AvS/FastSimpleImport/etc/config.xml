@@ -10,7 +10,7 @@
 <config>
     <modules>
         <AvS_FastSimpleImport>
-            <version>0.5.0</version>
+            <version>0.6.0</version>
         </AvS_FastSimpleImport>
     </modules>
 
@@ -66,6 +66,8 @@
                 <error_limit>100</error_limit>
                 <support_nested_arrays>0</support_nested_arrays>
                 <ignore_duplicates>0</ignore_duplicates>
+                <clear_field_on_empty_string>0</clear_field_on_empty_string>
+                <symbol_for_clear_field>###EMPTY###</symbol_for_clear_field>
             </general>
             <product>
                 <allow_rename_files>1</allow_rename_files>
