@@ -786,6 +786,36 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         return (bool) $valid;
     }
 
+    /**
+     * Save product attributes.
+     *
+     * @param array $attributesData
+     * @return Mage_ImportExport_Model_Import_Entity_Product
+     */
+    protected function _saveProductAttributes(array $attributesData)
+    {
+        foreach ($attributesData as $tableName => $skuData) {
+            $tableData = array();
+
+            foreach ($skuData as $sku => $attributes) {
+                $productId = $this->_newSku[$sku]['entity_id'];
+
+                foreach ($attributes as $attributeId => $storeValues) {
+                    foreach ($storeValues as $storeId => $storeValue) {
+                        $tableData[] = array(
+                            'entity_id'      => $productId,
+                            'entity_type_id' => $this->_entityTypeId,
+                            'attribute_id'   => $attributeId,
+                            'store_id'       => $storeId,
+                            'value'          => $storeValue
+                        );
+                    }
+                }
+            }
+            $this->_connection->insertOnDuplicate($tableName, $tableData, array('value'));
+        }
+        return $this;
+    }
     
     /**
      * Gather and save information about product entities.
