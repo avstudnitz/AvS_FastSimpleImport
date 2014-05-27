@@ -802,17 +802,29 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
 
                 foreach ($attributes as $attributeId => $storeValues) {
                     foreach ($storeValues as $storeId => $storeValue) {
-                        $tableData[] = array(
-                            'entity_id'      => $productId,
-                            'entity_type_id' => $this->_entityTypeId,
-                            'attribute_id'   => $attributeId,
-                            'store_id'       => $storeId,
-                            'value'          => $storeValue
-                        );
+                        if (! is_null($storeValue)) {
+                            $tableData[] = array(
+                                'entity_id'      => $productId,
+                                'entity_type_id' => $this->_entityTypeId,
+                                'attribute_id'   => $attributeId,
+                                'store_id'       => $storeId,
+                                'value'          => $storeValue
+                            );
+                        } else {
+                            $this->_connection->delete($tableName, array(
+                                'entity_id'      => $productId,
+                                'entity_type_id' => $this->_entityTypeId,
+                                'attribute_id'   => $attributeId,
+                                'store_id'       => $storeId,
+                            ));
+                        }
                     }
                 }
             }
-            $this->_connection->insertOnDuplicate($tableName, $tableData, array('value'));
+
+            if (count($tableData)) {
+                $this->_connection->insertOnDuplicate($tableName, $tableData, array('value'));
+            }
         }
         return $this;
     }
