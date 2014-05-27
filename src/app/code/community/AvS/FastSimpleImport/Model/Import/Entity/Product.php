@@ -811,11 +811,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                                 'value'          => $storeValue
                             );
                         } else {
-                            $this->_connection->delete($tableName, array(
-                                'entity_id'      => $productId,
-                                'entity_type_id' => $this->_entityTypeId,
-                                'attribute_id'   => $attributeId,
-                                'store_id'       => $storeId,
+                            /** @var Magento_Db_Adapter_Pdo_Mysql $connection */
+                            $connection = $this->_connection;
+
+                            $connection->delete($tableName, array(
+                                'entity_id=?'      => (int) $productId,
+                                'entity_type_id=?' => (int) $this->_entityTypeId,
+                                'attribute_id=?'   => (int) $attributeId,
+                                'store_id=?'       => (int) $storeId,
                             ));
                         }
                     }
