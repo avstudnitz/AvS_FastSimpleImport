@@ -787,6 +787,68 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     }
 
     /**
+     * Prepare attributes data
+     *
+     * @param array $rowData
+     * @param int $rowScope
+     * @param array $attributes
+     * @param string|null $rowSku
+     * @param int $rowStore
+     * @return array
+     */
+    protected function _prepareAttributes($rowData, $rowScope, $attributes, $rowSku, $rowStore)
+    {
+        $product = Mage::getModel('importexport/import_proxy_product', $rowData);
+
+        foreach ($rowData as $attrCode => $attrValue) {
+            $attribute = $this->_getAttribute($attrCode);
+            if ('multiselect' != $attribute->getFrontendInput()
+                && self::SCOPE_NULL == $rowScope
+            ) {
+                continue; // skip attribute processing for SCOPE_NULL rows
+            }
+            $attrId = $attribute->getId();
+            $backModel = $attribute->getBackendModel();
+            $attrTable = $attribute->getBackend()->getTable();
+            $storeIds = array(0);
+
+            if (!is_null($attrValue)) {
+                if ('datetime' == $attribute->getBackendType() && strtotime($attrValue)) {
+                    $attrValue = gmstrftime($this->_getStrftimeFormat(), strtotime($attrValue));
+                } elseif ($backModel) {
+                    $attribute->getBackend()->beforeSave($product);
+                    $attrValue = $product->getData($attribute->getAttributeCode());
+                }
+            }
+            if (self::SCOPE_STORE == $rowScope) {
+                if (self::SCOPE_WEBSITE == $attribute->getIsGlobal()) {
+                    // check website defaults already set
+                    if (!isset($attributes[$attrTable][$rowSku][$attrId][$rowStore])) {
+                        $storeIds = $this->_storeIdToWebsiteStoreIds[$rowStore];
+                    }
+                } elseif (self::SCOPE_STORE == $attribute->getIsGlobal()) {
+                    $storeIds = array($rowStore);
+                }
+            }
+            foreach ($storeIds as $storeId) {
+                if ('multiselect' == $attribute->getFrontendInput()) {
+                    if (!isset($attributes[$attrTable][$rowSku][$attrId][$storeId])) {
+                        $attributes[$attrTable][$rowSku][$attrId][$storeId] = '';
+                    } else {
+                        $attributes[$attrTable][$rowSku][$attrId][$storeId] .= ',';
+                    }
+                    $attributes[$attrTable][$rowSku][$attrId][$storeId] .= $attrValue;
+                } else {
+                    $attributes[$attrTable][$rowSku][$attrId][$storeId] = $attrValue;
+                }
+            }
+            $attribute->setBackendModel($backModel); // restore 'backend_model' to avoid 'default' setting
+        }
+        return $attributes;
+    }
+
+
+    /**
      * Save product attributes.
      *
      * @param array $attributesData
@@ -813,7 +875,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                         } else {
                             /** @var Magento_Db_Adapter_Pdo_Mysql $connection */
                             $connection = $this->_connection;
-
                             $connection->delete($tableName, array(
                                 'entity_id=?'      => (int) $productId,
                                 'entity_type_id=?' => (int) $this->_entityTypeId,
