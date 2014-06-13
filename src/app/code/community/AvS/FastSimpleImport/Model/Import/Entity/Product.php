@@ -787,6 +787,48 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     }
 
     /**
+     * Retrieve attribute by specified code
+     *
+     * @param string $code
+     * @return Mage_Eav_Model_Entity_Attribute_Abstract
+     */
+    protected function _getAttribute($code)
+    {
+
+        if (Mage::helper('fastsimpleimport')->getMagentoVersion() >= 1800) {
+            return parent::_getAttribute($code);
+        } else {
+            $attribute = Mage::getSingleton('importexport/import_proxy_product_resource')->getAttribute($code);
+            $backendModelName = (string)Mage::getConfig()->getNode(
+                'global/importexport/import/catalog_product/attributes/' . $attribute->getAttributeCode() . '/backend_model'
+            );
+            if (!empty($backendModelName)) {
+                $attribute->setBackendModel($backendModelName);
+            }
+            return $attribute;
+        }
+
+    }
+
+
+    /**
+     * Retrieve pattern for time formatting
+     *
+     * @return string
+     */
+    protected function _getStrftimeFormat()
+    {
+        if (Mage::helper('fastsimpleimport')->getMagentoVersion() >= 1800) {
+            return parent::_getStrftimeFormat();
+        } else {
+            return Varien_Date::convertZendToStrftime(Varien_Date::DATETIME_INTERNAL_FORMAT, true, true);
+        }
+
+    }
+
+
+
+    /**
      * Prepare attributes data
      *
      * @param array $rowData
