@@ -1348,6 +1348,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                 $sku = false; // mark SCOPE_DEFAULT row as invalid for future child rows if product not in DB already
             }
         }
+
+        //additional check if there isn't an error with a row. Else child rows will be imported.
+        if (isset($this->_invalidRows[$rowNum])) {
+            $sku = false;
+        }
         return !isset($this->_invalidRows[$rowNum]);
     }
 
