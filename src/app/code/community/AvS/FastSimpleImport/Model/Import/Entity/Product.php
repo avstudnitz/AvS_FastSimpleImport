@@ -1329,4 +1329,32 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         }
         return $this;
     }
+
+    /**
+     * Retrieve pattern for time formatting
+     *
+     * @return string
+     */
+    protected function _getStrftimeFormat()
+    {
+        return Varien_Date::convertZendToStrftime(Varien_Date::DATETIME_INTERNAL_FORMAT, true, true);
+    }
+
+    /**
+     * Retrieve attribute by specified code
+     *
+     * @param string $code
+     * @return Mage_Eav_Model_Entity_Attribute_Abstract
+     */
+    protected function _getAttribute($code)
+    {
+        $attribute = Mage::getSingleton('importexport/import_proxy_product_resource')->getAttribute($code);
+        $backendModelName = (string)Mage::getConfig()->getNode(
+            'global/importexport/import/catalog_product/attributes/' . $attribute->getAttributeCode() . '/backend_model'
+        );
+        if (!empty($backendModelName)) {
+            $attribute->setBackendModel($backendModelName);
+        }
+        return $attribute;
+    }
 }
