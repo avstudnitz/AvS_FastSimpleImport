@@ -1054,6 +1054,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                 ->_saveMediaGallery($mediaGallery)
                 ->_saveProductAttributes($attributes);
         }
+        if (method_exists($this,'_fixUrlKeys')) { // > EE 1.13.1.0
+            $this->_fixUrlKeys();
+        }
         return $this;
     }
 
