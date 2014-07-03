@@ -4,7 +4,7 @@
    "description": "Wrapper for Magento ImportExport functionality, which imports products and customers from arrays",
    "homepage": "https://github.com/avstudnitz/AvS_FastSimpleImport",
    "require": {
-      "magento-hackathon/magento-composer-installer": "dev-master"
+      "magento-hackathon/magento-composer-installer": "*"
    }
 }
 
