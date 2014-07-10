@@ -36,18 +36,6 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
     protected function _construct()
     {
         //Fix for issue #50
-        //
-        //This is to avoid problems with the repeated creation of of the same values for multiselect attributes.
-        //The product resource model has a cache containing models for each attribute that is requested. The first
-        //time this importer is instanciated, this cache is empty and so the real attribute values are loaded and
-        //cached.
-        //Since the importer bypasses product models, this cache is never updated with the new values created by the
-        //import procedure, so it retains the original attribute values list.
-        //If the importer model is discarded after importing some products (creating at least a new attribute option)
-        //and a new instance os created to import more products, then the new instance will still see the original list
-        //of attribute values and so will potentially recreate the same attribute values again.
-        //This line clears the cache, preventing such a problem. A better solution would be to actually update the cache
-        //with the new values or, at least, invalidate the cache only if new values are actually created.
         Mage::getSingleton('catalog/product')->getResource()->unsetAttributes();
 
         $this->setBehavior(Mage::getStoreConfig('fastsimpleimport/general/import_behavior'));
