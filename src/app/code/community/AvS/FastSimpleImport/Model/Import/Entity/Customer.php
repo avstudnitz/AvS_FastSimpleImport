@@ -263,13 +263,15 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
      */
     public function validateRow(array $rowData, $rowNum)
     {
+        static $email   = null; // e-mail is remembered through all customer rows
+        static $website = null; // website is remembered through all customer rows
+
         if (isset($rowData['fsi_line_number'])) {
             $rowNum = $rowData['fsi_line_number'];
         }
+
         $this->_filterRowData($rowData);
 
-        static $email   = null; // e-mail is remembered through all customer rows
-        static $website = null; // website is remembered through all customer rows
 
         if (isset($this->_validatedRows[$rowNum])) { // check that row is already validated
             return !isset($this->_invalidRows[$rowNum]);
@@ -335,11 +337,19 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
         // validate row data by address entity
         $this->_addressEntity->validateRow($rowData, $rowNum);
 
+        if (isset($this->_invalidRows[$rowNum])) {
+            $email = false; // mark row as invalid for next address rows
+        }
+
         return !isset($this->_invalidRows[$rowNum]);
     }
 
+
+    /**
+     * @param array $rowData
+     */
     public function filterRowData(&$rowData) {
-        return $this->_filterRowData($rowData);
+        $this->_filterRowData($rowData);
     }
 
     /**
@@ -417,7 +427,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                     $entityGroup = array();
                 }
 
-                if (isset($entityGroup) && $this->validateRow($rowData, $source->key())) {
+                if ($this->validateRow($rowData, $source->key()) && isset($entityGroup)) {
                     /* Add row to entity group */
                     $entityGroup[$source->key()] = $this->_prepareRowForDb($rowData);
                 } elseif (isset($entityGroup)) {

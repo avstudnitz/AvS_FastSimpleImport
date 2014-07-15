@@ -899,6 +899,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 $this->addRowError(self::ERROR_INVALID_STORE, $rowNum);
             }
         }
+
+        if (isset($this->_invalidRows[$rowNum])) {
+            $category = false; // mark row as invalid for next address rows
+        }
+
         return !isset($this->_invalidRows[$rowNum]);
     }
 
@@ -1136,7 +1141,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                     $entityGroup = array();
                 }
 
-                if (isset($entityGroup) && $this->validateRow($rowData, $source->key())) {
+                if ($this->validateRow($rowData, $source->key()) && isset($entityGroup)) {
                     /* Add row to entity group */
                     $entityGroup[$source->key()] = $this->_prepareRowForDb($rowData);
                 } elseif (isset($entityGroup)) {

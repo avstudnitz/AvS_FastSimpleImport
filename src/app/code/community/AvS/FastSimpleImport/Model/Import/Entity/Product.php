@@ -1189,8 +1189,12 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         return $this->_fileUploader;
     }
 
+
+    /**
+     * @param array $rowData
+     */
     public function filterRowData(&$rowData) {
-        return $this->_filterRowData($rowData);
+        $this->_filterRowData($rowData);
     }
 
     /**
