@@ -775,6 +775,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         }
 
         if (!$valid) {
+            //escape % for sprintf
+            $message = str_replace('%','%%',$message);
             $this->addRowError(Mage::helper('importexport')->__("Invalid value for '%s'") . '. ' . $message, $rowNum, $attrCode);
         } elseif (!empty($attrParams['is_unique'])) {
             if (isset($this->_uniqueAttributes[$attrCode][$rowData[$attrCode]])) {
