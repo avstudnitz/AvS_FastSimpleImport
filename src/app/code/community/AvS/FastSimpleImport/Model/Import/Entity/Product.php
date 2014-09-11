@@ -840,6 +840,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                         $attributes[$attrTable][$rowSku][$attrId][$storeId] .= ',';
                     }
                     $attributes[$attrTable][$rowSku][$attrId][$storeId] .= $attrValue;
+                    //avoid duplicates as it causes issues in indexes
+                    $attributes[$attrTable][$rowSku][$attrId][$storeId] = implode(',', array_unique(explode(',', $attributes[$attrTable][$rowSku][$attrId][$storeId])));
                 } else {
                     $attributes[$attrTable][$rowSku][$attrId][$storeId] = $attrValue;
                 }
@@ -894,7 +896,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         }
         return $this;
     }
-    
+
     /**
      * Gather and save information about product entities.
      *
