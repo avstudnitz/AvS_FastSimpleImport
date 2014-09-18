@@ -35,6 +35,9 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 {
     protected function _construct()
     {
+        //Fix for issue #50
+        Mage::getSingleton('catalog/product')->getResource()->unsetAttributes();
+
         $this->setBehavior(Mage::getStoreConfig('fastsimpleimport/general/import_behavior'));
         $this->setPartialIndexing(Mage::getStoreConfigFlag('fastsimpleimport/general/partial_indexing'));
         $this->setContinueAfterErrors(Mage::getStoreConfigFlag('fastsimpleimport/general/continue_after_errors'));

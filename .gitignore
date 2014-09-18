@@ -14,3 +14,4 @@ build.properties
 .settings/**/*
 .externalToolBuilders
 .externalToolBuilders/**/*
+.idea
