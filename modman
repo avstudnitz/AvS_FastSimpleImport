@@ -1,2 +1,2 @@
 src/app/code/community/AvS/FastSimpleImport app/code/community/AvS/FastSimpleImport
-src/app/etc/modules/*                       app/etc/modules/
+src/app/etc/modules/AvS_FastSimpleImport.xml                       app/etc/modules/AvS_FastSimpleImport.xml

@@ -6,7 +6,7 @@
  * @category   AvS
  * @package    AvS_FastSimpleImport
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software Licence 3.0 (OSL-3.0)
- * @author     Andreas von Studnitz <avs@avs-webentwicklung.de>
+ * @author     Paul Hachmang <paul@h-o.nl>
  */
 class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExport_Model_Import_Entity_Abstract
 {
@@ -49,6 +49,12 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     const ERROR_VALUE_IS_REQUIRED              = 'valueIsRequired';
     const ERROR_CATEGORY_NOT_FOUND_FOR_DELETE  = 'categoryNotFoundToDelete';
 
+    /**
+     * Code of a primary attribute which identifies the entity group if import contains of multiple rows
+     *
+     * @var string
+     */
+    protected $_masterAttributeCode = '_category';
 
     /**
      * Category attributes parameters.
@@ -176,6 +182,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     /** @var bool */
     protected $_ignoreDuplicates = false;
 
+    /** @var null|bool */
+    protected $_unsetEmptyFields = false;
+
+    /** @var null|bool */
+    protected $_symbolEmptyFields = false;
+
+
     public function setIgnoreDuplicates($ignore)
     {
         $this->_ignoreDuplicates = (boolean) $ignore;
@@ -186,6 +199,27 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     {
         return $this->_ignoreDuplicates;
     }
+
+
+    /**
+     * @param boolean $value
+     * @return $this
+     */
+    public function setUnsetEmptyFields($value) {
+        $this->_unsetEmptyFields = (boolean) $value;
+        return $this;
+    }
+
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setSymbolEmptyFields($value) {
+        $this->_symbolEmptyFields = $value;
+        return $this;
+    }
+
 
     /**
      * Set the error limit when the importer will stop
@@ -208,9 +242,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         parent::__construct();
 
         $this->_initWebsites()
-             ->_initStores()
-             ->_initCategories()
-             ->_initAttributes();
+            ->_initStores()
+            ->_initCategories()
+            ->_initAttributes();
 
         /* @var $categoryResource Mage_Catalog_Model_Resource_Category */
         $categoryResource = Mage::getModel('catalog/category')->getResource();
@@ -229,6 +263,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             $idToDelete = array();
 
             foreach ($bunch as $rowNum => $rowData) {
+                $this->_filterRowData($rowData);
                 if ($this->validateRow($rowData, $rowNum) && self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
                     $idToDelete[] = $this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]]['entity_id'];
                 }
@@ -463,6 +498,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 $rowScope = $this->getRowScope($rowData);
 
                 $rowData = $this->_prepareRowForDb($rowData);
+                $this->_filterRowData($rowData);
 
                 if (self::SCOPE_DEFAULT == $rowScope) {
                     $rowCategory = $rowData[self::COL_CATEGORY];
@@ -474,7 +510,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                         'parent_id'   => $parentCategory['entity_id'],
                         'level'       => $parentCategory['level'] + 1,
                         'created_at'  => empty($rowData['created_at']) ? now()
-                                         : gmstrftime($strftimeFormat, strtotime($rowData['created_at'])),
+                                : gmstrftime($strftimeFormat, strtotime($rowData['created_at'])),
                         'updated_at'  => now(),
                         'position'    => $rowData['position']
                     );
@@ -521,8 +557,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 $category = Mage::getModel('catalog/category', $rowData);
 
                 foreach (array_intersect_key($rowData, $this->_attributes) as $attrCode => $attrValue) {
-                    if (!$this->_attributes[$attrCode]['is_static'] && strlen($attrValue)) {
-                        
+                    if (!$this->_attributes[$attrCode]['is_static']) {
+
                         /** @var $attribute Mage_Eav_Model_Entity_Attribute */
                         $attribute = $this->_attributes[$attrCode]['attribute'];
 
@@ -544,7 +580,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                             }
                         } elseif ('datetime' == $attribute->getBackendType() && strtotime($attrValue)) {
                             $attrValue = gmstrftime($strftimeFormat, strtotime($attrValue));
-                        } elseif ($backModel) {
+                        } elseif ($backModel && 'available_sort_by' != $attrCode) {
                             $attribute->getBackend()->beforeSave($category);
                             $attrValue = $category->getData($attribute->getAttributeCode());
                         }
@@ -705,7 +741,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     public function getRowScope(array $rowData)
     {
-        if (strlen(trim($rowData[self::COL_CATEGORY]))) {
+        if (isset($rowData[self::COL_CATEGORY]) && strlen(trim($rowData[self::COL_CATEGORY]))) {
             return self::SCOPE_DEFAULT;
         } elseif (empty($rowData[self::COL_STORE])) {
             return self::SCOPE_NULL;
@@ -769,13 +805,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     public function validateRow(array $rowData, $rowNum)
     {
-        if (isset($rowData['fsi_line_number'])) {
-            $rowNum = $rowData['fsi_line_number'];
-        }
-
         static $root = null;
         static $category = null;
 
+        if (isset($rowData['fsi_line_number'])) {
+            $rowNum = $rowData['fsi_line_number'];
+        }
+        $this->_filterRowData($rowData);
 
         // check if row is already validated
         if (isset($this->_validatedRows[$rowNum])) {
@@ -863,6 +899,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 $this->addRowError(self::ERROR_INVALID_STORE, $rowNum);
             }
         }
+
+        if (isset($this->_invalidRows[$rowNum])) {
+            $category = false; // mark row as invalid for next address rows
+        }
+
         return !isset($this->_invalidRows[$rowNum]);
     }
 
@@ -876,6 +917,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         $categoryIds = array();
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
             foreach ($bunch as $rowNum => $rowData) {
+                $this->_filterRowData($rowData);
                 if (!$this->isRowAllowedToImport($rowData, $rowNum)) {
                     continue;
                 }
@@ -905,7 +947,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             case 'varchar':
                 $val   = Mage::helper('core/string')->cleanString($rowData[$attrCode]);
                 $valid = Mage::helper('core/string')->strlen($val) < self::DB_MAX_VARCHAR_LENGTH;
-                $message = 'String is too long, only ' . self::DB_MAX_VARCHAR_LENGTH . ' characters allowed. Your Input: '.$rowData[$attrCode]. ' Length: '.strlen($val);
+                $message = 'String is too long, only ' . self::DB_MAX_VARCHAR_LENGTH . ' characters allowed. Your input: ' . $rowData[$attrCode] . ', length: ' . strlen($val);
                 break;
             case 'decimal':
                 $val   = trim($rowData[$attrCode]);
@@ -915,23 +957,23 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             case 'select':
             case 'multiselect':
                 $valid = isset($attrParams['options'][strtolower($rowData[$attrCode])]);
-                $message = 'Possible options are: ' . implode(', ', array_keys($attrParams['options'])).' Your Input: '.$rowData[$attrCode];
+                $message = 'Possible options are: ' . implode(', ', array_keys($attrParams['options'])) . '. Your input: ' . $rowData[$attrCode];
                 break;
             case 'int':
                 $val   = trim($rowData[$attrCode]);
                 $valid = (int)$val == $val;
-                $message = 'Integer value expected. Your Input: '.$rowData[$attrCode];
+                $message = 'Integer value expected. Your Input: ' . $rowData[$attrCode];
                 break;
             case 'datetime':
                 $val   = trim($rowData[$attrCode]);
                 $valid = strtotime($val) !== false
                     || preg_match('/^\d{2}.\d{2}.\d{2,4}(?:\s+\d{1,2}.\d{1,2}(?:.\d{1,2})?)?$/', $val);
-                $message = 'Datetime value expected. Your Input: '.$rowData[$attrCode];
+                $message = 'Datetime value expected. Your Input: ' . $rowData[$attrCode];
                 break;
             case 'text':
                 $val   = Mage::helper('core/string')->cleanString($rowData[$attrCode]);
                 $valid = Mage::helper('core/string')->strlen($val) < self::DB_MAX_TEXT_LENGTH;
-                $message = 'String is too long, only ' . self::DB_MAX_TEXT_LENGTH . ' characters allowed. Your Input: '.$rowData[$attrCode]. ' Length: '.strlen($val);
+                $message = 'String is too long, only ' . self::DB_MAX_TEXT_LENGTH . ' characters allowed. Your input: ' . $rowData[$attrCode] . ', length: ' . strlen($val);
                 break;
             default:
                 $valid = true;
@@ -998,7 +1040,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
     public function updateChildrenCount() {
         //we only need to update the children count when we are updating, not when we are deleting.
-        if (! in_array($this->getBehavior(), array(Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE, Mage_ImportExport_Model_Import::BEHAVIOR_APPEND))) {
+        if (! in_array($this->getBehavior(), array(Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE, Mage_ImportExport_Model_Import::BEHAVIOR_DELETE, Mage_ImportExport_Model_Import::BEHAVIOR_APPEND))) {
             return;
         }
 
@@ -1007,6 +1049,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
         $categoryTable = Mage::getSingleton('core/resource')->getTableName('catalog/category');
         $categoryTableTmp = $categoryTable . '_tmp';
+        $connection->query('DROP TEMPORARY TABLE IF EXISTS ' . $categoryTableTmp);
         $connection->query("CREATE TEMPORARY TABLE {$categoryTableTmp} LIKE {$categoryTable};
             INSERT INTO {$categoryTableTmp} SELECT * FROM {$categoryTable};
             UPDATE {$categoryTable} cce
@@ -1025,5 +1068,89 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
     protected function _reindexUpdatedCategories() {
         //not yet implemented
+    }
+
+    /**
+     * Removes empty keys in case value is null or empty string
+     * Behavior can be turned off with config setting "fastsimpleimport/general/clear_field_on_empty_string"
+     * You can define a string which can be used for clearing a field, configured in "fastsimpleimport/product/symbol_for_clear_field"
+     *
+     * @param array $rowData
+     */
+    protected function _filterRowData(&$rowData)
+    {
+        if ($this->_unsetEmptyFields || $this->_symbolEmptyFields) {
+            foreach($rowData as $key => $fieldValue) {
+                if ($this->_unsetEmptyFields && !strlen($fieldValue)) {
+                    unset($rowData[$key]);
+                } else if ($this->_symbolEmptyFields && trim($fieldValue) == $this->_symbolEmptyFields) {
+                    $rowData[$key] = NULL;
+                }
+            }
+        }
+    }
+
+    /**
+     * Validate data rows and save bunches to DB.
+     * Taken from https://github.com/tim-bezhashvyly/Sandfox_ImportExportFix
+     *
+     * @return Mage_ImportExport_Model_Import_Entity_Abstract
+     */
+    protected function _saveValidatedBunches()
+    {
+        $source = $this->_getSource();
+        $bunchRows = array();
+        $startNewBunch = false;
+        $maxDataSize = Mage::getResourceHelper('importexport')->getMaxDataSize();
+        $bunchSize = Mage::helper('importexport')->getBunchSize();
+
+        $source->rewind();
+        $this->_dataSourceModel->cleanBunches();
+
+        while ($source->valid() || count($bunchRows) || isset($entityGroup)) {
+            if ($startNewBunch || !$source->valid()) {
+                /* If the end approached add last validated entity group to the bunch */
+                if (!$source->valid() && isset($entityGroup)) {
+                    $bunchRows = array_merge($bunchRows, $entityGroup);
+                    unset($entityGroup);
+                }
+                $this->_dataSourceModel->saveBunch($this->getEntityTypeCode(), $this->getBehavior(), $bunchRows);
+                $bunchRows = array();
+                $startNewBunch = false;
+            }
+            if ($source->valid()) {
+                if ($this->_errorsCount >= $this->_errorsLimit) { // errors limit check
+                    return $this;
+                }
+                $rowData = $source->current();
+
+                $this->_processedRowsCount++;
+
+                if (isset($rowData[$this->_masterAttributeCode]) && trim($rowData[$this->_masterAttributeCode])) {
+                    /* Add entity group that passed validation to bunch */
+                    if (isset($entityGroup)) {
+                        $bunchRows = array_merge($bunchRows, $entityGroup);
+                        $productDataSize = strlen(serialize($bunchRows));
+
+                        /* Check if the nw bunch should be started */
+                        $isBunchSizeExceeded = ($bunchSize > 0 && count($bunchRows) >= $bunchSize);
+                        $startNewBunch = $productDataSize >= $maxDataSize || $isBunchSizeExceeded;
+                    }
+
+                    /* And start a new one */
+                    $entityGroup = array();
+                }
+
+                if ($this->validateRow($rowData, $source->key()) && isset($entityGroup)) {
+                    /* Add row to entity group */
+                    $entityGroup[$source->key()] = $this->_prepareRowForDb($rowData);
+                } elseif (isset($entityGroup)) {
+                    /* In case validation of one line of the group fails kill the entire group */
+                    unset($entityGroup);
+                }
+                $source->next();
+            }
+        }
+        return $this;
     }
 }

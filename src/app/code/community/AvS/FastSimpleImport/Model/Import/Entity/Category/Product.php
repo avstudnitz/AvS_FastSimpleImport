@@ -287,7 +287,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
             }
         }
 
-        if (count($categoryIds) > 0) {
+        if ($this->getBehavior() == Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE && count($categoryIds) > 0) {
             $this->getConnection()->query(
                 $this->getConnection()->quoteInto(
                     "DELETE FROM `{$this->_entityTable}` WHERE `category_id` IN (?)", $categoryIds

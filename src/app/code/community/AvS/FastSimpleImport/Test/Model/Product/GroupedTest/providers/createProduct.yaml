@@ -1,0 +1,52 @@
+-
+  -
+    - sku: simple1
+      _type: simple
+      _attribute_set: Default
+      _product_websites: base
+      name: Default
+      price: 0.99
+      description: Default
+      short_description: Default
+      weight: 0
+      status: 1
+      visibility: 4
+      tax_class_id: 2
+      qty: 76
+      is_in_stock: 1
+      not_existing_attribute: 42
+    - sku: simple2
+      _type: simple
+      _attribute_set: Default
+      _product_websites: base
+      name: Default
+      price: 99.99
+      description: This is a <strong>süper</strong> description just for SEO
+      short_description: This is a short description! Surprised?
+      tax_class_id: 2
+      status: 2
+      visibility: 1
+      tax_class_id: 4
+      qty: 11
+      is_in_stock: 1
+      manage_stock: 0
+    - sku: 123456789
+      _type: grouped
+      _attribute_set: Default
+      _product_websites: base
+      name: Default
+      price: 0.99
+      description: Default
+      short_description: Default
+      weight: 0
+      status: 1
+      visibility: 4
+      tax_class_id: 2
+      is_in_stock: 1
+      _associated_sku: 'simple2'
+      _associated_position: 2
+    - sku: null
+      _type: null
+      _attribute_set: null
+      _associated_sku: 'simple1'
+      _associated_position: 1

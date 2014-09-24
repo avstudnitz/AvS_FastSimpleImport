@@ -10,7 +10,7 @@
 <config>
     <modules>
         <AvS_FastSimpleImport>
-            <version>0.4.0</version>
+            <version>0.6.0</version>
         </AvS_FastSimpleImport>
     </modules>
 
@@ -42,7 +42,7 @@
             <import_product_types>
                 <simple>fastsimpleimport/import_entity_product_type_simple</simple>
                 <configurable>fastsimpleimport/import_entity_product_type_configurable</configurable>
-                <virtual>fastsimpleimport/import_entity_product_type_simple</virtual>
+                <virtual>fastsimpleimport/import_entity_product_type_virtual</virtual>
                 <grouped>fastsimpleimport/import_entity_product_type_grouped</grouped>
                 <bundle>fastsimpleimport/import_entity_product_type_bundle</bundle>
             </import_product_types>
@@ -63,11 +63,31 @@
 
     <default>
         <fastsimpleimport>
+            <general>
+                <import_behavior>replace</import_behavior>
+                <partial_indexing>0</partial_indexing>
+                <continue_after_errors>0</continue_after_errors>
+                <error_limit>100</error_limit>
+                <support_nested_arrays>0</support_nested_arrays>
+                <ignore_duplicates>0</ignore_duplicates>
+                <clear_field_on_empty_string>0</clear_field_on_empty_string>
+                <symbol_for_clear_field>###EMPTY###</symbol_for_clear_field>
+            </general>
             <product>
+                <allow_rename_files>1</allow_rename_files>
                 <status>1</status>
                 <visibility>4</visibility>
                 <weight>0</weight>
             </product>
         </fastsimpleimport>
     </default>
+
+
+    <phpunit>
+        <suite>
+            <modules>
+                <AvS_FastSimpleImport/>
+            </modules>
+        </suite>
+    </phpunit>
 </config>

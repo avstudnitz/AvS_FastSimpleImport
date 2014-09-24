@@ -45,26 +45,7 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
      */
     public function __construct($data)
     {
-        if ($this->_useMultiArrays()) {
-
-            $numberLines = sizeof($data);
-            for ($lineNumber = 0; $lineNumber < $numberLines; $lineNumber++) {
-                
-                $line = $data[$lineNumber];
-                
-                $newLines = $this->_getNewLines($line);
-                
-                foreach($newLines as $newLine) {
-                    $newLine['fsi_line_number'] = $lineNumber;
-                    $this->_array[] = $newLine;
-                }
-                
-                unset($data[$lineNumber]);
-            }
-        } else {
-            
-            $this->_array = $data;
-        }
+        $this->_array = $data;
                 
         $this->_position = 0;
     }
@@ -146,38 +127,12 @@ class AvS_FastSimpleImport_Model_ArrayAdapter implements SeekableIterator
         $this->_array[$this->_position][$key] = $value;
     }
 
-    /**
-     * @return bool
-     */
-    protected function _useMultiArrays()
+    public function unsetValue($key)
     {
-        return true;
-    }
-
-    /**
-     * Transform nested array to multi-line array (ImportExport format) 
-     * 
-     * @param array $line
-     * @return array
-     */
-    protected function _getNewLines($line)
-    {
-        $newLines = array(
-            0 => $line
-        );
-        
-        foreach ($line as $fieldName => $fieldValue) {
-            if (is_array($fieldValue)) {
-                $newLineNumber = 0;
-                foreach ($fieldValue as $singleFieldValue) {
-                    if ($newLineNumber > 0) {
-                        $newLines[$newLineNumber]['sku'] = null;
-                    }
-                    $newLines[$newLineNumber++][$fieldName] = $singleFieldValue;
-                }
-            }
+        if (!$this->valid()) {
+            return;
         }
-        
-        return $newLines;
+
+        unset($this->_array[$this->_position][$key]);
     }
 }

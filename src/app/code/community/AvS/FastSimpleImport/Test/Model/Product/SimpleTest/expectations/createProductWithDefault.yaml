@@ -1,0 +1,11 @@
+1234567-1:
+  type_id: simple
+  attribute_set_id: 4
+  name: Default
+  price: 0.99
+  description: Default
+  short_description: Default
+  weight: 12345
+  status: 2
+  visibility: 3
+  tax_class_id: 4

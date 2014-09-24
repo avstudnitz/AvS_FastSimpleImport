@@ -1,0 +1,68 @@
+-
+  -
+    - sku: simple1
+      _type: simple
+      _attribute_set: Default
+      _product_websites: base
+      name: Default
+      price: 0.99
+      description: Default
+      short_description: Default
+      weight: 0
+      status: 1
+      visibility: 4
+      tax_class_id: 2
+      qty: 76
+      is_in_stock: 1
+      not_existing_attribute: 42
+    - sku: simple2
+      _type: simple
+      _attribute_set: Default
+      _product_websites: base
+      name: Default
+      price: 99.99
+      description: This is a <strong>süper</strong> description just for SEO
+      short_description: This is a short description! Surprised?
+      tax_class_id: 2
+      status: 2
+      visibility: 1
+      tax_class_id: 4
+      qty: 11
+      is_in_stock: 1
+      manage_stock: 0
+    - sku: 123456789
+      _type: bundle
+      _attribute_set: Default
+      _product_websites: base
+      name: Default
+      price: 0.99
+      description: Default
+      short_description: Default
+      weight: 0
+      status: 1
+      visibility: 4
+      tax_class_id: 2
+      is_in_stock: 1
+      price_view: as low as
+      price_type: 1
+      _bundle_option_title: Option 1
+      _bundle_option_type: select
+      _bundle_option_position: 1
+      _bundle_option_required: 1
+      _bundle_product_sku: 'simple2'
+      _bundle_product_position: 2
+      _bundle_product_is_default: false 
+      _bundle_product_qty: 2, 
+      _bundle_product_price_value: 20, 
+      _bundle_product_can_change_qty: 0, 
+    - sku: null
+      _type: null
+      _attribute_set: null
+      _bundle_option_title: Option 1
+      _bundle_product_sku: 'simple1'
+      _bundle_product_position: 1
+      _bundle_product_is_default: true 
+      _bundle_product_qty: 1, 
+      _bundle_product_price_value: 10, 
+      _bundle_product_can_change_qty: 1, 
+
