@@ -290,7 +290,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                 $this->addRowError(self::ERROR_EMAIL_SITE_NOT_FOUND, $rowNum);
             }
         } elseif (self::SCOPE_DEFAULT == $rowScope) { // row is SCOPE_DEFAULT = new customer block begins
-            $email   = $rowData[self::COL_EMAIL];
+            $email   = strtolower($rowData[self::COL_EMAIL]);
             $website = $rowData[self::COL_WEBSITE];
 
             if (!Zend_Validate::is($email, 'EmailAddress')) {
