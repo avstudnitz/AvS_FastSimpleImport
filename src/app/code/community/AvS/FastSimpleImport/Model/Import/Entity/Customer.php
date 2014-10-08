@@ -106,6 +106,20 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
     }
 
     /**
+     * Save customer data to DB.
+     *
+     * @return bool Result of operation.
+     */
+    protected function _importData()
+    {
+        parent::_importData();
+
+        Mage::dispatchEvent('customer_import_finish_before', array('adapter'=>$this));
+
+        return true;
+    }
+
+    /**
      * Gather and save information about customer entities.
      *
      * @return Mage_ImportExport_Model_Import_Entity_Customer
