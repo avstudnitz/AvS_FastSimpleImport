@@ -235,7 +235,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     protected function _getAttributeOptions($attribute)
     {
         if (!isset($this->_attributeOptions[$attribute->getAttributeCode()])) {
-            if ($attribute->getFrontendInput() == 'select') {
+            if (in_array($attribute->getFrontendInput(), array('select', 'multiselect'))) {
                 /** @var $attributeOptions Mage_Eav_Model_Entity_Attribute_Source_Table */
                 $attributeOptions = Mage::getModel('eav/entity_attribute_source_table');
                 $attributeOptions->setAttribute($attribute);
