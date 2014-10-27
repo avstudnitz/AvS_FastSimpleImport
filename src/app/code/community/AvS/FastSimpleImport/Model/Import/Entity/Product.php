@@ -632,7 +632,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             /** @var $attribute Mage_Eav_Model_Entity_Attribute */
             $attribute = Mage::getSingleton('catalog/product')->getResource()->getAttribute($attributeCode);
             if (!is_object($attribute)) {
-                Mage::throwException('Attribute ' . $attributeCode . ' not found.');
+                continue;
+//                Mage::throwException('Attribute ' . $attributeCode . ' not found.');
             }
             if ($attribute->getSourceModel() != 'eav/entity_attribute_source_table') {
                 Mage::throwException('Attribute ' . $attributeCode . ' is no dropdown attribute.');
@@ -659,7 +660,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
             /** @var $attribute Mage_Eav_Model_Entity_Attribute */
             $attribute = Mage::getSingleton('catalog/product')->getResource()->getAttribute($attributeCode);
             if (!is_object($attribute)) {
-                Mage::throwException('Attribute ' . $attributeCode . ' not found.');
+                continue;
+//                Mage::throwException('Attribute ' . $attributeCode . ' not found.');
             }
             if ($attribute->getBackendModel() != 'eav/entity_attribute_backend_array') {
                 Mage::throwException('Attribute ' . $attributeCode . ' is no multiselect attribute.');
