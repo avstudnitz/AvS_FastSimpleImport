@@ -45,6 +45,21 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     protected $_symbolEmptyFields = false;
 
     /**
+     * Attributes with index (not label) value.
+     *
+     * @var array
+     */
+    protected $_indexValueAttributes = array(
+        'status',
+        'tax_class_id',
+        'visibility',
+        'enable_googlecheckout',
+        'gift_message_available',
+        'custom_design',
+        'country_of_manufacture'
+    );
+
+    /**
      * Set the error limit when the importer will stop
      * @param $limit
      */
