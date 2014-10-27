@@ -1429,6 +1429,23 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         return $this;
     }
 
+
+    /**
+     * Common validation
+     *
+     * @param array $rowData
+     * @param int $rowNum
+     * @param string|false|null $sku
+     */
+    protected function _validate($rowData, $rowNum, $sku)
+    {
+        $this->_isProductWebsiteValid($rowData, $rowNum);
+        $this->_isProductCategoryValid($rowData, $rowNum);
+        $this->_isTierPriceValid($rowData, $rowNum);
+        $this->_isGroupPriceValid($rowData, $rowNum);
+        $this->_isSuperProductsSkuValid($rowData, $rowNum);
+    }
+
     /**
      * Retrieve pattern for time formatting
      *
