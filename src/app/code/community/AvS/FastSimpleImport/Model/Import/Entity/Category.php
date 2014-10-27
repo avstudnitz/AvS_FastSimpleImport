@@ -188,6 +188,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     /** @var null|bool */
     protected $_symbolEmptyFields = false;
 
+    protected $_defaultAttributeSetId = 0;
 
     public function setIgnoreDuplicates($ignore)
     {
@@ -244,7 +245,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         $this->_initWebsites()
             ->_initStores()
             ->_initCategories()
-            ->_initAttributes();
+            ->_initAttributes()
+            ->_initAttributeSetId();
 
         /* @var $categoryResource Mage_Catalog_Model_Resource_Category */
         $categoryResource = Mage::getModel('catalog/category')->getResource();
@@ -421,6 +423,16 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         return $this;
     }
 
+
+    /**
+     * Initialize the default attribute_set_id
+     * @return $this
+     */
+    protected function _initAttributeSetId() {
+        $this->_defaultAttributeSetId = Mage::getSingleton('catalog/category')->getDefaultAttributeSetId();
+        return $this;
+    }
+
     /**
      * Set valid attribute set and category type to rows with all scopes
      * to ensure that existing Categories doesn't changed.
@@ -529,7 +541,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                         $entityRow['entity_id']        = $entityId;
                         $entityRow['path']             = $parentCategory['path'] .'/'.$entityId;
                         $entityRow['entity_type_id']   = $this->_entityTypeId;
-                        $entityRow['attribute_set_id'] = 0;
+                        $entityRow['attribute_set_id'] = $this->_defaultAttributeSetId;
                         $entityRowsIn[]                = $entityRow;
 
                         $this->_newCategory[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]] = array(
