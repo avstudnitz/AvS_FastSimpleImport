@@ -38,10 +38,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     /** @var bool */
     protected $_disablePreprocessImageData = false;
 
-    /** @var null|bool */
+    /** @var bool */
     protected $_unsetEmptyFields = false;
 
-    /** @var null|bool */
+    /** @var bool|string */
     protected $_symbolEmptyFields = false;
 
     /** @var bool|string */

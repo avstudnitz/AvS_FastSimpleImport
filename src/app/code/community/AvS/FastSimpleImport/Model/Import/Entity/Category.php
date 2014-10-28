@@ -182,10 +182,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     /** @var bool */
     protected $_ignoreDuplicates = false;
 
-    /** @var null|bool */
+    /** @var bool */
     protected $_unsetEmptyFields = false;
 
-    /** @var null|bool */
+    /** @var bool|string */
     protected $_symbolEmptyFields = false;
 
     /** @var bool|string */
