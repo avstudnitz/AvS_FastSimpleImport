@@ -23,6 +23,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
     /** @var null|bool */
     protected $_symbolEmptyFields = false;
 
+    /** @var bool|string */
+    protected $_symbolIgnoreFields = false;
+
 
     /**
      * Constructor.
@@ -80,6 +83,17 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
         $this->_symbolEmptyFields = $value;
         return $this;
     }
+
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setSymbolIgnoreFields($value) {
+        $this->_symbolIgnoreFields = $value;
+        return $this;
+    }
+
 
     /**
      * Source model setter.
@@ -361,12 +375,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
      */
     protected function _filterRowData(&$rowData)
     {
-        if ($this->_unsetEmptyFields || $this->_symbolEmptyFields) {
+        if ($this->_unsetEmptyFields || $this->_symbolEmptyFields || $this->_symbolIgnoreFields) {
             foreach($rowData as $key => $fieldValue) {
                 if ($this->_unsetEmptyFields && !strlen($fieldValue)) {
                     unset($rowData[$key]);
                 } else if ($this->_symbolEmptyFields && trim($fieldValue) == $this->_symbolEmptyFields) {
                     $rowData[$key] = NULL;
+                } else if ($this->_symbolIgnoreFields && trim($fieldValue) == $this->_symbolIgnoreFields) {
+                    unset($rowData[$key]);
                 }
             }
         }
