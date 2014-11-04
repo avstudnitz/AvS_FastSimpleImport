@@ -522,10 +522,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                 $urlModel->refreshProductRewrite($productId);
             }
         }
-
-        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_flat', array('entity_id' => &$entityIds));
-        Mage::getSingleton('catalog/product_flat_indexer')->saveProduct($entityIds);
-
+        if (Mage::helper('catalog/category_flat')->isEnabled()) {
+            Mage::dispatchEvent('fastsimpleimport_reindex_products_before_flat', array('entity_id' => &$entityIds));
+            Mage::getSingleton('catalog/product_flat_indexer')->saveProduct($entityIds);
+        }
         Mage::dispatchEvent('fastsimpleimport_reindex_products_after', array('entity_id' => &$entityIds));
 
         return $this;
@@ -894,7 +894,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         }
         return $this;
     }
-    
+
     /**
      * Gather and save information about product entities.
      *
