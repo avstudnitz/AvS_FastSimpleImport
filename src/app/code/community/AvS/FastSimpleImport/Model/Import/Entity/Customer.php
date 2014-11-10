@@ -136,6 +136,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                     // entity table data
                     $entityRow = array(
                         'group_id'   => empty($rowData['group_id']) ? self::DEFAULT_GROUP_ID : $rowData['group_id'],
+                        'increment_id' => empty($rowData['increment_id']) ? null : $rowData['increment_id'],
                         'store_id'   => empty($rowData[self::COL_STORE])
                                         ? 0 : $this->_storeCodeToId[$rowData[self::COL_STORE]],
                         'created_at' => empty($rowData['created_at'])
@@ -189,6 +190,28 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                 }
             }
             $this->_saveCustomerEntity($entityRowsIn, $entityRowsUp)->_saveCustomerAttributes($attributes);
+        }
+        return $this;
+    }
+
+    /**
+     * Update and insert data in entity table.
+     *
+     * @param array $entityRowsIn Row for insert
+     * @param array $entityRowsUp Row for update
+     * @return Mage_ImportExport_Model_Import_Entity_Customer
+     */
+    protected function _saveCustomerEntity(array $entityRowsIn, array $entityRowsUp)
+    {
+        if ($entityRowsIn) {
+            $this->_connection->insertMultiple($this->_entityTable, $entityRowsIn);
+        }
+        if ($entityRowsUp) {
+            $this->_connection->insertOnDuplicate(
+                $this->_entityTable,
+                $entityRowsUp,
+                array('group_id', 'store_id', 'updated_at', 'created_at', 'increment_id')
+            );
         }
         return $this;
     }
