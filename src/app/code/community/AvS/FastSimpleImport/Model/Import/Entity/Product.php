@@ -719,11 +719,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     /**
      * Set a flag if the current import is a dryrun
      *
-     * @param bool $isDryrun
+     * @param bool $isDryRun
      * @return $this
      */
-    public function setIsDryrun($isDryrun) {
-        $this->_isDryRun = (bool) $isDryrun;
+    public function setIsDryRun($isDryRun) {
+        $this->_isDryRun = (bool) $isDryRun;
         return $this;
     }
 
