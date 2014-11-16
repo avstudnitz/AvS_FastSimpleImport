@@ -147,6 +147,9 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setErrorLimit($this->getErrorLimit());
         $entityAdapter->setDropdownAttributes($this->getDropdownAttributes());
         $entityAdapter->setMultiselectAttributes($this->getMultiselectAttributes());
+        $entityAdapter->setImageAttributes($this->getImageAttributes());
+        $entityAdapter->setAllowRenameFiles($this->getAllowRenameFiles());
+        $entityAdapter->setDisablePreprocessImageData($this->getDisablePreprocessImageData());
         $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
         $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
         $this->setEntityAdapter($entityAdapter);
@@ -233,6 +236,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Customer */
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_customer');
         $entityAdapter->setBehavior($this->getBehavior());
+        $entityAdapter->setIgnoreDuplicates($this->getIgnoreDuplicates());
         $entityAdapter->setErrorLimit($this->getErrorLimit());
         $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
         $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
@@ -330,6 +334,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_category');
         $entityAdapter->setBehavior($this->getBehavior());
         $entityAdapter->setErrorLimit($this->getErrorLimit());
+        $entityAdapter->setIgnoreDuplicates($this->getIgnoreDuplicates());
         $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
         $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
         $this->setEntityAdapter($entityAdapter);
@@ -421,8 +426,9 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_category_product');
         $entityAdapter->setBehavior($this->getBehavior());
         $entityAdapter->setErrorLimit($this->getErrorLimit());
-        $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
-        $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
+        $entityAdapter->setIgnoreDuplicates($this->getIgnoreDuplicates());
+//        $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
+//        $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
         $this->setEntityAdapter($entityAdapter);
         $validationResult = $this->validateSource($data);
         return $validationResult;
