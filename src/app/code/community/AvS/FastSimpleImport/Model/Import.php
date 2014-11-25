@@ -75,7 +75,8 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $partialIndexing = $this->getPartialIndexing();
 
         /** @var $entityAdapter AvS_FastSimpleImport_Model_Import_Entity_Product */
-        $entityAdapter = Mage::getModel('fastsimpleimport/import_entity_product');
+        $validTypes = Mage_ImportExport_Model_Config::getModels(Mage_ImportExport_Model_Import::CONFIG_KEY_ENTITIES);
+        $entityAdapter = Mage::getModel($validTypes[$this->getEntity()]['model']);
         $entityAdapter->setBehavior($this->getBehavior());
         $entityAdapter->setIsDryrun(false);
         $entityAdapter->setErrorLimit($this->getErrorLimit());
