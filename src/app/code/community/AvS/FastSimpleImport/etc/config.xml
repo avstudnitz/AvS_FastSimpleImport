@@ -29,6 +29,9 @@
 
         <importexport module="importexport">
             <import_entities>
+                <customer translate="label">
+                    <model_token>fastsimpleimport/import_entity_customer</model_token>
+                </customer>
                 <catalog_product translate="label">
                     <model_token>fastsimpleimport/import_entity_product</model_token>
                     <label>Product</label>
