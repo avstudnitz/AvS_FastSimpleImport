@@ -1,4 +1,17 @@
 <?php
+/**
+ * Abstract class for Product Entity Adapter whcih is used for switching between CE and EE
+ *
+ * @category   AvS
+ * @package    AvS_FastSimpleImport
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software Licence 3.0 (OSL-3.0)
+ * @author     Andreas von Studnitz <avs@avs-webentwicklung.de>
+ */
+if (class_exists('Enterprise_ImportExport_Model_Import_Entity_Product')) {
+    abstract class AvS_FastSimpleImport_Model_Import_Entity_Product_Abstract extends Enterprise_ImportExport_Model_Import_Entity_Product {}
+} else {
+    abstract class AvS_FastSimpleImport_Model_Import_Entity_Product_Abstract extends Mage_ImportExport_Model_Import_Entity_Product {}
+}
 
 /**
  * Entity Adapter for importing Magento Products
@@ -8,7 +21,7 @@
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software Licence 3.0 (OSL-3.0)
  * @author     Andreas von Studnitz <avs@avs-webentwicklung.de>
  */
-class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport_Model_Import_Entity_Product
+class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImport_Model_Import_Entity_Product_Abstract
 {
     /**
      * Code of a primary attribute which identifies the entity group if import contains of multiple rows
@@ -719,11 +732,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
     /**
      * Set a flag if the current import is a dryrun
      *
-     * @param bool $isDryRun
+     * @param bool $isDryrun
      * @return $this
      */
-    public function setIsDryRun($isDryRun) {
-        $this->_isDryRun = (bool) $isDryRun;
+    public function setIsDryrun($isDryrun) {
+        $this->_isDryRun = (bool) $isDryrun;
         return $this;
     }
 
@@ -817,6 +830,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
      */
     protected function _prepareAttributes($rowData, $rowScope, $attributes, $rowSku, $rowStore)
     {
+        if (method_exists($this, '_prepareUrlKey')) {
+            $rowData = $this->_prepareUrlKey($rowData, $rowScope, $rowSku);
+        }
+
         $product = Mage::getModel('importexport/import_proxy_product', $rowData);
 
         foreach ($rowData as $attrCode => $attrValue) {
@@ -1045,7 +1062,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                 if (self::SCOPE_NULL == $rowScope) {
                     // for multiselect attributes only
                     if (!is_null($previousAttributeSet)) {
-                         $rowData[Mage_ImportExport_Model_Import_Entity_Product::COL_ATTR_SET] = $previousAttributeSet;
+                        $rowData[Mage_ImportExport_Model_Import_Entity_Product::COL_ATTR_SET] = $previousAttributeSet;
                     }
                     if (is_null($productType) && !is_null($previousType)) {
                         $productType = $previousType;
@@ -1338,7 +1355,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
                 ) {
                     $this->addRowError(self::ERROR_INVALID_TYPE, $rowNum);
                 } elseif (!isset($rowData[self::COL_ATTR_SET])
-                          || !isset($this->_attrSetNameToId[$rowData[self::COL_ATTR_SET]])
+                    || !isset($this->_attrSetNameToId[$rowData[self::COL_ATTR_SET]])
                 ) {
                     $this->addRowError(self::ERROR_INVALID_ATTR_SET, $rowNum);
                 } elseif (!isset($this->_newSku[$sku])) {
@@ -1461,6 +1478,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
         $this->_isTierPriceValid($rowData, $rowNum);
         $this->_isGroupPriceValid($rowData, $rowNum);
         $this->_isSuperProductsSkuValid($rowData, $rowNum);
+
+        if (method_exists($this, '_isUrlKeyValid')) {
+            $this->_isUrlKeyValid($rowData, $rowNum, $sku);
+        }
     }
 
     /**
