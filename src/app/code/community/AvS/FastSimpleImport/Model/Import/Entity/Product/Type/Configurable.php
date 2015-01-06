@@ -135,6 +135,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
         if ($this->_superAttributes) {
             $attrSetIdToName   = $this->_entityModel->getAttrSetIdToName();
             $allowProductTypes = array();
+            $productIdArray = array();
             
             foreach ($bunch as $rowData){
                 if (!empty($rowData['_super_products_sku'])) {
