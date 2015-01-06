@@ -1511,4 +1511,20 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         }
         return $attribute;
     }
+
+
+    /**
+     * @param $sku
+     * @return array|false
+     */
+    public function getEntityBySku($sku)
+    {
+        if (isset($this->_oldSku[$sku])) {
+            return $this->_oldSku[$sku];
+        }
+        if (isset($this->_newSku[$sku])) {
+            return $this->_newSku[$sku];
+        }
+        return false;
+    }
 }
