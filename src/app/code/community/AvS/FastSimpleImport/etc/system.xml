@@ -100,6 +100,15 @@
                             <show_in_store>0</show_in_store>
                             <comment>When this symbol is present the existing value will be removed from Magento</comment>
                         </symbol_for_clear_field>
+                        <symbol_for_ignore_field translate="label">
+                            <label>Ignore Field on Symbol</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>200</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>When this symbol is present the existing value won't be overwritten in Magento</comment>
+                        </symbol_for_ignore_field>
                     </fields>
                 </general>
                 <product>
