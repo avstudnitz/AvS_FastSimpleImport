@@ -60,6 +60,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /** @var bool|string */
     protected $_symbolIgnoreFields = false;
 
+    /** @var bool */
+    protected $_ignoreDuplicates = false;
+
     /**
      * Attributes with index (not label) value.
      *
@@ -74,6 +77,17 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         'custom_design',
         'country_of_manufacture'
     );
+
+    public function setIgnoreDuplicates($ignore)
+    {
+	$this->_ignoreDuplicates = (boolean) $ignore;
+    }
+
+
+    public function getIgnoreDuplicates()
+    {
+	return $this->_ignoreDuplicates;
+    }
 
     /**
      * Set the error limit when the importer will stop
@@ -1330,6 +1344,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         $this->_validatedRows[$rowNum] = true;
 
         if (isset($this->_newSku[$rowData[self::COL_SKU]])) {
+	    if($this->getIgnoreDuplicates()){
+		return true;
+	    }
             $this->addRowError(self::ERROR_DUPLICATE_SKU, $rowNum);
             return false;
         }
