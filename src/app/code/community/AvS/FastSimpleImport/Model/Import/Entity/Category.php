@@ -1087,12 +1087,74 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         ");
     }
 
-    protected function _indexDeleteEvents() {
-        //not yet implemented
+
+    /**
+     * Reindex all categories
+     * @throws Exception
+     * @return $this
+     */
+    protected function _indexDeleteEvents()
+    {
+        return $this->_reindexUpdatedCategories();
     }
 
-    protected function _reindexUpdatedCategories() {
-        //not yet implemented
+
+    /**
+     * Reindex all categories
+     * @return $this
+     * @throws Exception
+     */
+    protected function _reindexUpdatedCategories()
+    {
+        $entityIds = $this->_getProcessedCategoryIds();
+
+        $categoryFlatHelper = Mage::helper('catalog/category_flat');
+        if ($categoryFlatHelper->isAvailable() && $categoryFlatHelper->isAccessible()) {
+            Mage::dispatchEvent('fastsimpleimport_reindex_category_before_flat', array('entity_id' => &$entityIds));
+            Mage::getResourceSingleton('catalog/category_flat')->reindexAll();
+        }
+
+        if (Mage::getResourceModel('ecomdev_urlrewrite/indexer')) {
+            Mage::dispatchEvent('fastsimpleimport_reindex_category_before_ecomdev_urlrewrite', array('entity_id' => &$entityIds));
+            Mage::getResourceSingleton('ecomdev_urlrewrite/indexer')->updateCategoryRewrites($entityIds);
+        } else {
+            Mage::dispatchEvent('fastsimpleimport_reindex_category_before_urlrewrite', array('entity_id' => &$entityIds));
+            /* @var $urlModel Mage_Catalog_Model_Url */
+            $urlModel = Mage::getSingleton('catalog/url');
+            $urlModel->clearStoreInvalidRewrites();
+            foreach ($entityIds as $productId) {
+                $urlModel->refreshCategoryRewrite($productId);
+            }
+        }
+        Mage::dispatchEvent('fastsimpleimport_reindex_category_after', array('entity_id' => &$entityIds));
+
+        return $this;
+    }
+
+
+    /**
+     * Ids of products which have been created, updated or deleted
+     *
+     * @return array
+     */
+    protected function _getProcessedCategoryIds()
+    {
+        $categoryIds = array();
+        $source = $this->getSource();
+
+        $source->rewind();
+        while ($source->valid()) {
+            $current = $source->current();
+            if (isset($this->_newCategory[$current[self::COL_ROOT]][$current[self::COL_CATEGORY]])) {
+                $categoryIds[] = $this->_newCategory[$current[self::COL_ROOT]][$current[self::COL_CATEGORY]];
+            } elseif (isset($this->_categoriesWithRoots[$current[self::COL_ROOT]][$current[self::COL_CATEGORY]])) {
+                $categoryIds[] = $this->_categoriesWithRoots[$current[self::COL_ROOT]][$current[self::COL_CATEGORY]];
+            }
+
+            $source->next();
+        }
+
+        return $categoryIds;
     }
 
     /**
