@@ -910,6 +910,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             foreach ($this->_attributes as $attrCode => $attrParams) {
                 if (isset($rowData[$attrCode]) && strlen($rowData[$attrCode])) {
                     $this->isAttributeValid($attrCode, $attrParams, $rowData, $rowNum);
+                } elseif ($attrParams['is_required'] && in_array($attrCode, $this->_indexValueAttributes)) {
+                    // empty value is allowed for these "required attributes" using the tickbox
+                    continue;
                 } elseif ($attrParams['is_required'] && !isset($this->_categoriesWithRoots[$root][$category])) {
                     $this->addRowError(self::ERROR_VALUE_IS_REQUIRED, $rowNum, $attrCode);
                 }
