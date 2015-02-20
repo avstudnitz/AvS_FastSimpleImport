@@ -914,7 +914,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
                 foreach ($attributes as $attributeId => $storeValues) {
                     foreach ($storeValues as $storeId => $storeValue) {
-                        if (! is_null($storeValue)) {
+                        // For storeId 0 we *must* save the NULL value into DB otherwise product collections can not load the store specific values
+                        if ($storeId == 0 || ! is_null($storeValue)) {
                             $tableData[] = array(
                                 'entity_id'      => $productId,
                                 'entity_type_id' => $this->_entityTypeId,

@@ -49,18 +49,19 @@ class AvS_FastSimpleImport_Model_NestedArrayAdapter extends AvS_FastSimpleImport
         
         foreach ($line as $fieldName => $fieldValue) {
             if (is_array($fieldValue)) {
-                if(!empty($fieldValue)) {
-                    $newLineNumber = 0;
-                    foreach ($fieldValue as $singleFieldValue) {
-                        if ($newLineNumber > 0) {
-                            $newLines[$newLineNumber]['sku'] = null;
-                            $newLines[$newLineNumber]['_type'] = null;
-                            $newLines[$newLineNumber]['_attribute_set'] = null;
+                $newLineNumber = 0;
+                foreach ($fieldValue as $singleFieldValue) {
+                    if ($newLineNumber > 0) {
+                        $newLines[$newLineNumber]['sku'] = null;
+                        $newLines[$newLineNumber]['_type'] = null;
+                        $newLines[$newLineNumber]['_attribute_set'] = null;
+
+                        $originalLineHasStoreScope = isset($line['_store']);
+                        if ($originalLineHasStoreScope) {
+                            $newLines[$newLineNumber]['_store'] = $line['_store'];
                         }
-                        $newLines[$newLineNumber++][$fieldName] = $singleFieldValue;
                     }
-                } else {
-                    $newLines[0][$fieldName] = '';
+                    $newLines[$newLineNumber++][$fieldName] = $singleFieldValue;
                 }
             }
         }
