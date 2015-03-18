@@ -75,7 +75,6 @@
                 <weight>0</weight>
                 <use_external_images>0</use_external_images>
                 <allow_rename_files>1</allow_rename_files>
-                <disable_preprocess_images>0</disable_preprocess_images>
             </product>
         </fastsimpleimport>
     </default>

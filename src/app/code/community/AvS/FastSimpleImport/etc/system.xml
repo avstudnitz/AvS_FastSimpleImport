@@ -199,7 +199,6 @@
                             <comment>If the images are preprocessed it downloads images from external URL's, sets the image attribute ID and fills in missing data.</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <depends><use_external_images>0</use_external_images></depends>
                             <sort_order>190</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
