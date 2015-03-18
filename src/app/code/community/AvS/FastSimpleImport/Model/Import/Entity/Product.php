@@ -186,13 +186,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     {
         if (!$this->_dataValidated) {
             $this->_createAttributeOptions();
+            $this->_preprocessImageData();
 
-            if (!$this->getUseExternalImages()) {
-                $this->_preprocessImageData();
-
-                if (!$this->getAllowRenameFiles()) {
-                    $this->_getUploader()->setAllowRenameFiles(false);
-                }
+            if (!$this->getAllowRenameFiles()) {
+                $this->_getUploader()->setAllowRenameFiles(false);
             }
         }
 
@@ -351,34 +348,37 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                 if (!isset($rowData['_media_lable'])) {
                     $this->_getSource()->setValue('_media_lable', '');
                 }
-                if (strpos($rowData['_media_image'], 'http') === 0 && strpos($rowData['_media_image'], '://') !== false) {
 
-                    if (isset($rowData['_media_target_filename']) && $rowData['_media_target_filename']) {
-                        $targetFilename = $rowData['_media_target_filename'];
-                    } else {
-                        $targetFilename = basename(parse_url($rowData['_media_image'], PHP_URL_PATH));
-                    }
+                if (!$this->getUseExternalImages()) {
+                    if (strpos($rowData['_media_image'], 'http') === 0 && strpos($rowData['_media_image'], '://') !== false) {
 
-                    if (!is_file($this->_getUploader()->getTmpDir() . DS . $targetFilename)) {
-                        $this->_copyExternalImageFile($rowData['_media_image'], $targetFilename);
-                    }
-                    $this->_getSource()->setValue('_media_image', $targetFilename);
-
-                } else {
-
-                    if (isset($rowData['_media_target_filename']) && $rowData['_media_target_filename']) {
-                        $targetFilename = $rowData['_media_target_filename'];
+                        if (isset($rowData['_media_target_filename']) && $rowData['_media_target_filename']) {
+                            $targetFilename = $rowData['_media_target_filename'];
+                        } else {
+                            $targetFilename = basename(parse_url($rowData['_media_image'], PHP_URL_PATH));
+                        }
 
                         if (!is_file($this->_getUploader()->getTmpDir() . DS . $targetFilename)) {
-                            if (is_file($this->_getUploader()->getTmpDir() . DS . $rowData['_media_image'])) {
-                                copy($this->_getUploader()->getTmpDir() . DS . $rowData['_media_image'], $this->_getUploader()->getTmpDir() . DS . $targetFilename);
+                            $this->_copyExternalImageFile($rowData['_media_image'], $targetFilename);
+                        }
+                        $this->_getSource()->setValue('_media_image', $targetFilename);
+
+                    } else {
+
+                        if (isset($rowData['_media_target_filename']) && $rowData['_media_target_filename']) {
+                            $targetFilename = $rowData['_media_target_filename'];
+
+                            if (!is_file($this->_getUploader()->getTmpDir() . DS . $targetFilename)) {
+                                if (is_file($this->_getUploader()->getTmpDir() . DS . $rowData['_media_image'])) {
+                                    copy($this->_getUploader()->getTmpDir() . DS . $rowData['_media_image'], $this->_getUploader()->getTmpDir() . DS . $targetFilename);
+                                }
+                                $this->_getSource()->setValue('_media_image', $targetFilename);
                             }
-                            $this->_getSource()->setValue('_media_image', $targetFilename);
                         }
                     }
-                }
 
-                $this->_getSource()->unsetValue('_media_target_filename');
+                    $this->_getSource()->unsetValue('_media_target_filename');
+                }
             }
 
             $this->_getSource()->next();
