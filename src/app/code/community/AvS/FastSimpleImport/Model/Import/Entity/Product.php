@@ -57,6 +57,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /** @var null|bool */
     protected $_symbolEmptyFields = false;
 
+    /** @var null|bool */
+    protected $_useExternalImages = false;
+
     /**
      * Attributes with index (not label) value.
      *
@@ -95,7 +98,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         return $this->_allowRenameFiles;
     }
 
-
     /**
      * @return boolean
      */
@@ -103,7 +105,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     {
         return $this->_disablePreprocessImageData;
     }
-
 
     /**
      * @param boolean $disablePreprocessImageData
@@ -115,7 +116,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         return $this;
     }
 
-
     /**
      * @param boolean $value
      * @return $this
@@ -125,13 +125,30 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         return $this;
     }
 
-
     /**
      * @param string $value
      * @return $this
      */
     public function setSymbolEmptyFields($value) {
         $this->_symbolEmptyFields = $value;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getUseExternalImages()
+    {
+        return $this->_useExternalImages;
+    }
+
+    /**
+     * @param boolean $useExternalImages
+     * @return $this
+     */
+    public function setUseExternalImages($useExternalImages)
+    {
+        $this->_useExternalImages = (boolean) $useExternalImages;
         return $this;
     }
 
@@ -169,10 +186,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     {
         if (!$this->_dataValidated) {
             $this->_createAttributeOptions();
-            $this->_preprocessImageData();
 
-            if (!$this->getAllowRenameFiles()) {
-                $this->_getUploader()->setAllowRenameFiles(false);
+            if (!$this->getUseExternalImages()) {
+                $this->_preprocessImageData();
+
+                if (!$this->getAllowRenameFiles()) {
+                    $this->_getUploader()->setAllowRenameFiles(false);
+                }
             }
         }
 
@@ -1031,7 +1051,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                             ? 0 : $this->_websiteCodeToId[$rowData['_group_price_website']]
                     );
                 }
-                if (is_array($this->_imagesArrayKeys)  && count($this->_imagesArrayKeys) > 0) {
+                if (!$this->getUseExternalImages() && is_array($this->_imagesArrayKeys) && count($this->_imagesArrayKeys) > 0) {
                     foreach ($this->_imagesArrayKeys as $imageCol) {
                         if (!empty($rowData[$imageCol])) { // 5. Media gallery phase
                             if (!array_key_exists($rowData[$imageCol], $uploadedGalleryFiles)) {

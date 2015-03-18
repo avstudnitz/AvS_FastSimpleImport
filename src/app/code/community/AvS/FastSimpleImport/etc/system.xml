@@ -128,16 +128,6 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </multiselect_attributes>
-                        <allow_rename_files translate="label comment" module="fastsimpleimport">
-                            <label>Allow renaming of files</label>
-                            <comment>Image files get renamed if file with the same name exists</comment>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>30</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </allow_rename_files>
                         <additional_image_attributes translate="label" module="fastsimpleimport">
                             <label>Additional Image Attributes</label>
                             <frontend_type>multiselect</frontend_type>
@@ -183,12 +173,34 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </weight>
+                        <use_external_images translate="label comment" module="fastsimpleimport">
+                            <label>Use external images</label>
+                            <comment>Images will not be downloaded, external URL's will be stored as they are.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>170</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </use_external_images>
+                        <allow_rename_files translate="label comment" module="fastsimpleimport">
+                            <label>Allow renaming of files</label>
+                            <comment>Image files get renamed if file with the same name exists</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <depends><use_external_images>0</use_external_images></depends>
+                            <sort_order>180</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </allow_rename_files>
                         <disable_preprocess_images translate="label comment" module="fastsimpleimport">
                             <label>Disable image preprocessing</label>
                             <comment>If the images are preprocessed it downloads images from external URL's, sets the image attribute ID and fills in missing data.</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>170</sort_order>
+                            <depends><use_external_images>0</use_external_images></depends>
+                            <sort_order>190</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
