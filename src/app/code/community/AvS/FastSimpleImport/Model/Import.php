@@ -156,6 +156,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setDisablePreprocessImageData($this->getDisablePreprocessImageData());
         $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
         $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
+        $entityAdapter->setUseExternalImages($this->getUseExternalImages());
         $this->setEntityAdapter($entityAdapter);
 
         $validationResult = $this->validateSource($data);
