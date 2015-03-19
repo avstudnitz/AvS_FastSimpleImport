@@ -22,6 +22,8 @@
  * @method boolean getUseNestedArrays()
  * @method AvS_FastSimpleImport_Model_Import setIgnoreDuplicates(boolean $value)
  * @method boolean getIgnoreDuplicates()
+ * @method AvS_FastSimpleImport_Model_Import setOnlyExistingEntities(boolean $value)
+ * @method boolean getOnlyExistingEntities()
  * @method AvS_FastSimpleImport_Model_Import setAllowRenameFiles(boolean $value)
  * @method boolean getAllowRenameFiles()
  * @method AvS_FastSimpleImport_Model_Import setDisablePreprocessImageData(boolean $value)
@@ -29,6 +31,7 @@
  * @method AvS_FastSimpleImport_Model_Import setUnsetEmptyFields(bool $value)
  * @method string getUnsetEmptyFields()
  * @method AvS_FastSimpleImport_Model_Import setSymbolEmptyFields(string $value)
+ * @method array getImageAttributes()
  * @method string getSymbolEmptyFields()
  * @method AvS_FastSimpleImport_Model_Import setSymbolIgnoreFields(string $value)
  * @method string getSymbolIgnoreFields()
@@ -37,15 +40,16 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 {
     protected function _construct()
     {
-        //Fix for issue #50
         Mage::getSingleton('catalog/product')->getResource()->unsetAttributes();
 
+        //@todo refactor these configuration options and implement it in the models with the _parameters field.
         $this->setBehavior(Mage::getStoreConfig('fastsimpleimport/general/import_behavior'));
         $this->setPartialIndexing(Mage::getStoreConfigFlag('fastsimpleimport/general/partial_indexing'));
         $this->setContinueAfterErrors(Mage::getStoreConfigFlag('fastsimpleimport/general/continue_after_errors'));
         $this->setErrorLimit(intval(Mage::getStoreConfig('fastsimpleimport/general/error_limit')));
         $this->setUseNestedArrays(Mage::getStoreConfigFlag('fastsimpleimport/general/support_nested_arrays'));
         $this->setIgnoreDuplicates(Mage::getStoreConfigFlag('fastsimpleimport/general/ignore_duplicates'));
+        $this->setOnlyExistingEntities(Mage::getStoreConfigFlag('fastsimpleimport/general/only_existing_entities'));
         $this->setDropdownAttributes(array_filter(explode(',', Mage::getStoreConfig('fastsimpleimport/product/select_attributes'))));
         $this->setMultiselectAttributes(array_filter(explode(',', Mage::getStoreConfig('fastsimpleimport/product/multiselect_attributes'))));
         $this->setAllowRenameFiles(Mage::getStoreConfigFlag('fastsimpleimport/product/allow_rename_files'));
@@ -85,6 +89,8 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setErrorLimit($this->getErrorLimit());
         $entityAdapter->setDropdownAttributes($this->getDropdownAttributes());
         $entityAdapter->setMultiselectAttributes($this->getMultiselectAttributes());
+        $entityAdapter->setIgnoreDuplicates($this->getIgnoreDuplicates());
+        $entityAdapter->setOnlyExistingEntities($this->getOnlyExistingEntities());
         $entityAdapter->setImageAttributes($this->getImageAttributes());
         $entityAdapter->setAllowRenameFiles($this->getAllowRenameFiles());
         $entityAdapter->setDisablePreprocessImageData($this->getDisablePreprocessImageData());
@@ -153,6 +159,8 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setErrorLimit($this->getErrorLimit());
         $entityAdapter->setDropdownAttributes($this->getDropdownAttributes());
         $entityAdapter->setMultiselectAttributes($this->getMultiselectAttributes());
+        $entityAdapter->setIgnoreDuplicates($this->getIgnoreDuplicates());
+        $entityAdapter->setOnlyExistingEntities($this->getOnlyExistingEntities());
         $entityAdapter->setImageAttributes($this->getImageAttributes());
         $entityAdapter->setAllowRenameFiles($this->getAllowRenameFiles());
         $entityAdapter->setDisablePreprocessImageData($this->getDisablePreprocessImageData());
@@ -192,6 +200,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter = Mage::getModel($validTypes[$this->getEntity()]['model']);
         $entityAdapter->setBehavior($this->getBehavior());
         $entityAdapter->setIgnoreDuplicates($this->getIgnoreDuplicates());
+        $entityAdapter->setOnlyExistingEntities($this->getOnlyExistingEntities());
         $entityAdapter->setErrorLimit($this->getErrorLimit());
         $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
         $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
@@ -247,6 +256,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter = Mage::getModel($validTypes[$this->getEntity()]['model']);
         $entityAdapter->setBehavior($this->getBehavior());
         $entityAdapter->setIgnoreDuplicates($this->getIgnoreDuplicates());
+        $entityAdapter->setOnlyExistingEntities($this->getOnlyExistingEntities());
         $entityAdapter->setErrorLimit($this->getErrorLimit());
         $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
         $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
@@ -286,6 +296,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setBehavior($this->getBehavior());
         $entityAdapter->setErrorLimit($this->getErrorLimit());
         $entityAdapter->setIgnoreDuplicates($this->getIgnoreDuplicates());
+        $entityAdapter->setOnlyExistingEntities($this->getOnlyExistingEntities());
         $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
         $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
         $entityAdapter->setSymbolIgnoreFields($this->getSymbolIgnoreFields());
@@ -349,6 +360,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setBehavior($this->getBehavior());
         $entityAdapter->setErrorLimit($this->getErrorLimit());
         $entityAdapter->setIgnoreDuplicates($this->getIgnoreDuplicates());
+        $entityAdapter->setOnlyExistingEntities($this->getOnlyExistingEntities());
         $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
         $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
         $entityAdapter->setSymbolIgnoreFields($this->getSymbolIgnoreFields());
@@ -386,6 +398,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setBehavior($this->getBehavior());
         $entityAdapter->setErrorLimit($this->getErrorLimit());
         $entityAdapter->setIgnoreDuplicates($this->getIgnoreDuplicates());
+        $entityAdapter->setOnlyExistingEntities($this->getOnlyExistingEntities());
 //        $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
 //        $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
 //        $entityAdapter->setSymbolIgnoreFields($this->getSymbolIgnoreFields());
@@ -443,6 +456,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setBehavior($this->getBehavior());
         $entityAdapter->setErrorLimit($this->getErrorLimit());
         $entityAdapter->setIgnoreDuplicates($this->getIgnoreDuplicates());
+        $entityAdapter->setOnlyExistingEntities($this->getOnlyExistingEntities());
 //        $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
 //        $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
 //        $entityAdapter->setSymbolIgnoreFields($this->getSymbolIgnoreFields());

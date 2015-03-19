@@ -7,7 +7,7 @@
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software Licence 3.0 (OSL-3.0)
  * @author     Andreas von Studnitz <avs@avs-webentwicklung.de>
  */
-if (@class_exists('Enterprise_ImportExport_Model_Import_Entity_Product')) {
+if (Mage::helper('core')->isModuleEnabled('Enterprise_ImportExport')) {
     abstract class AvS_FastSimpleImport_Model_Import_Entity_Product_Abstract extends Enterprise_ImportExport_Model_Import_Entity_Product {}
 } else {
     abstract class AvS_FastSimpleImport_Model_Import_Entity_Product_Abstract extends Mage_ImportExport_Model_Import_Entity_Product {}
@@ -21,7 +21,7 @@ if (@class_exists('Enterprise_ImportExport_Model_Import_Entity_Product')) {
  * @license    http://opensource.org/licenses/osl-3.0.php Open Software Licence 3.0 (OSL-3.0)
  * @author     Andreas von Studnitz <avs@avs-webentwicklung.de>
  */
-class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImport_Model_Import_Entity_Product_Abstract
+class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport_Model_Import_Entity_Product
 {
     /**
      * Code of a primary attribute which identifies the entity group if import contains of multiple rows
@@ -60,6 +60,12 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /** @var bool|string */
     protected $_symbolIgnoreFields = false;
 
+    /** @var bool */
+    protected $_ignoreDuplicates = false;
+
+    /** @var bool */
+    protected $_onlyExistingEntities = false;
+
     /**
      * Attributes with index (not label) value.
      *
@@ -75,11 +81,41 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         'country_of_manufacture'
     );
 
+    public function setIgnoreDuplicates($ignore)
+    {
+	    $this->_ignoreDuplicates = (bool) $ignore;
+        return $this;
+    }
+
+
+    public function getIgnoreDuplicates()
+    {
+        return $this->_ignoreDuplicates;
+    }
+
+
+    /**
+     * @param bool $update
+     * @return $this
+     */
+    public function setOnlyExistingEntities($update)
+    {
+        $this->_onlyExistingEntities = (bool) $update;
+        return $this;
+    }
+
+    public function getOnlyExistingEntities()
+    {
+        return $this->_onlyExistingEntities;
+    }
+
+
     /**
      * Set the error limit when the importer will stop
      * @param $limit
      */
-    public function setErrorLimit($limit) {
+    public function setErrorLimit($limit)
+    {
         if ($limit) {
             $this->_errorsLimit = $limit;
         } else {
@@ -658,11 +694,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
             /** @var $attribute Mage_Eav_Model_Entity_Attribute */
             $attribute = Mage::getSingleton('catalog/product')->getResource()->getAttribute($attributeCode);
-            if (!is_object($attribute)) {
+            if ($attribute === false) {
                 continue;
 //                Mage::throwException('Attribute ' . $attributeCode . ' not found.');
             }
-            if ($attribute->getSourceModel() != 'eav/entity_attribute_source_table') {
+            if (!($attribute->getSource() instanceof Mage_Eav_Model_Entity_Attribute_Source_Abstract)) {
                 Mage::throwException('Attribute ' . $attributeCode . ' is no dropdown attribute.');
             }
             $attributes[$attributeCode] = $attribute;
@@ -686,11 +722,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
             /** @var $attribute Mage_Eav_Model_Entity_Attribute */
             $attribute = Mage::getSingleton('catalog/product')->getResource()->getAttribute($attributeCode);
-            if (!is_object($attribute)) {
+            if ($attribute === false) {
                 continue;
 //                Mage::throwException('Attribute ' . $attributeCode . ' not found.');
             }
-            if ($attribute->getBackendModel() != 'eav/entity_attribute_backend_array') {
+            if (!($attribute->getBackend() instanceof Mage_Eav_Model_Entity_Attribute_Backend_Abstract)) {
                 Mage::throwException('Attribute ' . $attributeCode . ' is no multiselect attribute.');
             }
             $attributes[$attributeCode] = $attribute;
@@ -1332,6 +1368,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         $this->_validatedRows[$rowNum] = true;
 
         if (isset($this->_newSku[$rowData[self::COL_SKU]])) {
+            if($this->getIgnoreDuplicates() || $this->getOnlyExistingEntities()){
+                return false;
+            }
             $this->addRowError(self::ERROR_DUPLICATE_SKU, $rowNum);
             return false;
         }
@@ -1362,10 +1401,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                         'attr_set_id'   => $this->_oldSku[$sku]['attr_set_id'],
                         'attr_set_code' => $this->_attrSetIdToName[$this->_oldSku[$sku]['attr_set_id']]
                     );
+                } elseif ($this->getOnlyExistingEntities()) {
+                    return false;
                 } else {
                     $this->addRowError(self::ERROR_TYPE_UNSUPPORTED, $rowNum);
                     $sku = false; // child rows of legacy products with unsupported types are orphans
                 }
+            } elseif($this->getOnlyExistingEntities()) {
+                return false;
             } else { // validate new product type and attribute set
                 if (!isset($rowData[self::COL_TYPE])
                     || !isset($this->_productTypeModels[$rowData[self::COL_TYPE]])
