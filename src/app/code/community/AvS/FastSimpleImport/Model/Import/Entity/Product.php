@@ -1195,6 +1195,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends Mage_ImportExport
 
             // Format bunch to stock data rows
             foreach ($bunch as $rowNum => $rowData) {
+                $this->_filterRowData($rowData);
                 if (!$this->isRowAllowedToImport($rowData, $rowNum)) {
                     continue;
                 }
