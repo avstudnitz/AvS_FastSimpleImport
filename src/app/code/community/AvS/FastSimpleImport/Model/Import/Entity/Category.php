@@ -933,10 +933,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 if (!$this->isRowAllowedToImport($rowData, $rowNum)) {
                     continue;
                 }
-                if (!isset($this->_newCategory[$rowData[self::COL_CATEGORY]]['entity_id'])) {
+                if (!isset($this->_newCategory[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]]['entity_id'])) {
                     continue;
                 }
-                $categoryIds[] = $this->_newCategory[$rowData[self::COL_CATEGORY]]['entity_id'];
+                $categoryIds[] = $this->_newCategory[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]]['entity_id'];
             }
         }
         return $categoryIds;
