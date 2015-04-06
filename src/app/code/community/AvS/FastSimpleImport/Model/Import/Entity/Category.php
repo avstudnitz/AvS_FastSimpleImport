@@ -808,8 +808,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             } else {
                 return false;
             }
-        } else {
+        } elseif (isset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]])) {
             return reset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]]);
+        } else {
+            return false;
         }
     }
 

@@ -31,8 +31,10 @@ class AvS_FastSimpleImport_Test_Model_Category_Import extends EcomDev_PHPUnit_Te
         $result = $this->_model->validateRow($row, 1);
         $this->assertFalse($result);
 
+        $this->_model->addMessageTemplate(AvS_FastSimpleImport_Model_Import_Entity_Category::ERROR_INVALID_ROOT, 'Invalid Root');
+
         // Assert error message is correct
         $errors = $this->_model->getErrorMessages();
-        $this->assertArrayHasKey(AvS_FastSimpleImport_Model_Import_Entity_Category::ERROR_INVALID_ROOT, $errors);
+        $this->assertArrayHasKey('Invalid Root', $errors);
     }
 }
