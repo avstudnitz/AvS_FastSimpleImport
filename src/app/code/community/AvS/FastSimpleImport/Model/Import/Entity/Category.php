@@ -878,6 +878,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             $root = $rowData[self::COL_ROOT];
             $category = $rowData[self::COL_CATEGORY];
 
+            //check if the root exists
+            if (! isset($this->_categoriesWithRoots[$root]))
+            {
+                $this->addRowError(self::ERROR_INVALID_ROOT, $rowNum);
+                return false;
+            }
+
             //check if parent category exists
             if ($this->_getParentCategory($rowData) === false)
             {
@@ -899,14 +906,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                     $category = false;
                 }
             }
-
-            //check if the root exists
-            if (! isset($this->_categoriesWithRoots[$root]))
-            {
-                $this->addRowError(self::ERROR_INVALID_ROOT, $rowNum);
-                return false;
-            }
-
 
             // check simple attributes
             foreach ($this->_attributes as $attrCode => $attrParams) {
