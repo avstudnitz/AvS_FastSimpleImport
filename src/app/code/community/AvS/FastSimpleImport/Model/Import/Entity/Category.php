@@ -304,12 +304,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         $exploded = explode($delimiter, $string);
         $fixed = array();
         for($k = 0, $l = count($exploded); $k < $l; ++$k){
-            if($exploded[$k][strlen($exploded[$k]) - 1] == '\\') {
+            $eIdx = strlen($exploded[$k]) - 1;
+            if($eIdx >= 0 && $exploded[$k][$eIdx] == '\\') {
                 if($k + 1 >= $l) {
                     $fixed[] = trim($exploded[$k]);
                     break;
                 }
-                $exploded[$k][strlen($exploded[$k]) - 1] = $delimiter;
+                $exploded[$k][$eIdx] = $delimiter;
                 $exploded[$k] .= $exploded[$k + 1];
                 array_splice($exploded, $k + 1, 1);
                 --$l;
