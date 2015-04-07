@@ -60,6 +60,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /** @var bool|string */
     protected $_symbolIgnoreFields = false;
 
+    /** @var bool */
+    protected $_ignoreDuplicates = false;
+
     /**
      * Attributes with index (not label) value.
      *
@@ -74,6 +77,17 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         'custom_design',
         'country_of_manufacture'
     );
+
+    public function setIgnoreDuplicates($ignore)
+    {
+	$this->_ignoreDuplicates = (boolean) $ignore;
+    }
+
+
+    public function getIgnoreDuplicates()
+    {
+	return $this->_ignoreDuplicates;
+    }
 
     /**
      * Set the error limit when the importer will stop
@@ -658,11 +672,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
             /** @var $attribute Mage_Eav_Model_Entity_Attribute */
             $attribute = Mage::getSingleton('catalog/product')->getResource()->getAttribute($attributeCode);
-            if (!is_object($attribute)) {
+	    if ($attribute === false) {
                 continue;
-//                Mage::throwException('Attribute ' . $attributeCode . ' not found.');
             }
-            if ($attribute->getSourceModel() != 'eav/entity_attribute_source_table') {
+	    if (!($attribute->getSource() instanceof Mage_Eav_Model_Entity_Attribute_Source_Abstract)) {
                 Mage::throwException('Attribute ' . $attributeCode . ' is no dropdown attribute.');
             }
             $attributes[$attributeCode] = $attribute;
@@ -686,11 +699,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
             /** @var $attribute Mage_Eav_Model_Entity_Attribute */
             $attribute = Mage::getSingleton('catalog/product')->getResource()->getAttribute($attributeCode);
-            if (!is_object($attribute)) {
+	    if ($attribute === false) {
                 continue;
-//                Mage::throwException('Attribute ' . $attributeCode . ' not found.');
             }
-            if ($attribute->getBackendModel() != 'eav/entity_attribute_backend_array') {
+	    if (!($attribute->getBackend() instanceof Mage_Eav_Model_Entity_Attribute_Backend_Abstract)) {
                 Mage::throwException('Attribute ' . $attributeCode . ' is no multiselect attribute.');
             }
             $attributes[$attributeCode] = $attribute;
@@ -1332,6 +1344,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         $this->_validatedRows[$rowNum] = true;
 
         if (isset($this->_newSku[$rowData[self::COL_SKU]])) {
+	    if($this->getIgnoreDuplicates()){
+		return true;
+	    }
             $this->addRowError(self::ERROR_DUPLICATE_SKU, $rowNum);
             return false;
         }
