@@ -7,7 +7,7 @@ Wrapper for Magento ImportExport functionality which imports data from arrays
 
 Facts
 -----
-- version: 0.6.3
+- version: 0.6.4
 - extension key: AvS_FastSimpleImport
 - extension on Magento Connect: n/a
 - Magento Connect 1.0 extension key: n/a
