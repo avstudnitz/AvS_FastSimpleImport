@@ -49,7 +49,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $this->setAllowRenameFiles(Mage::getStoreConfigFlag('fastsimpleimport/product/allow_rename_files'));
         $this->setImageAttributes(array_filter(explode(',', Mage::getStoreConfig('fastsimpleimport/product/additional_image_attributes'))));
         $this->setDisablePreprocessImageData(Mage::getStoreConfigFlag('fastsimpleimport/product/disable_preprocess_images'));
-        $this->setUnsetEmptyFields(! Mage::getStoreConfigFlag('fastsimpleimport/general/clear_field_on_empty_string'));
+        $this->setUnsetEmptyFields(Mage::getStoreConfigFlag('fastsimpleimport/general/clear_field_on_empty_string'));
         $this->setSymbolEmptyFields(Mage::getStoreConfig('fastsimpleimport/general/symbol_for_clear_field'));
     }
 
