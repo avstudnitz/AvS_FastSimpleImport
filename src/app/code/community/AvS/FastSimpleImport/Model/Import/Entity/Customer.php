@@ -449,13 +449,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                     /* And start a new one */
                     $entityGroup = array();
                 }
-
-                if ($this->validateRow($rowData, $source->key()) && isset($entityGroup)) {
+                $this->validateRow($rowData, $source->key());
+                if (isset($entityGroup)) {
                     /* Add row to entity group */
                     $entityGroup[$source->key()] = $this->_prepareRowForDb($rowData);
-                } elseif (isset($entityGroup)) {
-                    /* In case validation of one line of the group fails kill the entire group */
-                    unset($entityGroup);
                 }
                 $source->next();
             }
