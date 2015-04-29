@@ -10,6 +10,8 @@
  */
 class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExport_Model_Import_Entity_Customer
 {
+    /** @var array */
+    protected $_sku = null;
     /**
      * Code of a primary attribute which identifies the entity group if import contains of multiple rows
      *
@@ -28,12 +30,24 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
 
 
     /**
-     * Constructor.
-     *
-     * @return void
+     * Error codes.
+     */
+    const ERROR_INVALID_SKU = 'invalidSku';
+    const ERROR_INVALID_QTY = 'invalidQty';
+
+    /**
+     * Constructor
      */
     public function __construct()
     {
+        $add = array('_wishlist_shared', '_wishlist_updated_at', '_wishlist_sharing_code',
+                     '_wishlist_item_sku', '_wishlist_item_added_at', '_wishlist_item_description',
+                     '_wishlist_item_qty');
+        $this->_particularAttributes = array_merge($this->_particularAttributes, $add);
+
+        $this->_messageTemplates[self::ERROR_INVALID_SKU] = 'SKU not found';
+        $this->_messageTemplates[self::ERROR_INVALID_QTY] = 'Qty must me numeric';
+        
         parent::__construct();
         $this->_addressEntity = Mage::getModel('fastsimpleimport/import_entity_customer_address', $this);
     }
@@ -63,7 +77,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
     {
         return $this->_ignoreDuplicates;
     }
-
 
     /**
      * @param boolean $value
@@ -109,6 +122,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
         return $this;
     }
 
+
     /**
      * Import behavior setter
      *
@@ -118,6 +132,140 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
     {
         $this->_parameters['behavior'] = $behavior;
     }
+
+
+    /**
+     * Save customer data to DB.
+     *
+     * @throws Exception
+     * @return bool Result of operation.
+     */
+    protected function _importData()
+    {
+        if (Mage_ImportExport_Model_Import::BEHAVIOR_DELETE == $this->getBehavior()) {
+            $this->_deleteCustomers();
+        } else {
+            $this->_saveCustomers();
+            $this->_addressEntity->importData();
+            $this->_saveWishlists();
+        }
+        return true;
+    }
+
+
+    /**
+     * Initialize existent product SKUs.
+     *
+     * @return Mage_ImportExport_Model_Import_Entity_Product
+     */
+    protected function _initSkus()
+    {
+        $columns = array('entity_id', 'type_id', 'attribute_set_id', 'sku');
+        foreach (Mage::getModel('catalog/product')->getProductEntitiesInfo($columns) as $info) {
+            $this->_sku[$info['sku']] =$info['entity_id'];
+        }
+        return $this;
+    }
+
+
+    public function getProductId($sku) {
+        if ($this->_sku === null) {
+            $this->_initSkus();
+        }
+        return isset($this->_sku[$sku]) ? (int) $this->_sku[$sku] : null;
+    }
+
+
+    protected function _saveWishlists() {
+
+        $entityItemTable = Mage::getResourceModel('wishlist/item')->getMainTable();
+        $oldCustomersToLower = array_change_key_case($this->_oldCustomers, CASE_LOWER);
+        $newCustomersToLower = array_change_key_case($this->_newCustomers, CASE_LOWER);
+
+        while ($bunch = $this->_dataSourceModel->getNextBunch()) {
+            $customerId = null;
+            $wishlistItems = array();
+
+            // Format bunch to stock data rows
+            foreach ($bunch as $rowNum => $rowData) {
+                if (!$this->isRowAllowedToImport($rowData, $rowNum)) {
+                    continue;
+                }
+
+                if (self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
+                    $wishlist = array();
+
+                    $emailToLower = strtolower($rowData[self::COL_EMAIL]);
+                    if (isset($oldCustomersToLower[$emailToLower][$rowData[self::COL_WEBSITE]])) {
+                        $wishlist['customer_id'] = $oldCustomersToLower[$emailToLower][$rowData[self::COL_WEBSITE]];
+                    } elseif (isset($oldCustomersToLower[$emailToLower][$rowData[self::COL_WEBSITE]])) {
+                        $wishlist['customer_id'] = $newCustomersToLower[$emailToLower][$rowData[self::COL_WEBSITE]];
+                    } else {
+                        Mage::throwException('Customer not found, shouldn\'t happen');
+                    }
+
+                    $keyLength = strlen('_wishlist_');
+                    foreach ($rowData as $key => $value) {
+                        if (strpos($key, '_wishlist_') === 0 && strpos($key, '_wishlist_item_') === false && !empty($value)) {
+                            $wishlist[substr($key, $keyLength)] = $value;
+                        }
+                    }
+
+                    $wishlistModel = Mage::getModel('wishlist/wishlist');
+                    $wishlistModel->loadByCustomer($wishlist['customer_id']);
+
+                    if (! isset($wishlist['sharing_code']) || empty($wishlist['sharing_code'])) {
+                        $wishlist['sharing_code'] = Mage::helper('core')->uniqHash();
+                    }
+
+                    if (! isset($wishlist['updated_at']) || empty($wishlist['updated_at'])) {
+                        $wishlist['updated_at'] = Mage::getSingleton('core/date')->gmtDate();
+                    }
+
+                    $wishlistModel->addData($wishlist);
+                    $wishlistModel->save();
+                    $wishlistId = (int) $wishlistModel->getId();
+                }
+
+                $wishlistItem = array();
+
+                if ($this->getBehavior() != Mage_ImportExport_Model_Import::BEHAVIOR_APPEND) { // remove old data?
+                    $this->_connection->delete(
+                        $entityItemTable,
+                        $this->_connection->quoteInto('wishlist_id = ?', $wishlistId)
+                    );
+                }
+
+                $keyLength = strlen('_wishlist_item_');
+                foreach ($rowData as $key => $value) {
+                    if (strpos($key, '_wishlist_') === 0 && !empty($value)) {
+                        $wishlistItem[substr($key, $keyLength)] = $value;
+                    }
+                }
+                if (! isset($wishlistItem['sku'])) {
+                    continue;
+                }
+
+                if (! isset($wishlist['added_at']) || empty($wishlist['added_at'])) {
+                    $wishlist['added_at'] = Mage::getSingleton('core/date')->gmtDate();
+                }
+
+                $wishlistItem['store_id'] = empty($rowData[self::COL_STORE]) ? 0 : $this->_storeCodeToId[$rowData[self::COL_STORE]];
+
+                $wishlistItem['wishlist_id'] = $wishlistId;
+                $wishlistItem['product_id'] = $this->getProductId($wishlistItem['sku']);
+                unset($wishlistItem['sku']);
+
+                $wishlistItems[] = $wishlistItem;
+            }
+
+            if ($wishlistItems) {
+                $this->_connection->insertOnDuplicate($entityItemTable, $wishlistItems);
+            }
+        }
+        return $this;
+    }
+
 
     /**
      * Gather and save information about customer entities.
@@ -208,6 +356,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
         return $this;
     }
 
+
     /**
      * Update and insert data in entity table.
      *
@@ -229,6 +378,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
         }
         return $this;
     }
+
 
     /**
      * Check one attribute. Can be overridden in child.
@@ -290,6 +440,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
         }
         return (bool) $valid;
     }
+
 
     /**
      * Validate data row.
@@ -374,6 +525,18 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
         // validate row data by address entity
         $this->_addressEntity->validateRow($rowData, $rowNum);
 
+        if (isset($rowData['_wishlist_item_sku'])
+            && !empty($rowData['_wishlist_item_sku'])
+            && $this->getProductId($rowData['_wishlist_item_sku']) === null) {
+            $this->addRowError(self::ERROR_INVALID_SKU, $rowNum, $rowData['_wishlist_item_sku']);
+        }
+
+        if (isset($rowData['_wishlist_item_qty'])
+            && !empty($rowData['_wishlist_item_qty'])
+            && !is_numeric($rowData['_wishlist_item_qty'])) {
+            $this->addRowError(self::ERROR_INVALID_QTY, $rowNum, $rowData['_wishlist_item_qty']);
+        }
+
         if (isset($this->_invalidRows[$rowNum])) {
             $email = false; // mark row as invalid for next address rows
         }
@@ -388,6 +551,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
     public function filterRowData(&$rowData) {
         $this->_filterRowData($rowData);
     }
+
 
     /**
      * Removes empty keys in case value is null or empty string
@@ -414,6 +578,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
             $rowData[self::COL_EMAIL] = null;
         }
     }
+
 
     /**
      * Validate data rows and save bunches to DB.
