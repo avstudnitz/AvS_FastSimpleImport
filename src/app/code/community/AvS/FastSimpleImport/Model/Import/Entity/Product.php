@@ -1,16 +1,34 @@
 <?php
-/**
- * Abstract class for Product Entity Adapter whcih is used for switching between CE and EE
- *
- * @category   AvS
- * @package    AvS_FastSimpleImport
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software Licence 3.0 (OSL-3.0)
- * @author     Andreas von Studnitz <avs@avs-webentwicklung.de>
- */
 if (class_exists('Enterprise_ImportExport_Model_Import_Entity_Product')) {
-    abstract class AvS_FastSimpleImport_Model_Import_Entity_Product_Abstract extends Enterprise_ImportExport_Model_Import_Entity_Product {}
+    /**
+     * Abstract class for Product Entity Adapter which is used for switching between CE and EE
+     *
+     * @category   AvS
+     * @package    AvS_FastSimpleImport
+     * @author     Andreas von Studnitz <avs@avs-webentwicklung.de>
+     * @author     Aoe Magento Team <team-magento@aoe.com>
+     * @license    http://opensource.org/licenses/osl-3.0.php Open Software Licence 3.0 (OSL-3.0)
+     * @link       https://github.com/AOEpeople/AvS_FastSimpleImport
+     */
+    abstract class AvS_FastSimpleImport_Model_Import_Entity_Product_Abstract extends Enterprise_ImportExport_Model_Import_Entity_Product
+    {
+        // empty class
+    }
 } else {
-    abstract class AvS_FastSimpleImport_Model_Import_Entity_Product_Abstract extends Mage_ImportExport_Model_Import_Entity_Product {}
+    /**
+     * Abstract class for Product Entity Adapter which is used for switching between CE and EE
+     *
+     * @category   AvS
+     * @package    AvS_FastSimpleImport
+     * @author     Andreas von Studnitz <avs@avs-webentwicklung.de>
+     * @author     Aoe Magento Team <team-magento@aoe.com>
+     * @license    http://opensource.org/licenses/osl-3.0.php Open Software Licence 3.0 (OSL-3.0)
+     * @link       https://github.com/AOEpeople/AvS_FastSimpleImport
+     */
+    abstract class AvS_FastSimpleImport_Model_Import_Entity_Product_Abstract extends Mage_ImportExport_Model_Import_Entity_Product
+    {
+        // empty class
+    }
 }
 
 /**
@@ -18,8 +36,10 @@ if (class_exists('Enterprise_ImportExport_Model_Import_Entity_Product')) {
  *
  * @category   AvS
  * @package    AvS_FastSimpleImport
- * @license    http://opensource.org/licenses/osl-3.0.php Open Software Licence 3.0 (OSL-3.0)
  * @author     Andreas von Studnitz <avs@avs-webentwicklung.de>
+ * @author     Aoe Magento Team <team-magento@aoe.com>
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software Licence 3.0 (OSL-3.0)
+ * @link       https://github.com/AOEpeople/AvS_FastSimpleImport
  */
 class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImport_Model_Import_Entity_Product_Abstract
 {
@@ -31,16 +51,16 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     protected $_masterAttributeCode = 'sku';
 
     /** @var array */
-    protected $_dropdownAttributes = array();
+    protected $_dropdownAttributes = [];
 
     /** @var array */
-    protected $_imageAttributes = array();
+    protected $_imageAttributes = [];
 
     /** @var array */
-    protected $_multiselectAttributes = array();
+    protected $_multiselectAttributes = [];
 
     /** @var array */
-    protected $_attributeOptions = array();
+    protected $_attributeOptions = [];
 
     /** @var bool */
     protected $_allowRenameFiles = false;
@@ -57,12 +77,18 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /** @var null|bool */
     protected $_symbolEmptyFields = false;
 
+    /** @var  string */
+    protected $_mediaGalleryTableName;
+
+    /** @var  string */
+    protected $_mediaValueTableName;
+
     /**
      * Attributes with index (not label) value.
      *
      * @var array
      */
-    protected $_indexValueAttributes = array(
+    protected $_indexValueAttributes = [
         'status',
         'tax_class_id',
         'visibility',
@@ -70,26 +96,38 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         'gift_message_available',
         'custom_design',
         'country_of_manufacture'
-    );
+    ];
 
     /**
      * Set the error limit when the importer will stop
-     * @param $limit
+     *
+     * @param int $limit The error limit
+     * @return void
      */
-    public function setErrorLimit($limit) {
+    public function setErrorLimit($limit)
+    {
         if ($limit) {
             $this->_errorsLimit = $limit;
         } else {
             $this->_errorsLimit = 100;
         }
+
+        return $this;
     }
 
+    /**
+     * @param boolean $allow Allow file renames
+     * @return $this
+     */
     public function setAllowRenameFiles($allow)
     {
         $this->_allowRenameFiles = (boolean) $allow;
         return $this;
     }
 
+    /**
+     * @return boolean
+     */
     public function getAllowRenameFiles()
     {
         return $this->_allowRenameFiles;
@@ -106,31 +144,34 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
 
     /**
-     * @param boolean $disablePreprocessImageData
+     * @param boolean $disablePreprocessImageData Disable preprossess image data
      * @return $this
      */
     public function setDisablePreprocessImageData($disablePreprocessImageData)
     {
         $this->_disablePreprocessImageData = (boolean) $disablePreprocessImageData;
+
         return $this;
     }
 
 
     /**
-     * @param boolean $value
+     * @param boolean $value Unset empty fields
      * @return $this
      */
-    public function setUnsetEmptyFields($value) {
+    public function setUnsetEmptyFields($value)
+    {
         $this->_unsetEmptyFields = (boolean) $value;
         return $this;
     }
 
 
     /**
-     * @param string $value
+     * @param string $value symbol empty fields
      * @return $this
      */
-    public function setSymbolEmptyFields($value) {
+    public function setSymbolEmptyFields($value)
+    {
         $this->_symbolEmptyFields = $value;
         return $this;
     }
@@ -138,7 +179,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /**
      * Source model setter.
      *
-     * @param array $source
+     * @param array $source Source array
      * @return AvS_FastSimpleImport_Model_Import_Entity_Product
      */
     public function setArraySource($source)
@@ -152,11 +193,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /**
      * Import behavior setter
      *
-     * @param string $behavior
+     * @param string $behavior Behaviour
+     * @return $this
      */
     public function setBehavior($behavior)
     {
         $this->_parameters['behavior'] = $behavior;
+
+        return $this;
     }
 
     /**
@@ -180,7 +224,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     }
 
     /**
-     *
+     * @return void
      */
     protected function _createAttributeOptions()
     {
@@ -189,11 +233,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     }
 
     /**
-     *
+     * @return void
      */
     protected function _createDropdownAttributeOptions()
     {
-        if (!sizeof($this->getDropdownAttributes()) || $this->getIsDryRun()) {
+        if (!count($this->getDropdownAttributes()) || $this->getIsDryRun()) {
             return;
         }
 
@@ -222,11 +266,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     }
 
     /**
-     *
+     * @return void
      */
     protected function _createMultiselectAttributeOptions()
     {
-        if (!sizeof($this->getMultiselectAttributes()) || $this->getIsDryRun()) {
+        if (!count($this->getMultiselectAttributes()) || $this->getIsDryRun()) {
             return;
         }
 
@@ -257,7 +301,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /**
      * Get all options of a dropdown attribute
      *
-     * @param Mage_Eav_Model_Entity_Attribute $attribute
+     * @param Mage_Eav_Model_Entity_Attribute $attribute Attribute
      * @return array
      */
     protected function _getAttributeOptions($attribute)
@@ -271,7 +315,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                 $attributeOptions = $attribute->getSource();
             }
 
-            $this->_attributeOptions[$attribute->getAttributeCode()] = array();
+            $this->_attributeOptions[$attribute->getAttributeCode()] = [];
             foreach ($attributeOptions->getAllOptions(false) as $option) {
                 $this->_attributeOptions[$attribute->getAttributeCode()][$option['value']] = $option['label'];
             }
@@ -281,18 +325,19 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     }
 
     /**
-     * @param Mage_Eav_Model_Entity_Attribute $attribute
-     * @param string $optionLabel
+     * @param Mage_Eav_Model_Entity_Attribute $attribute   Attribute
+     * @param string                          $optionLabel Frontend label
+     * @return void
      */
     protected function _createAttributeOption($attribute, $optionLabel)
     {
-        $option = array(
-            'value' => array(
-                array('0' => $optionLabel)
-            ),
-            'order' => array(0),
-            'delete' => array('')
-        );
+        $option = [
+            'value' => [
+                ['0' => $optionLabel]
+            ],
+            'order' => [0],
+            'delete' => ['']
+        ];
 
         $attribute->setOption($option);
 
@@ -305,6 +350,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /**
      * Autofill the fields "_media_attribute_id", "_media_is_disabled", "_media_position" and "_media_lable",
      * Check field "_media_image" for http links to images; download them
+     *
+     * @return void
      */
     protected function _preprocessImageData()
     {
@@ -368,8 +415,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /**
      * Download given file to ImportExport Tmp Dir (usually media/import)
      *
-     * @param string $url
-     * @param string $targetFilename
+     * @param string $url            Url
+     * @param string $targetFilename Target filename
+     * @return void
      */
     protected function _copyExternalImageFile($url, $targetFilename)
     {
@@ -399,7 +447,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     protected function _initCategories()
     {
         $transportObject = new Varien_Object();
-        Mage::dispatchEvent( 'avs_fastsimpleimport_entity_product_init_categories', array('transport' => $transportObject) );
+        Mage::dispatchEvent( 'avs_fastsimpleimport_entity_product_init_categories', ['transport' => $transportObject]);
 
         if ( $transportObject->getCategories() ) {
             $this->_categories = $transportObject->getCategories();
@@ -410,7 +458,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                 $structure = explode('/', $category->getPath());
                 $pathSize = count($structure);
                 if ($pathSize > 2) {
-                    $path = array();
+                    $path = [];
                     $this->_categories[implode('/', $path)] = $category->getId();
                     for ($i = 1; $i < $pathSize; $i++) {
                         $item = $collection->getItemById($structure[$i]);
@@ -445,7 +493,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
         $productCollection = Mage::getModel('catalog/product')
             ->getCollection()
-            ->addAttributeToFilter('sku', array('in' => $skus));
+            ->addAttributeToFilter('sku', ['in' => $skus]);
 
         foreach ($productCollection as $product) {
             /** @var $product Mage_Catalog_Model_Product */
@@ -463,7 +511,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
      */
     protected function _getProcessedProductSkus()
     {
-        $skus = array();
+        $skus = [];
         $source = $this->getSource();
 
         $source->rewind();
@@ -514,34 +562,34 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
          * Generate a fake mass update event that we pass to our indexers.
          */
         $event = Mage::getModel('index/event');
-        $event->setNewData(array(
+        $event->setNewData([
             'reindex_price_product_ids' => &$entityIds, // for product_indexer_price
             'reindex_stock_product_ids' => &$entityIds, // for indexer_stock
             'product_ids'               => &$entityIds, // for category_indexer_product
             'reindex_eav_product_ids'   => &$entityIds  // for product_indexer_eav
-        ));
+        ]);
 
         // Index our product entities.
-        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_indexer_stock', array('entity_id' => &$entityIds));
+        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_indexer_stock', ['entity_id' => &$entityIds]);
         Mage::getResourceSingleton('cataloginventory/indexer_stock')->catalogProductMassAction($event);
 
-        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_product_indexer_price', array('entity_id' => &$entityIds));
+        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_product_indexer_price', ['entity_id' => &$entityIds]);
         Mage::getResourceSingleton('catalog/product_indexer_price')->catalogProductMassAction($event);
 
-        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_category_indexer_product', array('entity_id' => &$entityIds));
+        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_category_indexer_product', ['entity_id' => &$entityIds]);
         Mage::getResourceSingleton('catalog/category_indexer_product')->catalogProductMassAction($event);
 
-        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_product_indexer_eav', array('entity_id' => &$entityIds));
+        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_product_indexer_eav', ['entity_id' => &$entityIds]);
         Mage::getResourceSingleton('catalog/product_indexer_eav')->catalogProductMassAction($event);
 
-        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_fulltext', array('entity_id' => &$entityIds));
+        Mage::dispatchEvent('fastsimpleimport_reindex_products_before_fulltext', ['entity_id' => &$entityIds]);
         Mage::getResourceSingleton('catalogsearch/fulltext')->rebuildIndex(null, $entityIds);
 
         if (Mage::getResourceModel('ecomdev_urlrewrite/indexer')) {
-            Mage::dispatchEvent('fastsimpleimport_reindex_products_before_ecomdev_urlrewrite', array('entity_id' => &$entityIds));
+            Mage::dispatchEvent('fastsimpleimport_reindex_products_before_ecomdev_urlrewrite', ['entity_id' => &$entityIds]);
             Mage::getResourceSingleton('ecomdev_urlrewrite/indexer')->updateProductRewrites($entityIds);
         } else {
-            Mage::dispatchEvent('fastsimpleimport_reindex_products_before_urlrewrite', array('entity_id' => &$entityIds));
+            Mage::dispatchEvent('fastsimpleimport_reindex_products_before_urlrewrite', ['entity_id' => &$entityIds]);
             /* @var $urlModel Mage_Catalog_Model_Url */
             $urlModel = Mage::getSingleton('catalog/url');
 
@@ -551,10 +599,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             }
         }
         if (Mage::helper('catalog/category_flat')->isEnabled()) {
-            Mage::dispatchEvent('fastsimpleimport_reindex_products_before_flat', array('entity_id' => &$entityIds));
+            Mage::dispatchEvent('fastsimpleimport_reindex_products_before_flat', ['entity_id' => &$entityIds]);
             Mage::getSingleton('catalog/product_flat_indexer')->saveProduct($entityIds);
         }
-        Mage::dispatchEvent('fastsimpleimport_reindex_products_after', array('entity_id' => &$entityIds));
+        Mage::dispatchEvent('fastsimpleimport_reindex_products_after', ['entity_id' => &$entityIds]);
 
         return $this;
     }
@@ -567,7 +615,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
      */
     protected function _getProcessedProductIds()
     {
-        $productIds = array();
+        $productIds = [];
         $source = $this->getSource();
 
         $source->rewind();
@@ -590,7 +638,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /**
      * Log delete index events for product
      *
-     * @param Mage_Catalog_Model_Product $product
+     * @param Mage_Catalog_Model_Product $product Product
+     * @return void
      */
     protected function _logDeleteEvent($product)
     {
@@ -632,11 +681,12 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /**
      * Set and Validate Attributes for which new Options should be created (dropdown only)
      *
-     * @param array $attributeCodes
+     * @param array $attributeCodes Attribute codes
+     * @return void
      */
     public function setDropdownAttributes($attributeCodes)
     {
-        $attributes = array();
+        $attributes = [];
         foreach ($attributeCodes as $attributeCode) {
             if (!$attributeCode) {
                 continue;
@@ -646,7 +696,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             $attribute = Mage::getSingleton('catalog/product')->getResource()->getAttribute($attributeCode);
             if (!is_object($attribute)) {
                 continue;
-//                Mage::throwException('Attribute ' . $attributeCode . ' not found.');
             }
             if ($attribute->getSourceModel() != 'eav/entity_attribute_source_table') {
                 Mage::throwException('Attribute ' . $attributeCode . ' is no dropdown attribute.');
@@ -660,11 +709,12 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /**
      * Set and Validate Attributes for which new Options should be created (multiselect only)
      *
-     * @param array $attributeCodes
+     * @param array $attributeCodes Attribute codes
+     * @return void
      */
     public function setMultiselectAttributes($attributeCodes)
     {
-        $attributes = array();
+        $attributes = [];
         foreach ($attributeCodes as $attributeCode) {
             if (!$attributeCode) {
                 continue;
@@ -674,7 +724,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             $attribute = Mage::getSingleton('catalog/product')->getResource()->getAttribute($attributeCode);
             if (!is_object($attribute)) {
                 continue;
-//                Mage::throwException('Attribute ' . $attributeCode . ' not found.');
             }
             if ($attribute->getBackendModel() != 'eav/entity_attribute_backend_array') {
                 Mage::throwException('Attribute ' . $attributeCode . ' is no multiselect attribute.');
@@ -689,7 +738,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
      * Set _imageAttributes to allow importing other media_gallery fields as images beside _media_gallery, image,
      * small_image and thumbnail.
      * Automatically sets $this->_imagesArrayKeys that is used by parent class to read from
-     * @param array $attributeCodes
+     *
+     * @param array $attributeCodes Attribute codes
+     * @return void
      */
     public function setImageAttributes($attributeCodes)
     {
@@ -732,10 +783,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /**
      * Set a flag if the current import is a dryrun
      *
-     * @param bool $isDryrun
+     * @param bool $isDryrun Dry run
      * @return $this
      */
-    public function setIsDryrun($isDryrun) {
+    public function setIsDryrun($isDryrun)
+    {
         $this->_isDryRun = (bool) $isDryrun;
         return $this;
     }
@@ -746,17 +798,18 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
      *
      * @return bool
      */
-    public function getIsDryRun() {
+    public function getIsDryRun()
+    {
         return $this->_isDryRun;
     }
 
     /**
      * Check one attribute. Can be overridden in child.
      *
-     * @param string $attrCode Attribute code
-     * @param array $attrParams Attribute params
-     * @param array $rowData Row data
-     * @param int $rowNum
+     * @param string $attrCode   Attribute code
+     * @param array  $attrParams Attribute params
+     * @param array  $rowData    Row data
+     * @param int    $rowNum     Row num
      * @return boolean
      */
     public function isAttributeValid($attrCode, array $attrParams, array $rowData, $rowNum)
@@ -770,7 +823,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                 break;
             case 'decimal':
                 $val   = trim($rowData[$attrCode]);
-                $valid = (float)$val == $val;
+                $valid = (float) $val == $val;
                 $message = 'Decimal value expected. Your Input: '.$rowData[$attrCode];
                 break;
             case 'select':
@@ -785,7 +838,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                 break;
             case 'int':
                 $val   = trim($rowData[$attrCode]);
-                $valid = (int)$val == $val;
+                $valid = (int) $val == $val;
                 $message = 'Integer value expected. Your Input: '.$rowData[$attrCode];
                 break;
             case 'datetime':
@@ -821,11 +874,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /**
      * Prepare attributes data
      *
-     * @param array $rowData
-     * @param int $rowScope
-     * @param array $attributes
-     * @param string|null $rowSku
-     * @param int $rowStore
+     * @param array       $rowData    Row data
+     * @param int         $rowScope   Row scope
+     * @param array       $attributes Attributes
+     * @param string|null $rowSku     Row sku
+     * @param int         $rowStore   Row store
      * @return array
      */
     protected function _prepareAttributes($rowData, $rowScope, $attributes, $rowSku, $rowStore)
@@ -846,7 +899,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             $attrId = $attribute->getId();
             $backModel = $attribute->getBackendModel();
             $attrTable = $attribute->getBackend()->getTable();
-            $storeIds = array(0);
+            $storeIds = [0];
 
             if (!is_null($attrValue)) {
                 if ('datetime' == $attribute->getBackendType() && strtotime($attrValue)) {
@@ -863,7 +916,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                         $storeIds = $this->_storeIdToWebsiteStoreIds[$rowStore];
                     }
                 } elseif (self::SCOPE_STORE == $attribute->getIsGlobal()) {
-                    $storeIds = array($rowStore);
+                    $storeIds = [$rowStore];
                 }
             }
             foreach ($storeIds as $storeId) {
@@ -887,13 +940,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /**
      * Save product attributes.
      *
-     * @param array $attributesData
+     * @param array $attributesData Attribute data
      * @return Mage_ImportExport_Model_Import_Entity_Product
      */
     protected function _saveProductAttributes(array $attributesData)
     {
         foreach ($attributesData as $tableName => $skuData) {
-            $tableData = array();
+            $tableData = [];
 
             foreach ($skuData as $sku => $attributes) {
                 $productId = $this->_newSku[$sku]['entity_id'];
@@ -902,29 +955,32 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                     foreach ($storeValues as $storeId => $storeValue) {
                         // For storeId 0 we *must* save the NULL value into DB otherwise product collections can not load the store specific values
                         if ($storeId == 0 || ! is_null($storeValue)) {
-                            $tableData[] = array(
+                            $tableData[] = [
                                 'entity_id'      => $productId,
                                 'entity_type_id' => $this->_entityTypeId,
                                 'attribute_id'   => $attributeId,
                                 'store_id'       => $storeId,
                                 'value'          => $storeValue
-                            );
+                            ];
                         } else {
                             /** @var Magento_Db_Adapter_Pdo_Mysql $connection */
                             $connection = $this->_connection;
-                            $connection->delete($tableName, array(
-                                'entity_id=?'      => (int) $productId,
-                                'entity_type_id=?' => (int) $this->_entityTypeId,
-                                'attribute_id=?'   => (int) $attributeId,
-                                'store_id=?'       => (int) $storeId,
-                            ));
+                            $connection->delete(
+                                $tableName,
+                                [
+                                    'entity_id=?'      => (int) $productId,
+                                    'entity_type_id=?' => (int) $this->_entityTypeId,
+                                    'attribute_id=?'   => (int) $attributeId,
+                                    'store_id=?'       => (int) $storeId,
+                                ]
+                            );
                         }
                     }
                 }
             }
 
             if (count($tableData)) {
-                $this->_connection->insertOnDuplicate($tableName, $tableData, array('value'));
+                $this->_connection->insertOnDuplicate($tableName, $tableData, ['value']);
             }
         }
         return $this;
@@ -943,15 +999,15 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         $rowSku         = null;
 
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
-            $entityRowsIn = array();
-            $entityRowsUp = array();
-            $attributes   = array();
-            $websites     = array();
-            $categories   = array();
-            $tierPrices   = array();
-            $groupPrices  = array();
-            $mediaGallery = array();
-            $uploadedGalleryFiles = array();
+            $entityRowsIn = [];
+            $entityRowsUp = [];
+            $attributes   = [];
+            $websites     = [];
+            $categories   = [];
+            $tierPrices   = [];
+            $groupPrices  = [];
+            $mediaGallery = [];
+            $uploadedGalleryFiles = [];
             $previousType = null;
             $previousAttributeSet = null;
 
@@ -967,20 +1023,20 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
                     // 1. Entity phase
                     if (isset($this->_oldSku[$rowSku])) { // existing row
-                        $entityRowsUp[] = array(
+                        $entityRowsUp[] = [
                             'updated_at' => now(),
                             'entity_id'  => $this->_oldSku[$rowSku]['entity_id']
-                        );
+                        ];
                     } else { // new row
                         if (!$productLimit || $productsQty < $productLimit) {
-                            $entityRowsIn[$rowSku] = array(
+                            $entityRowsIn[$rowSku] = [
                                 'entity_type_id'   => $this->_entityTypeId,
                                 'attribute_set_id' => $this->_newSku[$rowSku]['attr_set_id'],
                                 'type_id'          => $this->_newSku[$rowSku]['type_id'],
                                 'sku'              => $rowSku,
                                 'created_at'       => now(),
                                 'updated_at'       => now()
-                            );
+                            ];
                             $productsQty++;
                         } else {
                             $rowSku = null; // sign for child rows to be skipped
@@ -1008,11 +1064,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                 } elseif (!empty($categoryPath)) {
                     $categories[$rowSku][$this->_categories[$categoryPath]] = true;
                 } elseif (isset($rowData[self::COL_CATEGORY])) {
-                    $categories[$rowSku] = array();
+                    $categories[$rowSku] = [];
                 }
 
                 if (!empty($rowData['_tier_price_website'])) { // 4.1. Tier prices phase
-                    $tierPrices[$rowSku][] = array(
+                    $tierPrices[$rowSku][] = [
                         'all_groups'        => $rowData['_tier_price_customer_group'] == self::VALUE_ALL,
                         'customer_group_id' => ($rowData['_tier_price_customer_group'] == self::VALUE_ALL)
                             ? 0 : $rowData['_tier_price_customer_group'],
@@ -1020,19 +1076,19 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                         'value'             => $rowData['_tier_price_price'],
                         'website_id'        => (self::VALUE_ALL == $rowData['_tier_price_website'] || $priceIsGlobal)
                             ? 0 : $this->_websiteCodeToId[$rowData['_tier_price_website']]
-                    );
+                    ];
                 }
                 if (!empty($rowData['_group_price_website'])) { // 4.2. Group prices phase
-                    $groupPrices[$rowSku][] = array(
+                    $groupPrices[$rowSku][] = [
                         'all_groups'        => $rowData['_group_price_customer_group'] == self::VALUE_ALL,
                         'customer_group_id' => ($rowData['_group_price_customer_group'] == self::VALUE_ALL)
                             ? 0 : $rowData['_group_price_customer_group'],
                         'value'             => $rowData['_group_price_price'],
                         'website_id'        => (self::VALUE_ALL == $rowData['_group_price_website'] || $priceIsGlobal)
                             ? 0 : $this->_websiteCodeToId[$rowData['_group_price_website']]
-                    );
+                    ];
                 }
-                if (is_array($this->_imagesArrayKeys)  && count($this->_imagesArrayKeys) > 0) {
+                if (is_array($this->_imagesArrayKeys) && count($this->_imagesArrayKeys)) {
                     foreach ($this->_imagesArrayKeys as $imageCol) {
                         if (!empty($rowData[$imageCol])) { // 5. Media gallery phase
                             if (!array_key_exists($rowData[$imageCol], $uploadedGalleryFiles)) {
@@ -1042,15 +1098,21 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                         }
                     }
                 }
+
                 if (!empty($rowData['_media_image'])) {
-                    $mediaGallery[$rowSku][] = array(
+                    $mediaImageData = [
                         'attribute_id'      => $rowData['_media_attribute_id'],
                         'label'             => isset($rowData['_media_lable']) ? $rowData['_media_lable'] : '',
                         'position'          => isset($rowData['_media_position']) ? $rowData['_media_position'] : 0,
                         'disabled'          => isset($rowData['_media_is_disabled']) ? $rowData['_media_is_disabled'] : 0,
-                        'value'             => $rowData['_media_image'],
-                        'store_id'          => $this->_getRowStoreId($rowData['_store'])
-                    );
+                        'value'             => $rowData['_media_image']
+                    ];
+
+                    if (isset($rowData['_store'])) {
+                        $mediaImageData['store_id'] = $this->_getRowStoreId($rowData['_store']);
+                    }
+
+                    $mediaGallery[$rowSku][] = $mediaImageData;
                 }
                 // 6. Attributes phase
                 $rowStore     = self::SCOPE_STORE == $rowScope ? $this->_storeCodeToId[$rowData[self::COL_STORE]] : 0;
@@ -1109,7 +1171,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
      */
     protected function _saveStockItem()
     {
-        $defaultStockData = array(
+        $defaultStockData = [
             'manage_stock'                  => 1,
             'use_config_manage_stock'       => 1,
             'qty'                           => 0,
@@ -1131,7 +1193,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             'is_in_stock'                   => 0,
             'low_stock_date'                => null,
             'stock_status_changed_auto'     => 0,
-        );
+        ];
 
         if (version_compare(Mage::getVersion(), '1.7.0.0', 'ge')) {
             $defaultStockData['is_decimal_divided'] = 0;
@@ -1142,7 +1204,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         $sku = null;
 
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
-            $stockData = array();
+            $stockData = [];
 
             // Format bunch to stock data rows
             foreach ($bunch as $rowNum => $rowData) {
@@ -1178,7 +1240,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
                 if ($helper->isQty($this->_newSku[$sku]['type_id'])) {
                     if ($stockItem->verifyNotification()) {
-                        $stockItem->setLowStockDate(Mage::app()->getLocale()
+                        $stockItem->setLowStockDate(
+                            Mage::app()->getLocale()
                                 ->date(null, null, null, false)
                                 ->toString(Varien_Date::DATETIME_INTERNAL_FORMAT)
                         );
@@ -1200,6 +1263,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
     /**
      * Returns an object for upload a media files
+     *
+     * @return Mage_ImportExport_Model_Import_Uploader
      */
     protected function _getUploader()
     {
@@ -1410,7 +1475,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     protected function _saveValidatedBunches()
     {
         $source = $this->_getSource();
-        $bunchRows = array();
+        $bunchRows = [];
         $startNewBunch = false;
         $maxDataSize = Mage::getResourceHelper('importexport')->getMaxDataSize();
         $bunchSize = Mage::helper('importexport')->getBunchSize();
@@ -1426,7 +1491,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                     unset($entityGroup);
                 }
                 $this->_dataSourceModel->saveBunch($this->getEntityTypeCode(), $this->getBehavior(), $bunchRows);
-                $bunchRows = array();
+                $bunchRows = [];
                 $startNewBunch = false;
             }
             if ($source->valid()) {
@@ -1449,7 +1514,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                     }
 
                     /* And start a new one */
-                    $entityGroup = array();
+                    $entityGroup = [];
                 }
 
                 if ($this->validateRow($rowData, $source->key()) && isset($entityGroup)) {
@@ -1526,23 +1591,12 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             return $this;
         }
 
-        static $mediaGalleryTableName = null;
-        static $mediaValueTableName = null;
-        static $productId = null;
-
-        if (!$mediaGalleryTableName) {
-            $mediaGalleryTableName = Mage::getModel('importexport/import_proxy_product_resource')
-                ->getTable('catalog/product_attribute_media_gallery');
-        }
-
-        if (!$mediaValueTableName) {
-            $mediaValueTableName = Mage::getModel('importexport/import_proxy_product_resource')
-                ->getTable('catalog/product_attribute_media_gallery_value');
-        }
+        $mediaGalleryTableName = $this->_getMediaGalleryTableName();
+        $mediaValueTableName = $this->_getMediaValueTableName();
 
         foreach ($mediaGalleryData as $productSku => $mediaGalleryRows) {
             $productId = $this->_newSku[$productSku]['entity_id'];
-            $insertedGalleryImgs = array();
+            $insertedGalleryImgs = [];
 
             if (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND != $this->getBehavior()) {
                 $this->_connection->delete(
@@ -1604,11 +1658,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     protected function _getRowStoreId($storeCode)
     {
         $registryVal = Mage::registry('fsi-media-store-id');
-        if (is_null($registryVal[$storeCode])) {
-            $allStores = Mage::app()->getStores();
-            $storeData = array();
-            foreach ($allStores as $store => $val) {
-                $storeData[Mage::app()->getStore($store)->getCode()] = Mage::app()->getStore($store)->getId();
+        if (!isset($registryVal[$storeCode])) {
+            $allStores = Mage::app()->getStores(false, true);
+            $storeData = [];
+            foreach ($allStores as $_storeCode => $_store) {
+                /** @var string $_storeCode */
+                /** @var Mage_Core_Model_Store $_store */
+                $storeData[$_storeCode] = $_store->getId();
             }
             Mage::register(
                 'fsi-media-store-id',
@@ -1616,5 +1672,38 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             );
         }
         return Mage::registry('fsi-media-store-id')[$storeCode];
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getMediaGalleryTableName()
+    {
+        if (isset($this->_getMediaGalleryTableName)) {
+            return $this->_mediaGalleryTableName;
+        }
+
+        $mediaGalleryTableName = Mage::getModel('importexport/import_proxy_product_resource')
+            ->getTable('catalog/product_attribute_media_gallery');
+
+        $this->_mediaGalleryTableName = $mediaGalleryTableName;
+
+        return $mediaGalleryTableName;
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getMediaValueTableName() {
+        if (isset($this->_mediaValueTableName)) {
+            return $this->_mediaValueTableName;
+        }
+
+        $mediaValueTableName = Mage::getModel('importexport/import_proxy_product_resource')
+            ->getTable('catalog/product_attribute_media_gallery_value');
+
+        $this->_mediaValueTableName = $mediaValueTableName;
+
+        return $mediaValueTableName;
     }
 }
