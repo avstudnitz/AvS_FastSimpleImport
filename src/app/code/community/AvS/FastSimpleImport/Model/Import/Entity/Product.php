@@ -1048,7 +1048,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                         'label'             => isset($rowData['_media_lable']) ? $rowData['_media_lable'] : '',
                         'position'          => isset($rowData['_media_position']) ? $rowData['_media_position'] : 0,
                         'disabled'          => isset($rowData['_media_is_disabled']) ? $rowData['_media_is_disabled'] : 0,
-                        'value'             => $rowData['_media_image']
+                        'value'             => $rowData['_media_image'],
                         'store_id'          => $this->_getRowStoreId($rowData['_store'])
                     );
                 }
