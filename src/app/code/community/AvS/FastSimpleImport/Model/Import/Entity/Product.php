@@ -900,7 +900,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
                 foreach ($attributes as $attributeId => $storeValues) {
                     foreach ($storeValues as $storeId => $storeValue) {
-                        if (! is_null($storeValue)) {
+                        // For storeId 0 we *must* save the NULL value into DB otherwise product collections can not load the store specific values
+                        if ($storeId == 0 || ! is_null($storeValue)) {
                             $tableData[] = array(
                                 'entity_id'      => $productId,
                                 'entity_type_id' => $this->_entityTypeId,
@@ -1047,7 +1048,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                         'label'             => isset($rowData['_media_lable']) ? $rowData['_media_lable'] : '',
                         'position'          => isset($rowData['_media_position']) ? $rowData['_media_position'] : 0,
                         'disabled'          => isset($rowData['_media_is_disabled']) ? $rowData['_media_is_disabled'] : 0,
-                        'value'             => $rowData['_media_image']
+                        'value'             => $rowData['_media_image'],
+                        'store_id'          => $this->_getRowStoreId($rowData['_store'])
                     );
                 }
                 // 6. Attributes phase
@@ -1087,8 +1089,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                 ->_saveProductCategories($categories)
                 ->_saveProductTierPrices($tierPrices)
                 ->_saveProductGroupPrices($groupPrices)
-                ->_saveMediaGallery($mediaGallery)
                 ->_saveProductAttributes($attributes);
+            $this->_saveMediaGallery($mediaGallery);
         }
         if (method_exists($this,'_fixUrlKeys')) { // > EE 1.13.1.0
             $this->_fixUrlKeys();
@@ -1510,5 +1512,109 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             $attribute->setBackendModel($backendModelName);
         }
         return $attribute;
+    }
+
+    /**
+     * Save product media gallery.
+     *
+     * @param array $mediaGalleryData
+     * @return Mage_ImportExport_Model_Import_Entity_Product
+     */
+    protected function _saveMediaGallery(array $mediaGalleryData)
+    {
+        if (empty($mediaGalleryData)) {
+            return $this;
+        }
+
+        static $mediaGalleryTableName = null;
+        static $mediaValueTableName = null;
+        static $productId = null;
+
+        if (!$mediaGalleryTableName) {
+            $mediaGalleryTableName = Mage::getModel('importexport/import_proxy_product_resource')
+                ->getTable('catalog/product_attribute_media_gallery');
+        }
+
+        if (!$mediaValueTableName) {
+            $mediaValueTableName = Mage::getModel('importexport/import_proxy_product_resource')
+                ->getTable('catalog/product_attribute_media_gallery_value');
+        }
+
+        foreach ($mediaGalleryData as $productSku => $mediaGalleryRows) {
+            $productId = $this->_newSku[$productSku]['entity_id'];
+            $insertedGalleryImgs = array();
+
+            if (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND != $this->getBehavior()) {
+                $this->_connection->delete(
+                    $mediaGalleryTableName,
+                    $this->_connection->quoteInto('entity_id IN (?)', $productId)
+                );
+            }
+
+            foreach ($mediaGalleryRows as $insertValue) {
+
+                if (!in_array($insertValue['value'], $insertedGalleryImgs)) {
+                    $valueArr = array(
+                        'attribute_id' => $insertValue['attribute_id'],
+                        'entity_id'    => $productId,
+                        'value'        => $insertValue['value']
+                    );
+
+                    $this->_connection
+                        ->insertOnDuplicate($mediaGalleryTableName, $valueArr, array('entity_id'));
+
+                    $insertedGalleryImgs[] = $insertValue['value'];
+                }
+
+                $newMediaValues = $this->_connection->fetchPairs($this->_connection->select()
+                    ->from($mediaGalleryTableName, array('value', 'value_id'))
+                    ->where('entity_id IN (?)', $productId)
+                );
+
+                if (array_key_exists($insertValue['value'], $newMediaValues)) {
+                    $insertValue['value_id'] = $newMediaValues[$insertValue['value']];
+                }
+
+                $valueArr = array(
+                    'value_id' => $insertValue['value_id'],
+                    'store_id' => empty($insertValue['store_id']) ? Mage_Catalog_Model_Abstract::DEFAULT_STORE_ID : $insertValue['store_id'],
+                    'label'    => $insertValue['label'],
+                    'position' => $insertValue['position'],
+                    'disabled' => $insertValue['disabled']
+                );
+
+                try {
+                    $this->_connection
+                        ->insertOnDuplicate($mediaValueTableName, $valueArr, array('value_id'));
+                } catch (Exception $e) {
+                    $this->_connection->delete(
+                        $mediaGalleryTableName, $this->_connection->quoteInto('value_id IN (?)', $newMediaValues)
+                    );
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $storeCode Store Code
+     * @returns int
+     */
+    protected function _getRowStoreId($storeCode)
+    {
+        $registryVal = Mage::registry('fsi-media-store-id');
+        if (is_null($registryVal[$storeCode])) {
+            $allStores = Mage::app()->getStores();
+            $storeData = array();
+            foreach ($allStores as $store => $val) {
+                $storeData[Mage::app()->getStore($store)->getCode()] = Mage::app()->getStore($store)->getId();
+            }
+            Mage::register(
+                'fsi-media-store-id',
+                $storeData
+            );
+        }
+        return Mage::registry('fsi-media-store-id')[$storeCode];
     }
 }

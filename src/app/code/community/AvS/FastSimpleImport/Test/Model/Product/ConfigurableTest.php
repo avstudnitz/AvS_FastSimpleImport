@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Class AvS_FastSimpleImport_Test_Model_Product_ConfigurableTest
+ *
+ * @loadFixture defaultEnvironment.yaml
+ */
 class AvS_FastSimpleImport_Test_Model_Product_ConfigurableTest extends EcomDev_PHPUnit_Test_Case
 {
     protected function setUp()

@@ -1,0 +1,19 @@
+scope:
+  website:
+    - website_id: 1
+      code: base
+      name: Base Website
+      default_group_id: 1
+  group:
+    - group_id: 1
+      website_id: 1
+      name: Base Store Group
+      default_store_id: 1
+      root_category_id: 2
+  store:
+    - store_id: 1
+      website_id: 1
+      group_id: 1
+      code: basestore
+      name: Base Store
+      is_active: 1
