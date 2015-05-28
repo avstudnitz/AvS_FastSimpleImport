@@ -1104,13 +1104,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                         'attribute_id'      => $rowData['_media_attribute_id'],
                         'label'             => isset($rowData['_media_lable']) ? $rowData['_media_lable'] : '',
                         'position'          => isset($rowData['_media_position']) ? $rowData['_media_position'] : 0,
-                        'disabled'          => isset($rowData['_media_is_disabled']) ? $rowData['_media_is_disabled'] : 0,
+                        'disabled'          => isset($rowData['_media_is_disabled']) ? $rowData['_media_is_disabled'] : 1, // always disable if not set in the import
+                        'store_id'          => isset($rowData['_store']) ? $rowData['_store'] : Mage_Catalog_Model_Abstract::DEFAULT_STORE_ID,
                         'value'             => $rowData['_media_image']
                     ];
-
-                    if (isset($rowData['_store'])) {
-                        $mediaImageData['store_id'] = $this->_getRowStoreId($rowData['_store']);
-                    }
 
                     $mediaGallery[$rowSku][] = $mediaImageData;
                 }
@@ -1631,7 +1628,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
                 $valueArr = array(
                     'value_id' => $insertValue['value_id'],
-                    'store_id' => empty($insertValue['store_id']) ? Mage_Catalog_Model_Abstract::DEFAULT_STORE_ID : $insertValue['store_id'],
+                    'store_id' => $insertValue['store_id'],
                     'label'    => $insertValue['label'],
                     'position' => $insertValue['position'],
                     'disabled' => $insertValue['disabled']
