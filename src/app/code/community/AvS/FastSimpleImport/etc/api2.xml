@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<config>
+    <api2>
+        <resource_groups>
+            <fastsimpleimport translate="title" module="fastsimpleimport">
+                <title>Fast Simple Import</title>
+                <sort_order>40</sort_order>
+            </fastsimpleimport>
+        </resource_groups>
+        <resources>
+            <fastsimpleimport_product_import>
+                <group>fastsimpleimport</group>
+                <model>fastsimpleimport/import_entity_product</model>
+                <title>Product Import</title>
+                <sort_order>0</sort_order>
+                <privileges>
+                    <admin>
+                        <create>1</create>
+                        <update>1</update>
+                    </admin>
+                </privileges>
+                <routes>
+                    <route_entity>
+                        <route>/fastsimpleimport/product</route>
+                        <action_type>entity</action_type>
+                    </route_entity>
+                    <route_collection>
+                        <route>/fastsimpleimport/products</route>
+                        <action_type>collection</action_type>
+                    </route_collection>
+                </routes>
+                <versions>1</versions>
+            </fastsimpleimport_product_import>
+        </resources>
+    </api2>
+</config>

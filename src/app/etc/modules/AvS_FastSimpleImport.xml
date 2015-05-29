@@ -4,6 +4,9 @@
 		<AvS_FastSimpleImport>
 			<active>true</active>
 			<codePool>community</codePool>
+			<depends>
+				<Mage_Api2 />
+			</depends>
 		</AvS_FastSimpleImport>
 	</modules>
 </config>
