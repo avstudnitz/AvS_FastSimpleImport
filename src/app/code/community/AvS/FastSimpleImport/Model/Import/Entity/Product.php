@@ -188,7 +188,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             $this->_createAttributeOptions();
             $this->_preprocessImageData();
 
-            if (!$this->getAllowRenameFiles()) {
+            if (!$this->getAllowRenameFiles() && !$this->getUseExternalImages()) {
                 $this->_getUploader()->setAllowRenameFiles(false);
             }
         }
