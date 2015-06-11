@@ -418,6 +418,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
      * @param string $url            Url
      * @param string $targetFilename Target filename
      * @return void
+     * @throws Exception
      */
     protected function _copyExternalImageFile($url, $targetFilename)
     {
@@ -426,7 +427,25 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             if (!is_dir($dir)) {
                 mkdir($dir);
             }
-            $fileHandle = fopen($dir . DS . $targetFilename, 'w+');
+
+            $tmpTargetPath = $dir . DS . $targetFilename;
+
+            // check if path for target file exists
+            $tmpTargetDir = dirname($tmpTargetPath);
+            if (!file_exists($tmpTargetDir)) {
+                @mkdir($tmpTargetDir, 0777, true);
+            }
+
+            // check if path for target file is not a file
+            if (!is_dir($tmpTargetDir)) {
+                throw new Exception(sprintf('Tmp target ist %s is not a directory', $tmpTargetDir));
+            }
+
+            $fileHandle = fopen($tmpTargetPath, 'w+');
+            if (false === $fileHandle) {
+                throw new Exception(sprintf('Unable to fopen \'%s\' to write image file.', $tmpTargetPath));
+            }
+
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_TIMEOUT, 50);
             curl_setopt($ch, CURLOPT_FILE, $fileHandle);
