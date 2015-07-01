@@ -28,7 +28,7 @@ class AvS_FastSimpleImport_Test_Model_Product_BundleTest extends EcomDev_PHPUnit
 
         $this->assertCount(3, $productBaseModel->getCollection()->getAllIds());
 
-        $bundleProducts = $productBaseModel->getCollection()->addFieldToFilter('type_id', array('eq' => 'bundle'))->load();
+        $bundleProducts = $productBaseModel->getCollection()->addFieldToFilter('type_id', array('eq' => 'bundle'));
         $this->assertCount(1, $bundleProducts->getAllIds());
 
         $sku = $bundleProducts->getFirstItem()->getSku();

@@ -28,7 +28,7 @@ class AvS_FastSimpleImport_Test_Model_Product_NestedArrayTest extends EcomDev_PH
 
         $this->assertCount(3, $productBaseModel->getCollection()->getAllIds());
 
-        $groupedProducts = $productBaseModel->getCollection()->addFieldToFilter('type_id', array('eq' => 'grouped'))->load();
+        $groupedProducts = $productBaseModel->getCollection()->addFieldToFilter('type_id', array('eq' => 'grouped'));
         $this->assertCount(1, $groupedProducts->getAllIds());
 
         $sku = $groupedProducts->getFirstItem()->getSku();
