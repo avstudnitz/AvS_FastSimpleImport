@@ -641,4 +641,40 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
         }
         return $this;
     }
+
+    /**
+     * DB connection getter.
+     *
+     * @return Varien_Db_Adapter_Pdo_Mysql
+     */
+    public function getConnection()
+    {
+        return $this->_connection;
+    }
+
+    /**
+     * Get next bunch of validatetd rows.
+     *
+     * @return array|null
+     */
+    public function getNextBunch()
+    {
+        return $this->_dataSourceModel->getNextBunch();
+    }
+
+
+    /**
+     * @param string $email
+     * @return array|false
+     */
+    public function getEntityByEmail($email)
+    {
+        if (isset($this->_oldCustomers[$email])) {
+            return $this->_oldCustomers[$email];
+        }
+        if (isset($this->_newCustomers[$email])) {
+            return $this->_newCustomers[$email];
+        }
+        return false;
+    }
 }
