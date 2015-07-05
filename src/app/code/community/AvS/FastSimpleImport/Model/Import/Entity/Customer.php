@@ -149,6 +149,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
             $this->_addressEntity->importData();
             $this->_saveWishlists();
         }
+        Mage::dispatchEvent('customer_import_finish_before', array('adapter' => $this));
         return true;
     }
 
