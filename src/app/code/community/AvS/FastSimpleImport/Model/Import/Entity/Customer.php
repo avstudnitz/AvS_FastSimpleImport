@@ -331,7 +331,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                             $attrParams = $this->_attributes[$attrCode];
 
                             if ('select' == $attrParams['type']) {
-                                $value = $attrParams['options'][strtolower($value)];
+                                if (isset($attrParams['options'][strtolower($value)])) {
+                                    $value = $attrParams['options'][strtolower($value)];
+                                }
                             } elseif ('datetime' == $attrParams['type']) {
                                 $value = gmstrftime($strftimeFormat, strtotime($value));
                             } elseif ($backModel) {
