@@ -199,10 +199,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                     $emailToLower = strtolower($rowData[self::COL_EMAIL]);
                     if (isset($oldCustomersToLower[$emailToLower][$rowData[self::COL_WEBSITE]])) {
                         $wishlist['customer_id'] = $oldCustomersToLower[$emailToLower][$rowData[self::COL_WEBSITE]];
-                    } elseif (isset($oldCustomersToLower[$emailToLower][$rowData[self::COL_WEBSITE]])) {
+                    } elseif (isset($newCustomersToLower[$emailToLower][$rowData[self::COL_WEBSITE]])) {
                         $wishlist['customer_id'] = $newCustomersToLower[$emailToLower][$rowData[self::COL_WEBSITE]];
-                    } else {
-                        Mage::throwException('Customer not found, shouldn\'t happen');
                     }
 
                     $keyLength = strlen('_wishlist_');
