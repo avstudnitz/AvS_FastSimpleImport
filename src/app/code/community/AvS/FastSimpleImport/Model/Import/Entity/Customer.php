@@ -210,6 +210,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                         }
                     }
 
+                    //no wishlist data found.
+                    if (count($wishlist) <= 1) {
+                        continue;
+                    }
+
                     $wishlistModel = Mage::getModel('wishlist/wishlist');
                     $wishlistModel->loadByCustomer($wishlist['customer_id']);
 
@@ -224,16 +229,17 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                     $wishlistModel->addData($wishlist);
                     $wishlistModel->save();
                     $wishlistId = (int) $wishlistModel->getId();
+
+                    if ($this->getBehavior() != Mage_ImportExport_Model_Import::BEHAVIOR_APPEND) { // remove old data?
+                        $this->_connection->delete(
+                            $entityItemTable,
+                            $this->_connection->quoteInto('wishlist_id = ?', $wishlistId)
+                        );
+                    }
                 }
 
                 $wishlistItem = array();
 
-                if ($this->getBehavior() != Mage_ImportExport_Model_Import::BEHAVIOR_APPEND) { // remove old data?
-                    $this->_connection->delete(
-                        $entityItemTable,
-                        $this->_connection->quoteInto('wishlist_id = ?', $wishlistId)
-                    );
-                }
 
                 $keyLength = strlen('_wishlist_item_');
                 foreach ($rowData as $key => $value) {
