@@ -578,7 +578,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                 $urlModel->refreshProductRewrite($productId);
             }
         }
-        if (Mage::helper('catalog/category_flat')->isEnabled()) {
+        if (Mage::helper('catalog/product_flat')->isEnabled()) {
             Mage::dispatchEvent('fastsimpleimport_reindex_products_before_flat', array('entity_id' => &$entityIds));
             Mage::getSingleton('catalog/product_flat_indexer')->saveProduct($entityIds);
         }
