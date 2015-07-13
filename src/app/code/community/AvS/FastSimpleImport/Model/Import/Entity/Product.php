@@ -378,7 +378,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                 if (!isset($rowData['_media_lable'])) {
                     $this->_getSource()->setValue('_media_lable', '');
                 }
-                if (strpos($rowData['_media_image'], 'http') === 0 && strpos($rowData['_media_image'], '://') !== false) {
+                if (strpos($rowData['_media_image'], 'http' ) === 0 && strpos($rowData['_media_image'], '://') !== false) {
 
                     if (isset($rowData['_media_target_filename']) && $rowData['_media_target_filename']) {
                         $targetFilename = $rowData['_media_target_filename'];
@@ -450,9 +450,27 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             curl_setopt($ch, CURLOPT_TIMEOUT, 50);
             curl_setopt($ch, CURLOPT_FILE, $fileHandle);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt(
+                $ch,
+                CURLOPT_HEADER,
+                [
+                    'Cache-Control: no-cache, no-store, must-revalidate',
+                    'Pragma: no-cache',
+                    'Expires: 0'
+                ]
+            );
             curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
             fclose($fileHandle);
+
+            if (404 == $httpCode) {
+                if (is_file($tmpTargetPath)) {
+                    unlink($tmpTargetPath);
+                }
+
+                throw new Exception('Got 404 while fetching image from url ' . $url);
+            }
         } catch (Exception $e) {
             Mage::throwException('Download of file ' . $url . ' failed: ' . $e->getMessage());
         }
