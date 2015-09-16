@@ -378,8 +378,16 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                     'level' => $category->getLevel(),
                     'position' => $category->getPosition()
                 );
+
+                //allow importing by ids.
+                if (!isset($this->_categoriesWithRoots[$structure[1]])) {
+                    $this->_categoriesWithRoots[$structure[1]] = array();
+                }
+                $this->_categoriesWithRoots[$structure[1]][$category->getId()] =
+                    $this->_categoriesWithRoots[$rootCategoryName][$index];
             }
         }
+
         return $this;
     }
 
