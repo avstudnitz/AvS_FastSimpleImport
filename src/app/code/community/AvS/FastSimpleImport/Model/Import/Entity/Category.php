@@ -1251,4 +1251,22 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         }
         return $this;
     }
+
+
+    /**
+     * @param $sku
+     * @return array|false
+     */
+    public function getEntityByCategory($root, $category)
+    {
+        if (isset($this->_categoriesWithRoots[$root][$category])) {
+            return $this->_categoriesWithRoots[$root][$category];
+        }
+
+        if (isset($this->_newCategory[$root][$category])) {
+            return $this->_newCategory[$root][$category];
+        }
+
+        return false;
+    }
 }
