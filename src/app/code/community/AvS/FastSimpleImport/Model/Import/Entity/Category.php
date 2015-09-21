@@ -1115,26 +1115,36 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     protected function _reindexUpdatedCategories()
     {
-        $entityIds = $this->_getProcessedCategoryIds();
 
-        $categoryFlatHelper = Mage::helper('catalog/category_flat');
-        if ($categoryFlatHelper->isAvailable() && $categoryFlatHelper->isAccessible()) {
-            Mage::dispatchEvent('fastsimpleimport_reindex_category_before_flat', array('entity_id' => &$entityIds));
-            Mage::getResourceSingleton('catalog/category_flat')->reindexAll();
-        }
-
-        if (Mage::getResourceModel('ecomdev_urlrewrite/indexer')) {
-            Mage::dispatchEvent('fastsimpleimport_reindex_category_before_ecomdev_urlrewrite', array('entity_id' => &$entityIds));
-            Mage::getResourceSingleton('ecomdev_urlrewrite/indexer')->updateCategoryRewrites($entityIds);
+        if (Mage::helper('core')->isModuleEnabled('Enterprise_Index')) {
+            Mage::dispatchEvent('fastsimpleimport_reindex_category_enterprise_before');
+            Mage::getSingleton('enterprise_index/observer')->refreshIndex(Mage::getModel('cron/schedule'));
         } else {
-            Mage::dispatchEvent('fastsimpleimport_reindex_category_before_urlrewrite', array('entity_id' => &$entityIds));
-            /* @var $urlModel Mage_Catalog_Model_Url */
-            $urlModel = Mage::getSingleton('catalog/url');
-            $urlModel->clearStoreInvalidRewrites();
-            foreach ($entityIds as $productId) {
-                $urlModel->refreshCategoryRewrite($productId);
+            $entityIds = $this->_getProcessedCategoryIds();
+
+            $categoryFlatHelper = Mage::helper('catalog/category_flat');
+            if ($categoryFlatHelper->isAvailable() && $categoryFlatHelper->isAccessible()) {
+
+                Mage::dispatchEvent('fastsimpleimport_reindex_category_before_flat', array('entity_id' => &$entityIds));
+                Mage::getResourceSingleton('catalog/category_flat')->reindexAll();
+            }
+
+            if (Mage::helper('core')->isModuleEnabled('EcomDev_UrlRewrite')) {
+
+                Mage::dispatchEvent('fastsimpleimport_reindex_category_before_ecomdev_urlrewrite', array('entity_id' => &$entityIds));
+                Mage::getResourceSingleton('ecomdev_urlrewrite/indexer')->updateCategoryRewrites($entityIds);
+            } else {
+
+                Mage::dispatchEvent('fastsimpleimport_reindex_category_before_urlrewrite', array('entity_id' => &$entityIds));
+                /* @var $urlModel Mage_Catalog_Model_Url */
+                $urlModel = Mage::getSingleton('catalog/url');
+                $urlModel->clearStoreInvalidRewrites();
+                foreach ($entityIds as $productId) {
+                    $urlModel->refreshCategoryRewrite($productId);
+                }
             }
         }
+
         Mage::dispatchEvent('fastsimpleimport_reindex_category_after', array('entity_id' => &$entityIds));
 
         return $this;
