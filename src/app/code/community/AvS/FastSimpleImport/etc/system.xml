@@ -37,9 +37,10 @@
                             <show_in_store>0</show_in_store>
                         </import_behavior>
                         <partial_indexing translate="label">
-                            <label>Partial Indexing</label>
+                            <label>Indexing Mode</label>
+                            <comment><![CDATA[Use asynchronous Indexing with the <a href="https://github.com/magento-hackathon/AsyncIndex" target="_blank">AsyncIndex</a> module]]></comment>
                             <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <source_model>fastsimpleimport/system_config_source_product_indexingMode</source_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>

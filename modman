@@ -1,2 +1,3 @@
-src/app/code/community/AvS/FastSimpleImport app/code/community/AvS/FastSimpleImport
-src/app/etc/modules/AvS_FastSimpleImport.xml                       app/etc/modules/AvS_FastSimpleImport.xml
+src/app/code/community/AvS/FastSimpleImport                 app/code/community/AvS/FastSimpleImport
+src/app/etc/modules/AvS_FastSimpleImport.xml                app/etc/modules/AvS_FastSimpleImport.xml
+src/app/locale/de_DE/AvS_FastSimpleImport.csv               app/locale/de_DE/AvS_FastSimpleImport.csv
