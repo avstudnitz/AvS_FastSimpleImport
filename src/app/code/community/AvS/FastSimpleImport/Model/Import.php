@@ -130,10 +130,10 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 
                         foreach($entityAdapter->getNewSku() as $importedData) {
                             $entityId = $importedData['entity_id'];
+                            Mage::getResourceModel('cataloginventory/indexer_stock')->reindexProducts($entityId);
+
                             $productDummy->setId($entityId);
 
-                            $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($entityId);
-                            $indexer->logEvent($stockItem, 'cataloginventory_stock_item', 'save');
                             $indexer->logEvent($productDummy, 'catalog_product', 'save');
                             $indexer->logEvent($productDummy, 'catalog_product', 'catalog_reindex_price');
                         }
