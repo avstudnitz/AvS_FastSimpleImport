@@ -159,6 +159,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
                 'super_link' => array(),
                 'relation'   => array()
             );
+            $superAttributePosition = 0;
             foreach ($bunch as $rowNum => $rowData) {
                 if (!$this->_entityModel->isRowAllowedToImport($rowData, $rowNum)) {
                     continue;
@@ -203,8 +204,16 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
                     $productSuperAttrId = $this->_getSuperAttributeId($productId, $attrParams['id']);
                 } elseif (!isset($superAttributes['attributes'][$productId][$attrParams['id']])) {
                     $productSuperAttrId = $nextAttrId++;
+
+                    if(($rowData['sku'] !== NULL) && ($rowData['_type'] == 'configurable')) {
+                        /*
+                            Positioning of super attribute will be reset if a new configurable product is detected
+                        */
+                        $superAttributePosition = 0;
+                    }
+
                     $superAttributes['attributes'][$productId][$attrParams['id']] = array(
-                        'product_super_attribute_id' => $productSuperAttrId, 'position' => 0
+                        'product_super_attribute_id' => $productSuperAttrId, 'position' => $superAttributePosition++
                     );
                     $superAttributes['labels'][] = array(
                         'product_super_attribute_id' => $productSuperAttrId,
