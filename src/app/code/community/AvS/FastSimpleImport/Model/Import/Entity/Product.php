@@ -1531,4 +1531,93 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         }
         return $attribute;
     }
+
+    /**
+     * Save product media gallery.
+     *
+     * @param array $mediaGalleryData
+     * @return Mage_ImportExport_Model_Import_Entity_Product
+     */
+    protected function _saveMediaGallery(array $mediaGalleryData)
+    {
+        if (empty($mediaGalleryData)) {
+            return $this;
+        }
+
+        static $mediaGalleryTableName = null;
+        static $mediaValueTableName = null;
+        static $productId = null;
+
+        if (!$mediaGalleryTableName) {
+            $mediaGalleryTableName = Mage::getModel('importexport/import_proxy_product_resource')
+                ->getTable('catalog/product_attribute_media_gallery');
+        }
+
+        if (!$mediaValueTableName) {
+            $mediaValueTableName = Mage::getModel('importexport/import_proxy_product_resource')
+                ->getTable('catalog/product_attribute_media_gallery_value');
+        }
+
+        foreach ($mediaGalleryData as $productSku => $mediaGalleryRows) {
+            $productId = $this->_newSku[$productSku]['entity_id'];
+            $insertedGalleryImgs = array();
+
+            if (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND != $this->getBehavior()) {
+                $this->_connection->delete(
+                    $mediaGalleryTableName,
+                    $this->_connection->quoteInto('entity_id IN (?)', $productId)
+                );
+            } else if ($this->getUseExternalImages()) {
+                $insertedGalleryImgs = $this->_connection->fetchCol($this->_connection->select()
+                    ->from($mediaGalleryTableName, 'value')
+                    ->where('entity_id IN (?)', $productId)
+                    ->where('value LIKE ?', 'http://%')
+                );
+            }
+
+            foreach ($mediaGalleryRows as $insertValue) {
+
+                if (!in_array($insertValue['value'], $insertedGalleryImgs)) {
+                    $valueArr = array(
+                        'attribute_id' => $insertValue['attribute_id'],
+                        'entity_id'    => $productId,
+                        'value'        => $insertValue['value']
+                    );
+
+                    $this->_connection
+                        ->insertOnDuplicate($mediaGalleryTableName, $valueArr, array('entity_id'));
+
+                    $insertedGalleryImgs[] = $insertValue['value'];
+                }
+
+                $newMediaValues = $this->_connection->fetchPairs($this->_connection->select()
+                    ->from($mediaGalleryTableName, array('value', 'value_id'))
+                    ->where('entity_id IN (?)', $productId)
+                );
+
+                if (array_key_exists($insertValue['value'], $newMediaValues)) {
+                    $insertValue['value_id'] = $newMediaValues[$insertValue['value']];
+                }
+
+                $valueArr = array(
+                    'value_id' => $insertValue['value_id'],
+                    'store_id' => Mage_Catalog_Model_Abstract::DEFAULT_STORE_ID,
+                    'label'    => $insertValue['label'],
+                    'position' => $insertValue['position'],
+                    'disabled' => $insertValue['disabled']
+                );
+
+                try {
+                    $this->_connection
+                        ->insertOnDuplicate($mediaValueTableName, $valueArr, array('value_id'));
+                } catch (Exception $e) {
+                    $this->_connection->delete(
+                        $mediaGalleryTableName, $this->_connection->quoteInto('value_id IN (?)', $newMediaValues)
+                    );
+                }
+            }
+        }
+
+        return $this;
+    }
 }
