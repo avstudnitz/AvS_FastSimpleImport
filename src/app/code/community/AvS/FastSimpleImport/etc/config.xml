@@ -70,10 +70,11 @@
                 <symbol_for_clear_field>###EMPTY###</symbol_for_clear_field>
             </general>
             <product>
-                <allow_rename_files>1</allow_rename_files>
                 <status>1</status>
                 <visibility>4</visibility>
                 <weight>0</weight>
+                <use_external_images>0</use_external_images>
+                <allow_rename_files>1</allow_rename_files>
             </product>
         </fastsimpleimport>
     </default>

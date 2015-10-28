@@ -57,6 +57,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /** @var null|bool */
     protected $_symbolEmptyFields = false;
 
+    /** @var null|bool */
+    protected $_useExternalImages = false;
+
     /**
      * Attributes with index (not label) value.
      *
@@ -95,7 +98,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         return $this->_allowRenameFiles;
     }
 
-
     /**
      * @return boolean
      */
@@ -103,7 +105,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     {
         return $this->_disablePreprocessImageData;
     }
-
 
     /**
      * @param boolean $disablePreprocessImageData
@@ -115,7 +116,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         return $this;
     }
 
-
     /**
      * @param boolean $value
      * @return $this
@@ -125,13 +125,30 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         return $this;
     }
 
-
     /**
      * @param string $value
      * @return $this
      */
     public function setSymbolEmptyFields($value) {
         $this->_symbolEmptyFields = $value;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getUseExternalImages()
+    {
+        return $this->_useExternalImages;
+    }
+
+    /**
+     * @param boolean $useExternalImages
+     * @return $this
+     */
+    public function setUseExternalImages($useExternalImages)
+    {
+        $this->_useExternalImages = (boolean) $useExternalImages;
         return $this;
     }
 
@@ -171,7 +188,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             $this->_createAttributeOptions();
             $this->_preprocessImageData();
 
-            if (!$this->getAllowRenameFiles()) {
+            if (!$this->getAllowRenameFiles() && !$this->getUseExternalImages()) {
                 $this->_getUploader()->setAllowRenameFiles(false);
             }
         }
@@ -331,34 +348,37 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                 if (!isset($rowData['_media_lable'])) {
                     $this->_getSource()->setValue('_media_lable', '');
                 }
-                if (strpos($rowData['_media_image'], 'http') === 0 && strpos($rowData['_media_image'], '://') !== false) {
 
-                    if (isset($rowData['_media_target_filename']) && $rowData['_media_target_filename']) {
-                        $targetFilename = $rowData['_media_target_filename'];
-                    } else {
-                        $targetFilename = basename(parse_url($rowData['_media_image'], PHP_URL_PATH));
-                    }
+                if (!$this->getUseExternalImages()) {
+                    if (strpos($rowData['_media_image'], 'http') === 0 && strpos($rowData['_media_image'], '://') !== false) {
 
-                    if (!is_file($this->_getUploader()->getTmpDir() . DS . $targetFilename)) {
-                        $this->_copyExternalImageFile($rowData['_media_image'], $targetFilename);
-                    }
-                    $this->_getSource()->setValue('_media_image', $targetFilename);
-
-                } else {
-
-                    if (isset($rowData['_media_target_filename']) && $rowData['_media_target_filename']) {
-                        $targetFilename = $rowData['_media_target_filename'];
+                        if (isset($rowData['_media_target_filename']) && $rowData['_media_target_filename']) {
+                            $targetFilename = $rowData['_media_target_filename'];
+                        } else {
+                            $targetFilename = basename(parse_url($rowData['_media_image'], PHP_URL_PATH));
+                        }
 
                         if (!is_file($this->_getUploader()->getTmpDir() . DS . $targetFilename)) {
-                            if (is_file($this->_getUploader()->getTmpDir() . DS . $rowData['_media_image'])) {
-                                copy($this->_getUploader()->getTmpDir() . DS . $rowData['_media_image'], $this->_getUploader()->getTmpDir() . DS . $targetFilename);
+                            $this->_copyExternalImageFile($rowData['_media_image'], $targetFilename);
+                        }
+                        $this->_getSource()->setValue('_media_image', $targetFilename);
+
+                    } else {
+
+                        if (isset($rowData['_media_target_filename']) && $rowData['_media_target_filename']) {
+                            $targetFilename = $rowData['_media_target_filename'];
+
+                            if (!is_file($this->_getUploader()->getTmpDir() . DS . $targetFilename)) {
+                                if (is_file($this->_getUploader()->getTmpDir() . DS . $rowData['_media_image'])) {
+                                    copy($this->_getUploader()->getTmpDir() . DS . $rowData['_media_image'], $this->_getUploader()->getTmpDir() . DS . $targetFilename);
+                                }
+                                $this->_getSource()->setValue('_media_image', $targetFilename);
                             }
-                            $this->_getSource()->setValue('_media_image', $targetFilename);
                         }
                     }
-                }
 
-                $this->_getSource()->unsetValue('_media_target_filename');
+                    $this->_getSource()->unsetValue('_media_target_filename');
+                }
             }
 
             $this->_getSource()->next();
@@ -1031,7 +1051,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                             ? 0 : $this->_websiteCodeToId[$rowData['_group_price_website']]
                     );
                 }
-                if (is_array($this->_imagesArrayKeys)  && count($this->_imagesArrayKeys) > 0) {
+                if (!$this->getUseExternalImages() && is_array($this->_imagesArrayKeys) && count($this->_imagesArrayKeys) > 0) {
                     foreach ($this->_imagesArrayKeys as $imageCol) {
                         if (!empty($rowData[$imageCol])) { // 5. Media gallery phase
                             if (!array_key_exists($rowData[$imageCol], $uploadedGalleryFiles)) {
@@ -1510,5 +1530,94 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             $attribute->setBackendModel($backendModelName);
         }
         return $attribute;
+    }
+
+    /**
+     * Save product media gallery.
+     *
+     * @param array $mediaGalleryData
+     * @return Mage_ImportExport_Model_Import_Entity_Product
+     */
+    protected function _saveMediaGallery(array $mediaGalleryData)
+    {
+        if (empty($mediaGalleryData)) {
+            return $this;
+        }
+
+        static $mediaGalleryTableName = null;
+        static $mediaValueTableName = null;
+        static $productId = null;
+
+        if (!$mediaGalleryTableName) {
+            $mediaGalleryTableName = Mage::getModel('importexport/import_proxy_product_resource')
+                ->getTable('catalog/product_attribute_media_gallery');
+        }
+
+        if (!$mediaValueTableName) {
+            $mediaValueTableName = Mage::getModel('importexport/import_proxy_product_resource')
+                ->getTable('catalog/product_attribute_media_gallery_value');
+        }
+
+        foreach ($mediaGalleryData as $productSku => $mediaGalleryRows) {
+            $productId = $this->_newSku[$productSku]['entity_id'];
+            $insertedGalleryImgs = array();
+
+            if (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND != $this->getBehavior()) {
+                $this->_connection->delete(
+                    $mediaGalleryTableName,
+                    $this->_connection->quoteInto('entity_id IN (?)', $productId)
+                );
+            } else if ($this->getUseExternalImages()) {
+                $insertedGalleryImgs = $this->_connection->fetchCol($this->_connection->select()
+                    ->from($mediaGalleryTableName, 'value')
+                    ->where('entity_id IN (?)', $productId)
+                    ->where('value LIKE ?', 'http://%')
+                );
+            }
+
+            foreach ($mediaGalleryRows as $insertValue) {
+
+                if (!in_array($insertValue['value'], $insertedGalleryImgs)) {
+                    $valueArr = array(
+                        'attribute_id' => $insertValue['attribute_id'],
+                        'entity_id'    => $productId,
+                        'value'        => $insertValue['value']
+                    );
+
+                    $this->_connection
+                        ->insertOnDuplicate($mediaGalleryTableName, $valueArr, array('entity_id'));
+
+                    $insertedGalleryImgs[] = $insertValue['value'];
+                }
+
+                $newMediaValues = $this->_connection->fetchPairs($this->_connection->select()
+                    ->from($mediaGalleryTableName, array('value', 'value_id'))
+                    ->where('entity_id IN (?)', $productId)
+                );
+
+                if (array_key_exists($insertValue['value'], $newMediaValues)) {
+                    $insertValue['value_id'] = $newMediaValues[$insertValue['value']];
+                }
+
+                $valueArr = array(
+                    'value_id' => $insertValue['value_id'],
+                    'store_id' => Mage_Catalog_Model_Abstract::DEFAULT_STORE_ID,
+                    'label'    => $insertValue['label'],
+                    'position' => $insertValue['position'],
+                    'disabled' => $insertValue['disabled']
+                );
+
+                try {
+                    $this->_connection
+                        ->insertOnDuplicate($mediaValueTableName, $valueArr, array('value_id'));
+                } catch (Exception $e) {
+                    $this->_connection->delete(
+                        $mediaGalleryTableName, $this->_connection->quoteInto('value_id IN (?)', $newMediaValues)
+                    );
+                }
+            }
+        }
+
+        return $this;
     }
 }
