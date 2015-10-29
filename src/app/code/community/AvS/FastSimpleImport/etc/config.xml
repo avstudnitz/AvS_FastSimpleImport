@@ -19,6 +19,11 @@
             <fastsimpleimport>
                 <class>AvS_FastSimpleImport_Model</class>
             </fastsimpleimport>
+            <importexport>
+                <rewrite>
+                    <import_entity_product>AvS_FastSimpleImport_Model_Import_Entity_Product</import_entity_product>
+                </rewrite>
+            </importexport>
         </models>
 
         <helpers>
