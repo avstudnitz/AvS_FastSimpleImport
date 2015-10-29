@@ -255,7 +255,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     {
         parent::__construct();
 
-        $this->_initWebsites()
+        $this
+            ->_initOnTabAttributes()
+            ->_initWebsites()
             ->_initStores()
             ->_initCategories()
             ->_initAttributes()
@@ -342,6 +344,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             $this->_deleteCategories();
         } else {
             $this->_saveCategories();
+            $this->_saveOnTab();
         }
         Mage::dispatchEvent('catalog_category_import_finish_before', array('adapter'=>$this));
         return true;
@@ -424,7 +427,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     /**
      * Initialize customer attributes.
      *
-     * @return Mage_ImportExport_Model_Import_Entity_Customer
+     * @return $this
      */
     protected function _initAttributes()
     {
@@ -1278,5 +1281,110 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         }
 
         return false;
+    }
+
+
+    /**
+     * @return $this
+     */
+    protected function _initOnTabAttributes()
+    {
+        if (Mage::helper('core')->isModuleEnabled('OnTap_Merchandiser')) {
+            $this->_particularAttributes = array_merge($this->_particularAttributes, [
+                '_ontap_heroproducts',
+                '_ontap_attribute',
+                '_ontap_attribute_value',
+                '_ontap_attribute_logic',
+                '_ontap_ruled_only',
+                '_ontap_automatic_sort'
+            ]);
+        }
+        return $this;
+    }
+
+    /**
+     * Stock item saving.
+     * Overwritten in order to fix bug with stock data import
+     * See http://www.magentocommerce.com/bug-tracking/issue/?issue=13539
+     * See https://github.com/avstudnitz/AvS_FastSimpleImport/issues/3
+     *
+     * @return Mage_ImportExport_Model_Import_Entity_Product
+     */
+    protected function _saveOnTab()
+    {
+        if (! Mage::helper('core')->isModuleEnabled('OnTap_Merchandiser')) {
+            return $this;
+        }
+
+        $entityTable = Mage::getSingleton('core/resource')->getTableName('merchandiser_category_values');
+        $categoryId = null;
+
+        while ($bunch = $this->_dataSourceModel->getNextBunch()) {
+            $onTapData = array();
+
+            // Format bunch to stock data rows
+            foreach ($bunch as $rowNum => $rowData) {
+                $this->_filterRowData($rowData);
+                if (!$this->isRowAllowedToImport($rowData, $rowNum)) {
+                    continue;
+                }
+
+                if (self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
+                    $category = $this->getEntityByCategory($rowData[self::COL_ROOT], $rowData[self::COL_CATEGORY]);
+                    $categoryId = (int) $category['entity_id'];
+
+                    $onTapData[$categoryId] = [
+                        'category_id' => $categoryId,
+                        'heroproducts' => [],
+                        'attribute_codes' => [],
+                        'smart_attributes' => [],
+                        'ruled_only' => 0,
+                        'automatic_sort' => null
+                    ];
+                }
+
+                //we have a non-SCOPE_DEFAULT row, we check if it has a stock_id, if not, skip it.
+                if (self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
+                    if (isset($rowData['_ontap_ruled_only'])) {
+                        $onTapData[$categoryId]['ruled_only'] = (int) $rowData['_ontap_ruled_only'];
+                    }
+                    if (isset($rowData['_ontap_automatic_sort'])) {
+                        $onTapData[$categoryId]['automatic_sort'] = $rowData['_ontap_automatic_sort'];
+                    }
+                }
+
+                //get the _ontab_* smart attribute values and map them to the new keys that are present in the database.
+                $smartAttributes = array_intersect_key($rowData, [
+                    '_ontap_attribute' => '',
+                    '_ontap_attribute_value' => '',
+                    '_ontap_attribute_logic' => '',
+                ]);
+
+                //only add if we've found data
+                //todo check if we've got all values, there should be three, else it will throw an error here.
+                if ($smartAttributes) {
+                    $smartAttributes = array_combine(['attribute', 'value', 'link'],  $smartAttributes);
+                    $onTapData[$categoryId]['attribute_codes'][] = $smartAttributes['attribute'];
+                    $onTapData[$categoryId]['smart_attributes'][] = $smartAttributes;
+                }
+
+                if (isset($rowData['_ontap_heroproducts'])) {
+                    $onTapData[$categoryId]['heroproducts'][] = $rowData['_ontap_heroproducts'];
+                }
+            }
+
+            if ($onTapData) {
+                //flatten data
+                foreach ($onTapData as &$onTapRow) {
+                    $onTapRow['attribute_codes'] = implode(',', array_unique($onTapRow['attribute_codes']));
+                    $onTapRow['heroproducts'] = implode(',',$onTapRow['heroproducts']);
+                    $onTapRow['smart_attributes'] = serialize($onTapRow['smart_attributes']);
+                }
+
+                //Insert Data
+                $this->_connection->insertOnDuplicate($entityTable, $onTapData);
+            }
+        }
+        return $this;
     }
 }
