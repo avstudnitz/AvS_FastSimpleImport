@@ -1318,6 +1318,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
         $entityTable = Mage::getSingleton('core/resource')->getTableName('merchandiser_category_values');
         $categoryId = null;
+        $attributeIdsByCode = [];
 
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
             $onTapData = array();
@@ -1335,11 +1336,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
                     $onTapData[$categoryId] = [
                         'category_id' => $categoryId,
-                        'heroproducts' => [],
-                        'attribute_codes' => [],
-                        'smart_attributes' => [],
-                        'ruled_only' => 0,
-                        'automatic_sort' => null
                     ];
                 }
 
@@ -1363,26 +1359,58 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 //only add if we've found data
                 //todo check if we've got all values, there should be three, else it will throw an error here.
                 if ($smartAttributes) {
+                    if (! isset($onTapData[$categoryId]['attribute_codes'])) {
+                        $onTapData[$categoryId]['attribute_codes'] = [];
+                        $onTapData[$categoryId]['smart_attributes'] = [];
+                    }
+
                     $smartAttributes = array_combine(['attribute', 'value', 'link'],  $smartAttributes);
-                    $onTapData[$categoryId]['attribute_codes'][] = $smartAttributes['attribute'];
+
+                    if (! isset($attributeIdsByCode[$smartAttributes['attribute']])) {
+                        $attributeIdsByCode[$smartAttributes['attribute']] =
+                            Mage::getSingleton('catalog/product')
+                                ->getResource()
+                                ->getAttribute($smartAttributes['attribute'])
+                                ->getId();
+                    }
+
+                    $attributeCode = $smartAttributes['attribute'];
+                    $smartAttributes['attribute'] = $attributeIdsByCode[$smartAttributes['attribute']];
+
+                    $onTapData[$categoryId]['attribute_codes'][] = $attributeCode;
                     $onTapData[$categoryId]['smart_attributes'][] = $smartAttributes;
                 }
 
                 if (isset($rowData['_ontap_heroproducts'])) {
+                    if (! isset($onTapData[$categoryId]['heroproducts'])) {
+                        $onTapData[$categoryId]['heroproducts'] = [];
+                    }
                     $onTapData[$categoryId]['heroproducts'][] = $rowData['_ontap_heroproducts'];
                 }
             }
 
             if ($onTapData) {
                 //flatten data
-                foreach ($onTapData as &$onTapRow) {
-                    $onTapRow['attribute_codes'] = implode(',', array_unique($onTapRow['attribute_codes']));
-                    $onTapRow['heroproducts'] = implode(',',$onTapRow['heroproducts']);
-                    $onTapRow['smart_attributes'] = serialize($onTapRow['smart_attributes']);
+                foreach ($onTapData as $catId => &$onTapRow) {
+                    if (isset($onTapData[$categoryId]['attribute_codes'])) {
+                        $onTapRow['attribute_codes'] = implode(',', array_unique($onTapRow['attribute_codes']));
+                    }
+                    if (isset($onTapData[$categoryId]['heroproducts'])) {
+                        $onTapRow['heroproducts'] = implode(',', $onTapRow['heroproducts']);
+                    }
+                    if (isset($onTapData[$categoryId]['smart_attributes'])) {
+                        $onTapRow['smart_attributes'] = serialize($onTapRow['smart_attributes']);
+                    }
+
+                    if (count($onTapRow) <= 1) {
+                        unset($onTapData[$catId]);
+                    }
                 }
 
                 //Insert Data
-                $this->_connection->insertOnDuplicate($entityTable, $onTapData);
+                if ($onTapData) {
+                    $this->_connection->insertOnDuplicate($entityTable, $onTapData);
+                }
             }
         }
         return $this;
