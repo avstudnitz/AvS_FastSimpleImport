@@ -667,6 +667,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             $this->_fileUploader    = new Mage_ImportExport_Model_Import_Uploader();
 
             $this->_fileUploader->init();
+            $this->_fileUploader->removeValidateCallback('catalog_product_image');
             $this->_fileUploader->setFilesDispersion(false);
 
             $tmpDir     = Mage::getConfig()->getOptions()->getMediaDir() . '/import';
