@@ -1337,6 +1337,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
                     $onTapData[$categoryId] = [
                         'category_id' => $categoryId,
+                        'heroproducts'     => '',
+                        'attribute_codes'  => '',
+                        'smart_attributes' => '',
+                        'ruled_only'       => '',
+                        'automatic_sort'   => ''
                     ];
                 }
 
@@ -1393,13 +1398,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             if ($onTapData) {
                 //flatten data
                 foreach ($onTapData as $catId => &$onTapRow) {
-                    if (isset($onTapData[$categoryId]['attribute_codes'])) {
+                    if (! empty($onTapRow['attribute_codes'])) {
                         $onTapRow['attribute_codes'] = implode(',', array_unique($onTapRow['attribute_codes']));
                     }
-                    if (isset($onTapData[$categoryId]['heroproducts'])) {
+                    if (! empty($onTapRow['heroproducts'])) {
                         $onTapRow['heroproducts'] = implode(',', $onTapRow['heroproducts']);
                     }
-                    if (isset($onTapData[$categoryId]['smart_attributes'])) {
+                    if (! empty($onTapRow['smart_attributes'])) {
                         $onTapRow['smart_attributes'] = serialize($onTapRow['smart_attributes']);
                     }
 
