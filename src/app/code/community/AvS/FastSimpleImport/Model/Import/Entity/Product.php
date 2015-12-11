@@ -1566,4 +1566,101 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         }
         return false;
     }
+
+
+    /**
+     * Save product categories.
+     *
+     * @param array $categoriesData
+     * @return Mage_ImportExport_Model_Import_Entity_Product
+     */
+    protected function _saveProductCategories(array $categoriesData)
+    {
+        static $tableName = null;
+
+        if (!$tableName) {
+            $tableName = Mage::getModel('importexport/import_proxy_product_resource')->getProductCategoryTable();
+        }
+        if ($categoriesData) {
+            $categoriesIn = [];
+            $affectedProductIds = [];
+
+            foreach ($categoriesData as $delSku => $categories) {
+                $productId  = $this->_newSku[$delSku]['entity_id'];
+                $affectedProductIds[] = $productId;
+
+                foreach (array_keys($categories) as $categoryId) {
+                    $categoriesIn[] = ['product_id' => $productId, 'category_id' => $categoryId, 'position' => 1];
+                }
+            }
+
+            if (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND != $this->getBehavior()) {
+                if (true) { //@todo make switch that allows you to manage all categories.
+                    $externalIdAttr = $this->_getCategoryAttribute('external_id');
+
+                    //Select all non-protected categories.
+                    $select = $this->_connection->select()
+                        ->from(['main_table' => $tableName], ['product_id', 'category_id'])->where('product_id IN(?)', $affectedProductIds)
+                        ->join(
+                            ['external_id_attr' => $externalIdAttr->getBackendTable()],
+                            implode(' AND ', [
+                                '`main_table`.`category_id` = `external_id_attr`.`entity_id`',
+                                $this->_connection->quoteInto('`external_id_attr`.`attribute_id` = ?', $externalIdAttr->getId()),
+                                '`external_id_attr`.`value` IS NOT NULL'
+                            ]),
+                            []
+                        );
+
+                    $availableCategories = $this->_connection->fetchAll($select);
+                    foreach ($availableCategories as $key => $availableCategory) {
+                        foreach ($categoriesIn as $categoryIn) {
+                            if ($availableCategory['product_id'] == $categoryIn['product_id']
+                                && $availableCategory['category_id'] == $categoryIn['category_id']
+                            ) {
+                                unset($availableCategories[$key]);
+                            }
+                        }
+                    }
+                    $deleteCategories = $availableCategories;
+
+                    if ($deleteCategories) {
+                        $deleteWhere = [];
+                        foreach ($deleteCategories as $deleteCategory) {
+                            $whereStmt = [];
+                            foreach ($deleteCategory as $field => $value) {
+                                $whereStmt[] = $this->_connection->quoteInto("{$field} = ?", $value);
+                            }
+                            $deleteWhere[] = '(' . implode(' AND ', $whereStmt) . ')';
+                        }
+
+                        $this->_connection->delete($tableName, implode(' OR ', $deleteWhere));
+                    }
+                } else {
+
+                }
+            }
+            if ($categoriesIn) {
+                $this->_connection->insertOnDuplicate($tableName, $categoriesIn, array('position'));
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Retrieve attribute by specified code
+     *
+     * @param string $code
+     * @return Mage_Catalog_Model_Resource_Eav_Attribute
+     */
+    protected function _getCategoryAttribute($code)
+    {
+        $attribute = Mage::getResourceSingleton('catalog/category')->getAttribute($code);
+        $backendModelName = (string)Mage::getConfig()->getNode(
+            'global/importexport/import/catalog_category/attributes/' . $attribute->getAttributeCode() . '/backend_model'
+        );
+        if (!empty($backendModelName)) {
+            $attribute->setBackendModel($backendModelName);
+        }
+        return $attribute;
+    }
 }

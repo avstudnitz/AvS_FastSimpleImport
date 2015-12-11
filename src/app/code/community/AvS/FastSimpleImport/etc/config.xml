@@ -10,7 +10,7 @@
 <config>
     <modules>
         <AvS_FastSimpleImport>
-            <version>0.6.4</version>
+            <version>0.7.1</version>
         </AvS_FastSimpleImport>
     </modules>
 
@@ -20,6 +20,14 @@
                 <class>AvS_FastSimpleImport_Model</class>
             </fastsimpleimport>
         </models>
+        <resources>
+            <fastsimpleimport_setup>
+                <setup>
+                    <module>AvS_FastSimpleImport</module>
+                    <class>Mage_Catalog_Model_Resource_Setup</class>
+                </setup>
+            </fastsimpleimport_setup>
+        </resources>
 
         <helpers>
             <fastsimpleimport>
