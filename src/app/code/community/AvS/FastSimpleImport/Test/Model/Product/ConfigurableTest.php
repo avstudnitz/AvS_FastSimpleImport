@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Class AvS_FastSimpleImport_Test_Model_Product_ConfigurableTest
+ *
+ * @loadFixture defaultEnvironment.yaml
+ */
 class AvS_FastSimpleImport_Test_Model_Product_ConfigurableTest extends EcomDev_PHPUnit_Test_Case
 {
     protected function setUp()
@@ -33,7 +38,7 @@ class AvS_FastSimpleImport_Test_Model_Product_ConfigurableTest extends EcomDev_P
 
         $this->assertCount(3, $productBaseModel->getCollection()->getAllIds());
 
-        $configurableProducts = $productBaseModel->getCollection()->addFieldToFilter('type_id' ,array('eq' => 'configurable'))->load();
+        $configurableProducts = $productBaseModel->getCollection()->addFieldToFilter('type_id' ,array('eq' => 'configurable'));
         $this->assertCount(1, $configurableProducts->getAllIds());
 
         $sku = $configurableProducts->getFirstItem()->getSku();
