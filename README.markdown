@@ -7,7 +7,7 @@ Wrapper for Magento ImportExport functionality which imports data from arrays
 
 Facts
 -----
-- version: 0.6.3
+- version: 0.6.4
 - extension key: AvS_FastSimpleImport
 - extension on Magento Connect: n/a
 - Magento Connect 1.0 extension key: n/a
@@ -46,9 +46,10 @@ Compatibility
 Installation Instructions
 -------------------------
 1. Install the extension via GitHub, composer or a similar method.
-2. Clear the cache, logout from the admin panel and then login again.
-3. Read the [documentation](http://avstudnitz.github.io/AvS_FastSimpleImport/)
-4. Configure the extension under System -> Configuration -> Services -> FastSimpleImport.
+2. If you are using the Enterprise Edition then add ```<Enterprise_ImportExport/>``` to the ```<depends>``` node directly after ```<Mage_ImportExport/>```
+3. Clear the cache, logout from the admin panel and then login again.
+4. Read the [documentation](http://avstudnitz.github.io/AvS_FastSimpleImport/)
+5. Configure the extension under System -> Configuration -> Services -> FastSimpleImport.
 
 Uninstallation
 --------------
