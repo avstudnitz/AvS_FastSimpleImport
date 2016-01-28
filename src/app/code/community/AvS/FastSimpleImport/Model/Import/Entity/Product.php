@@ -1168,7 +1168,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                     // add a disabled entry to default to prevent the display of this image
                     // in other stores
                     if ($currentStoreId != Mage_Catalog_Model_Product::DEFAULT_STORE_ID) {
-                        $defaultMediaImageData = array()
+                        $defaultMediaImageData = array(
                             'attribute_id'      => $rowData['_media_attribute_id'],
                             'label'             => isset($rowData['_media_lable']) ? $rowData['_media_lable'] : '',
                             'position'          => isset($rowData['_media_position']) ? $rowData['_media_position'] : 0,
@@ -1179,7 +1179,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                         $mediaGallery[$rowSku][] = $defaultMediaImageData;
                     }
 
-                    $mediaImageData = array()
+                    $mediaImageData = array(
                         'attribute_id' => $rowData['_media_attribute_id'],
                         'label' => isset($rowData['_media_lable']) ? $rowData['_media_lable'] : '',
                         'position' => isset($rowData['_media_position']) ? $rowData['_media_position'] : 0,
