@@ -1,0 +1,40 @@
+scope:
+  website:
+    - website_id: 1
+      code: base
+      name: Base Website
+      default_group_id: 1
+      is_default: 1
+
+  group:
+    - group_id: 1
+      website_id: 1
+      name: Base Store Group
+      default_store_id: 1
+      root_category_id: 2
+
+  store:
+    - store_id: 1
+      website_id: 1
+      group_id: 1
+      code: basestore
+      name: Base Store
+      sort_order: 0
+      is_active: 1
+    - store_id: 2
+      website_id: 1
+      group_id: 1
+      code: basestore2
+      name: Base Store 2
+      sort_order: 1
+      is_active: 0
+    - store_id: 3
+      website_id: 1
+      group_id: 1
+      code: basestore3
+      name: Base Store 3
+      sort_order: 0
+      is_active: 0
+
+config:
+  default/dev/template/allow_symlink: 1

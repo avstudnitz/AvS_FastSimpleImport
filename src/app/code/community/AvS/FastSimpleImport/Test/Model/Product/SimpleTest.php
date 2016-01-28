@@ -1,10 +1,11 @@
 <?php
+
 /**
  * Created by IntelliJ IDEA.
  * Date: 22.02.14
  * Time: 11:42
+ * @loadFixture defaultEnvironment.yaml
  */
-
 class AvS_FastSimpleImport_Test_Model_Product_SimpleTest extends EcomDev_PHPUnit_Test_Case
 {
 
@@ -12,12 +13,17 @@ class AvS_FastSimpleImport_Test_Model_Product_SimpleTest extends EcomDev_PHPUnit
      * @test
      * @loadExpectation
      * @dataProvider dataProvider
+     *
+     * @param array $values Test values
+     * @return void
      */
     public function createProduct($values)
     {
-        Mage::getModel('fastsimpleimport/import')->processProductImport($values);
+        $this->_getImportModel()->processProductImport($values);
 
         $sku = (string) $values[0]['sku'];
+
+        /** @var Mage_Catalog_Model_Product $product */
         $product = Mage::getModel('catalog/product');
         $product->load($product->getIdBySku($sku));
         $expected = $this->expected('%s-%s', $sku, 1);
@@ -40,6 +46,9 @@ class AvS_FastSimpleImport_Test_Model_Product_SimpleTest extends EcomDev_PHPUnit
      * @loadExpectation
      * @loadFixture defaultValues.yaml
      * @dataProvider dataProvider
+     *
+     * @param array $values Test values
+     * @return void
      */
     public function createProductWithDefault($values)
     {
@@ -47,8 +56,11 @@ class AvS_FastSimpleImport_Test_Model_Product_SimpleTest extends EcomDev_PHPUnit
         $this->assertEquals(4, Mage::getStoreConfig('fastsimpleimport/product/tax_class_id'));
         $this->assertEquals(3, Mage::getStoreConfig('fastsimpleimport/product/visibility'));
         $this->assertEquals(12345, Mage::getStoreConfig('fastsimpleimport/product/weight'));
-        Mage::getModel('fastsimpleimport/import')->processProductImport($values);
+
+        $this->_getImportModel()->processProductImport($values);
         $sku = (string) $values[0]['sku'];
+
+        /** @var Mage_Catalog_Model_Product $product */
         $product = Mage::getModel('catalog/product');
         $product->load($product->getIdBySku($sku));
         $expected = $this->expected('%s-%s', $sku, 1);
@@ -63,16 +75,20 @@ class AvS_FastSimpleImport_Test_Model_Product_SimpleTest extends EcomDev_PHPUnit
      * @test
      * @loadExpectation
      * @dataProvider dataProvider
+     *
+     * @param array $values Test values
+     * @return void
      */
     public function updateProduct($values)
     {
         $origData = $values[0];
         $sku = (string) $values[0]['sku'];
-        Mage::getModel('fastsimpleimport/import')->processProductImport(array($origData));
+        $this->_getImportModel()->processProductImport([$origData]);
 
         $updateData = $values[1];
-        Mage::getModel('fastsimpleimport/import')->processProductImport(array($updateData));
+        $this->_getImportModel()->processProductImport([$updateData]);
 
+        /** @var Mage_Catalog_Model_Product $product */
         $product = Mage::getModel('catalog/product');
         $product->load($product->getIdBySku($sku));
         $afterCreate = $this->expected('%s-%s', $sku, 'create');
@@ -84,6 +100,14 @@ class AvS_FastSimpleImport_Test_Model_Product_SimpleTest extends EcomDev_PHPUnit
 
     }
 
-
+    /**
+     * Get the import model
+     *
+     * @return AvS_FastSimpleImport_Model_Import
+     */
+    protected function _getImportModel()
+    {
+        return Mage::getModel('fastsimpleimport/import');
+    }
 
 }

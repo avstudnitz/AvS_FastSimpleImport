@@ -3,8 +3,9 @@
  * Created by IntelliJ IDEA.
  * Date: 22.02.14
  * Time: 17:09
+ *
+ * @loadFixture defaultEnvironment.yaml
  */
-
 class AvS_FastSimpleImport_Test_Model_Category_MainTest extends EcomDev_PHPUnit_Test_Case
 {
     const CATEGORY_BASIC_COUNT = 2;
