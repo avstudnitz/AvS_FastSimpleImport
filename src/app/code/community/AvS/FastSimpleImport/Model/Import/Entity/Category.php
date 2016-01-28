@@ -807,22 +807,22 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     protected function _getParentCategory($rowData)
     {
-        $categoryParts = $this->_explodeEscaped('/',$rowData[self::COL_CATEGORY]);
+        $categoryParts = $this->_explodeEscaped('/', $rowData[self::COL_CATEGORY]);
         array_pop($categoryParts);
-        $parent = $this->_implodeEscaped('/',$categoryParts);
+        $parent = $this->_implodeEscaped('/', $categoryParts);
 
-        if ($parent)
-        {
-            if (isset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$parent]))
-            {
+        if ($parent) {
+            if (isset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$parent])) {
                 return $this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$parent];
             } elseif (isset($this->_newCategory[$rowData[self::COL_ROOT]][$parent])) {
                 return $this->_newCategory[$rowData[self::COL_ROOT]][$parent];
             } else {
                 return false;
             }
-        } else {
+        } elseif (isset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]])) {
             return reset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]]);
+        } else {
+            return false;
         }
     }
 
@@ -889,9 +889,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             $root = $rowData[self::COL_ROOT];
             $category = $rowData[self::COL_CATEGORY];
 
+            //check if the root exists
+            if (! isset($this->_categoriesWithRoots[$root])) {
+                $this->addRowError(self::ERROR_INVALID_ROOT, $rowNum);
+                return false;
+            }
+
             //check if parent category exists
-            if ($this->_getParentCategory($rowData) === false)
-            {
+            if ($this->_getParentCategory($rowData) === false) {
 
                 $this->addRowError(self::ERROR_PARENT_NOT_FOUND, $rowNum);
                 return false;
@@ -910,14 +915,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                     $category = false;
                 }
             }
-
-            //check if the root exists
-            if (! isset($this->_categoriesWithRoots[$root]))
-            {
-                $this->addRowError(self::ERROR_INVALID_ROOT, $rowNum);
-                return false;
-            }
-
 
             // check simple attributes
             foreach ($this->_attributes as $attrCode => $attrParams) {
