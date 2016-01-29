@@ -225,13 +225,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             return;
         }
 
-        $coreHelper = Mage::helper("core");
+        $escapeHelper = Mage::helper("fastsimpleimport/escapeCsv");;
         $source = $this->_getSource();
 
         $source->rewind();
         while ($source->valid()) {
 
-            $rowData = $coreHelper->unEscapeCSVData($source->current());
+            $rowData = $escapeHelper->unEscapeCSVData($source->current());
             $this->_filterRowData($rowData);
             foreach ($this->getDropdownAttributes() as $attribute) {
 
