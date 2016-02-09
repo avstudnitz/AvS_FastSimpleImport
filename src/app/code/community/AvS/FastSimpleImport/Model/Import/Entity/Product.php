@@ -58,7 +58,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     protected $_symbolEmptyFields = false;
 
     /** @var null|bool */
-    protected $_useExternalImages = false;
+    protected $_downloadExternalImages = false;
 
     /**
      * Attributes with index (not label) value.
@@ -137,18 +137,18 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /**
      * @return boolean
      */
-    public function getUseExternalImages()
+    public function getDownloadExternalImages()
     {
-        return $this->_useExternalImages;
+        return $this->_downloadExternalImages;
     }
 
     /**
-     * @param boolean $useExternalImages
+     * @param boolean $downloadExternalImages
      * @return $this
      */
-    public function setUseExternalImages($useExternalImages)
+    public function setDownloadExternalImages($downloadExternalImages)
     {
-        $this->_useExternalImages = (boolean) $useExternalImages;
+        $this->_downloadExternalImages = (boolean) $downloadExternalImages;
         return $this;
     }
 
@@ -188,7 +188,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             $this->_createAttributeOptions();
             $this->_preprocessImageData();
 
-            if (!$this->getAllowRenameFiles() && !$this->getUseExternalImages()) {
+            if (!$this->getAllowRenameFiles() && $this->getDownloadExternalImages()) {
                 $this->_getUploader()->setAllowRenameFiles(false);
             }
         }
@@ -349,7 +349,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                     $this->_getSource()->setValue('_media_lable', '');
                 }
 
-                if (!$this->getUseExternalImages()) {
+                if ($this->getDownloadExternalImages()) {
                     if (strpos($rowData['_media_image'], 'http') === 0 && strpos($rowData['_media_image'], '://') !== false) {
 
                         if (isset($rowData['_media_target_filename']) && $rowData['_media_target_filename']) {
@@ -1051,7 +1051,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                             ? 0 : $this->_websiteCodeToId[$rowData['_group_price_website']]
                     );
                 }
-                if (!$this->getUseExternalImages() && is_array($this->_imagesArrayKeys) && count($this->_imagesArrayKeys) > 0) {
+                if ($this->getDownloadExternalImages() && is_array($this->_imagesArrayKeys) && count($this->_imagesArrayKeys) > 0) {
                     foreach ($this->_imagesArrayKeys as $imageCol) {
                         if (!empty($rowData[$imageCol])) { // 5. Media gallery phase
                             if (!array_key_exists($rowData[$imageCol], $uploadedGalleryFiles)) {
@@ -1567,7 +1567,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                     $mediaGalleryTableName,
                     $this->_connection->quoteInto('entity_id IN (?)', $productId)
                 );
-            } else if ($this->getUseExternalImages()) {
+            } else if (!$this->getDownloadExternalImages()) {
                 $insertedGalleryImgs = $this->_connection->fetchCol($this->_connection->select()
                     ->from($mediaGalleryTableName, 'value')
                     ->where('entity_id IN (?)', $productId)
@@ -1576,7 +1576,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             }
 
             foreach ($mediaGalleryRows as $insertValue) {
-
                 if (!in_array($insertValue['value'], $insertedGalleryImgs)) {
                     $valueArr = array(
                         'attribute_id' => $insertValue['attribute_id'],

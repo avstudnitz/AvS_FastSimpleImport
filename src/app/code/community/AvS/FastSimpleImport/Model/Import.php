@@ -30,8 +30,8 @@
  * @method string getUnsetEmptyFields()
  * @method AvS_FastSimpleImport_Model_Import setSymbolEmptyFields(string $value)
  * @method string getSymbolEmptyFields()
- * @method AvS_FastSimpleImport_Model_Import setUseExternalImages(boolean $value)
- * @method boolean getUseExternalImages()
+ * @method AvS_FastSimpleImport_Model_Import setDownloadExternalImages(boolean $value)
+ * @method boolean getDownloadExternalImages()
  */
 class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
 {
@@ -53,7 +53,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $this->setDisablePreprocessImageData(Mage::getStoreConfigFlag('fastsimpleimport/product/disable_preprocess_images'));
         $this->setUnsetEmptyFields(! Mage::getStoreConfigFlag('fastsimpleimport/general/clear_field_on_empty_string'));
         $this->setSymbolEmptyFields(Mage::getStoreConfig('fastsimpleimport/general/symbol_for_clear_field'));
-        $this->setUseExternalImages(Mage::getStoreConfigFlag('fastsimpleimport/product/use_external_images'));
+        $this->setDownloadExternalImages(Mage::getStoreConfigFlag('fastsimpleimport/product/download_external_images'));
     }
 
     /**
@@ -89,7 +89,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setDisablePreprocessImageData($this->getDisablePreprocessImageData());
         $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
         $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
-        $entityAdapter->setUseExternalImages($this->getUseExternalImages());
+        $entityAdapter->setDownloadExternalImages($this->getDownloadExternalImages());
         $this->setEntityAdapter($entityAdapter);
 
         $validationResult = $this->validateSource($data);
@@ -156,7 +156,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setDisablePreprocessImageData($this->getDisablePreprocessImageData());
         $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
         $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
-        $entityAdapter->setUseExternalImages($this->getUseExternalImages());
+        $entityAdapter->setDownloadExternalImages($this->getDownloadExternalImages());
         $this->setEntityAdapter($entityAdapter);
 
         $validationResult = $this->validateSource($data);

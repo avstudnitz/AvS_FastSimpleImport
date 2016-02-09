@@ -73,12 +73,11 @@
                 <status>1</status>
                 <visibility>4</visibility>
                 <weight>0</weight>
-                <use_external_images>0</use_external_images>
+                <download_external_images>1</download_external_images>
                 <allow_rename_files>1</allow_rename_files>
             </product>
         </fastsimpleimport>
     </default>
-
 
     <phpunit>
         <suite>
