@@ -14,6 +14,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      * Size of bunch - part of entities to save in one step.
      */
     const BUNCH_SIZE = 20;
+    protected $_useConfigAttributes = array('available_sort_by', 'default_sort_by', 'filter_price_range');
 
     /**
      * Data row scopes.
@@ -834,6 +835,21 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         return end($categoryParts);
     }
 
+    protected function isAttributeUsingConfig($attrCode, $rowData)
+    {
+        if (!in_array($attrCode, $this->_useConfigAttributes)) {
+            return false;
+        }
+
+        $key = 'use_config_' . $attrCode;
+
+        if (!empty($rowData[$key])) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Validate data row.
      *
@@ -923,7 +939,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             foreach ($this->_attributes as $attrCode => $attrParams) {
                 if (isset($rowData[$attrCode]) && strlen($rowData[$attrCode])) {
                     $this->isAttributeValid($attrCode, $attrParams, $rowData, $rowNum);
-                } elseif ($attrParams['is_required'] && !isset($this->_categoriesWithRoots[$root][$category])) {
+                } elseif ($attrParams['is_required'] && !isset($this->_categoriesWithRoots[$root][$category])
+                    && !$this->isAttributeUsingConfig($attrCode, $rowData)) {
                     $this->addRowError(self::ERROR_VALUE_IS_REQUIRED, $rowNum, $attrCode);
                 }
             }
