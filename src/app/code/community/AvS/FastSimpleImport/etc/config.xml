@@ -10,7 +10,7 @@
 <config>
     <modules>
         <AvS_FastSimpleImport>
-            <version>0.6.4</version>
+            <version>0.7.0</version>
         </AvS_FastSimpleImport>
     </modules>
 
