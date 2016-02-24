@@ -285,7 +285,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
                 $options = $this->_getAttributeOptions($attribute);
 
-                if (!in_array(trim($rowData[$attributeCode]), $options, true)) {
+                if (!in_array(strtolower(trim($rowData[$attributeCode])), $options, true)) {
                     $this->_createAttributeOption($attribute, trim($rowData[$attributeCode]));
                 }
             }
@@ -318,7 +318,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
                 $options = $this->_getAttributeOptions($attribute);
 
-                if (!in_array(trim($rowData[$attributeCode]), $options, true)) {
+                if (!in_array(strtolower(trim($rowData[$attributeCode])), $options, true)) {
                     $this->_createAttributeOption($attribute, trim($rowData[$attributeCode]));
                 }
             }
@@ -346,7 +346,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
             $this->_attributeOptions[$attribute->getAttributeCode()] = array();
             foreach ($attributeOptions->getAllOptions(false) as $option) {
-                $this->_attributeOptions[$attribute->getAttributeCode()][$option['value']] = $option['label'];
+                $label = strtolower($option['label']);
+                $this->_attributeOptions[$attribute->getAttributeCode()][$option['value']] = $label;
             }
         }
 
