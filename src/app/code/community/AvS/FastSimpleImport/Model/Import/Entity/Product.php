@@ -285,7 +285,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
                 $options = $this->_getAttributeOptions($attribute);
 
-                if (!in_array(strtolower(trim($rowData[$attributeCode])), $options, true)) {
+                /** @var AvS_FastSimpleImport_Helper_Data $helper */
+                $helper = Mage::helper('fastsimpleimport');
+                if (!in_array($helper->strtolower(trim($rowData[$attributeCode])), $options, true)) {
                     $this->_createAttributeOption($attribute, trim($rowData[$attributeCode]));
                 }
             }
@@ -318,7 +320,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
                 $options = $this->_getAttributeOptions($attribute);
 
-                if (!in_array(strtolower(trim($rowData[$attributeCode])), $options, true)) {
+                /** @var AvS_FastSimpleImport_Helper_Data $helper */
+                $helper = Mage::helper('fastsimpleimport');
+                if (!in_array($helper->strtolower(trim($rowData[$attributeCode])), $options, true)) {
                     $this->_createAttributeOption($attribute, trim($rowData[$attributeCode]));
                 }
             }
@@ -346,7 +350,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
             $this->_attributeOptions[$attribute->getAttributeCode()] = array();
             foreach ($attributeOptions->getAllOptions(false) as $option) {
-                $label = strtolower($option['label']);
+                $label = Mage::helper('fastsimpleimport')->strtolower($option['label']);
                 $this->_attributeOptions[$attribute->getAttributeCode()][$option['value']] = $label;
             }
         }
