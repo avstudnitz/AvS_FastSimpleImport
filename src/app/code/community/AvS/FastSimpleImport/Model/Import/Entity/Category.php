@@ -300,7 +300,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         return $this->_categoriesWithRoots;
     }
 
-
     protected function _explodeEscaped($delimiter = '/', $string)
     {
         $exploded = explode($delimiter, $string);
@@ -1417,5 +1416,25 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             }
         }
         return $this;
+    }
+
+    /**
+     * New categories data.
+     *
+     * @return array
+     */
+    public function getNewCategory()
+    {
+        return $this->_newCategory;
+    }
+
+    /**
+     * Existing categories getter.
+     *
+     * @return array
+     */
+    public function getOldCategory()
+    {
+        return $this->getCategoriesWithRoots();
     }
 }
