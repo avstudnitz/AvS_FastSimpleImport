@@ -1679,7 +1679,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
         foreach ($mediaGalleryData as $productSku => $mediaGalleryRows) {
             $productId = $this->_newSku[$productSku]['entity_id'];
-            $insertedGalleryImgs = [];
+            $insertedGalleryImgs = array();
 
             if (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND != $this->getBehavior()) {
                 $this->_connection->delete(
@@ -1742,7 +1742,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         $registryVal = Mage::registry('fsi-media-store-id');
         if (!isset($registryVal[$storeCode])) {
             $allStores = Mage::app()->getStores(false, true);
-            $storeData = [];
+            $storeData = array();
             foreach ($allStores as $_storeCode => $_store) {
                 /** @var string $_storeCode */
                 /** @var Mage_Core_Model_Store $_store */
