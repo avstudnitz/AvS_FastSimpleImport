@@ -44,6 +44,11 @@ if (@class_exists('Enterprise_ImportExport_Model_Import_Entity_Product')) {
 class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImport_Model_Import_Entity_Product_Abstract
 {
     /**
+     * Col Category
+     */
+    const COL_CATEGORY_POSITION = 'category_position';
+
+    /**
      * Code of a primary attribute which identifies the entity group if import contains of multiple rows
      *
      * @var string
@@ -1125,9 +1130,18 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                 $categoryPath = empty($rowData[self::COL_CATEGORY]) ? '' : $rowData[self::COL_CATEGORY];
                 if (!empty($rowData[self::COL_ROOT_CATEGORY])) {
                     $categoryId = $this->_categoriesWithRoots[$rowData[self::COL_ROOT_CATEGORY]][$categoryPath];
-                    $categories[$rowSku][$categoryId] = true;
+                    if (!empty($rowData[self::COL_CATEGORY_POSITION])) {
+                        $categories[$rowSku][$categoryId] = $rowData[self::COL_CATEGORY_POSITION];
+                    } else {
+                        $categories[$rowSku][$categoryId] = true;
+                    }
                 } elseif (!empty($categoryPath)) {
-                    $categories[$rowSku][$this->_categories[$categoryPath]] = true;
+                    if (!empty($rowData[self::COL_CATEGORY_POSITION])) {
+                        $categories[$rowSku][$this->_categories[$categoryPath]] = $rowData[self::COL_CATEGORY_POSITION];
+                    } else {
+                        $categories[$rowSku][$this->_categories[$categoryPath]] = true;
+                    }
+
                 } elseif (array_key_exists(self::COL_CATEGORY, $rowData)) {
                     $categories[$rowSku] = array();
                 }
@@ -1241,6 +1255,43 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         return $this;
     }
 
+    /**
+     * Save product categories.
+     *
+     * @param array $categoriesData
+     * @return Mage_ImportExport_Model_Import_Entity_Product
+     */
+    protected function _saveProductCategories(array $categoriesData)
+    {
+        static $tableName = null;
+
+        if (!$tableName) {
+            $tableName = Mage::getModel('importexport/import_proxy_product_resource')->getProductCategoryTable();
+        }
+        if ($categoriesData) {
+            $categoriesIn = array();
+            $delProductId = array();
+
+            foreach ($categoriesData as $delSku => $categories) {
+                $productId      = $this->_newSku[$delSku]['entity_id'];
+                $delProductId[] = $productId;
+
+                foreach ($categories as $categoryId => $position) {
+                    $categoriesIn[] = array('product_id' => $productId, 'category_id' => $categoryId, 'position' => (int) $position);
+                }
+            }
+            if (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND != $this->getBehavior()) {
+                $this->_connection->delete(
+                    $tableName,
+                    $this->_connection->quoteInto('product_id IN (?)', $delProductId)
+                );
+            }
+            if ($categoriesIn) {
+                $this->_connection->insertOnDuplicate($tableName, $categoriesIn, array('position'));
+            }
+        }
+        return $this;
+    }
 
     /**
      * Stock item saving.
