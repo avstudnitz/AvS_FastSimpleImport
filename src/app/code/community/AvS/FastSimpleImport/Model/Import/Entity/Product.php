@@ -377,7 +377,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
         $attribute->save();
 
-        $this->_attributeOptions[$attribute->getAttributeCode()][] = $optionLabel;
+        $this->_attributeOptions[$attribute->getAttributeCode()][] = Mage::helper('fastsimpleimport')->strtolower($optionLabel);
         $this->_initTypeModels();
     }
 
