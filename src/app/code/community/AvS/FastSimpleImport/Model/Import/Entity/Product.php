@@ -1128,7 +1128,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                     $categories[$rowSku][$categoryId] = true;
                 } elseif (!empty($categoryPath)) {
                     $categories[$rowSku][$this->_categories[$categoryPath]] = true;
-                } elseif (array_key_exists(self::COL_CATEGORY, $rowData)) {
+                } elseif (array_key_exists(self::COL_CATEGORY, $rowData) && $rowScope == self::SCOPE_DEFAULT) {
                     $categories[$rowSku] = array();
                 }
 
