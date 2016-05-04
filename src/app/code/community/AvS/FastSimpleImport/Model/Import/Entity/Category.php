@@ -474,10 +474,32 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
         if (self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
             $rowData['name'] = $this->_getCategoryName($rowData);
-            if (! isset($rowData['position'])) $rowData['position'] = 10000; // diglin - prevent warning message
+            $rowData['position'] = $this->_getCategoryPosition($rowData);
         }
 
         return $rowData;
+    }
+
+    /**
+     * Populate position to prevent warning
+     * try to use existing value to prevent reordering during update
+     *
+     * @param $rowData
+     * @return int
+     */
+    protected function _getCategoryPosition($rowData)
+    {
+        if (isset($rowData['position'])) {
+            return $rowData['position'];
+        }
+
+        $position = 10000;
+        if (isset($rowData['_root']) && isset($rowData['_category'])
+            && isset($this->_categoriesWithRoots[$rowData['_root']][$rowData['_category']])
+        ) {
+            $position = $this->_categoriesWithRoots[$rowData['_root']][$rowData['_category']]['position'];
+        }
+        return $position;
     }
 
 
