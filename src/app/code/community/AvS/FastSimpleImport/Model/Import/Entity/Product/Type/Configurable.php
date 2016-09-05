@@ -281,4 +281,37 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
         }
         return $this;
     }
+
+    /**
+     * Array of SKU to array of super attribute values for all products.
+     *
+     * @return Mage_ImportExport_Model_Import_Entity_Product_Type_Configurable
+     */
+    protected function _loadSkuSuperAttributeValues()
+    {
+        if ($this->_superAttributes) {
+            $attrSetIdToName   = $this->_entityModel->getAttrSetIdToName();
+            $allowProductTypes = array();
+
+            foreach (Mage::getConfig()
+                         ->getNode('global/catalog/product/type/configurable/allow_product_types')->children() as $type) {
+                $allowProductTypes[] = $type->getName();
+            }
+            foreach (Mage::getResourceModel('catalog/product_collection')
+                         ->addFieldToFilter('type_id', $allowProductTypes)
+                         ->addAttributeToSelect(array_keys($this->_superAttributes)) as $product) {
+                $attrSetName = $attrSetIdToName[$product->getAttributeSetId()];
+
+                $data = array_intersect_key(
+                    $product->getData(),
+                    $this->_superAttributes
+                );
+                foreach ($data as $attrCode => $value) {
+                    $attrId = $this->_superAttributes[$attrCode]['id'];
+                    $this->_skuSuperAttributeValues[$attrSetName][$product->getId()][$attrId] = $value;
+                }
+            }
+        }
+        return $this;
+    }
 }
