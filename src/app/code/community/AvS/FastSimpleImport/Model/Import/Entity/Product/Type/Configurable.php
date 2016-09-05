@@ -297,19 +297,31 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
                          ->getNode('global/catalog/product/type/configurable/allow_product_types')->children() as $type) {
                 $allowProductTypes[] = $type->getName();
             }
-            foreach (Mage::getResourceModel('catalog/product_collection')
-                         ->addFieldToFilter('type_id', $allowProductTypes)
-                         ->addAttributeToSelect(array_keys($this->_superAttributes)) as $product) {
-                $attrSetName = $attrSetIdToName[$product->getAttributeSetId()];
 
-                $data = array_intersect_key(
-                    $product->getData(),
-                    $this->_superAttributes
-                );
-                foreach ($data as $attrCode => $value) {
-                    $attrId = $this->_superAttributes[$attrCode]['id'];
-                    $this->_skuSuperAttributeValues[$attrSetName][$product->getId()][$attrId] = $value;
+            $collection = Mage::getResourceModel('catalog/product_collection')
+                ->addFieldToFilter('type_id', $allowProductTypes)
+                ->addAttributeToSelect(array_keys($this->_superAttributes));
+
+            $collection->setPageSize(200);
+            $pages = $collection->getLastPageNumber();
+
+            for ($currentPage = 1; $currentPage <= $pages; $currentPage++) {
+
+                $collection->setCurPage($currentPage);
+
+                foreach ($collection as $product) {
+                    $attrSetName = $attrSetIdToName[$product->getAttributeSetId()];
+
+                    $data = array_intersect_key(
+                        $product->getData(),
+                        $this->_superAttributes
+                    );
+                    foreach ($data as $attrCode => $value) {
+                        $attrId = $this->_superAttributes[$attrCode]['id'];
+                        $this->_skuSuperAttributeValues[$attrSetName][$product->getId()][$attrId] = $value;
+                    }
                 }
+                $collection->clear();
             }
         }
         return $this;
