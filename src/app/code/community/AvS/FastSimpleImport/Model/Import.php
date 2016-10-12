@@ -27,6 +27,7 @@
  * @method AvS_FastSimpleImport_Model_Import setDisablePreprocessImageData(boolean $value)
  * @method AvS_FastSimpleImport_Model_Import setDisablePreprocessDownloadableLinksData(boolean $value)
  * @method boolean getDisablePreprocessImageData()
+ * @method boolean getDisablePreprocessDownloadableLinksData()
  * @method AvS_FastSimpleImport_Model_Import setUnsetEmptyFields(bool $value)
  * @method string getUnsetEmptyFields()
  * @method AvS_FastSimpleImport_Model_Import setSymbolEmptyFields(string $value)
@@ -159,6 +160,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setImageAttributes($this->getImageAttributes());
         $entityAdapter->setAllowRenameFiles($this->getAllowRenameFiles());
         $entityAdapter->setDisablePreprocessImageData($this->getDisablePreprocessImageData());
+	$entityAdapter->setDisablePreprocessDownloadableLinksData($this->getDisablePreprocessDownloadableLinksData());
         $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
         $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
         $entityAdapter->setSymbolIgnoreFields($this->getSymbolIgnoreFields());
