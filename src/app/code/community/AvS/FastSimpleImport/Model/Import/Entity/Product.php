@@ -966,7 +966,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             $attrId = $attribute->getId();
             $backModel = $attribute->getBackendModel();
             $attrTable = $attribute->getBackend()->getTable();
-            $storeIds = array(0);
+            $storeIds = array($rowStore);
 
             if (!is_null($attrValue)) {
                 if ('datetime' == $attribute->getBackendType() && strtotime($attrValue)) {
