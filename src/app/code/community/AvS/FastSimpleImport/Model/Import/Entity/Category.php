@@ -808,22 +808,22 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     protected function _getParentCategory($rowData)
     {
-        $categoryParts = $this->_explodeEscaped('/',$rowData[self::COL_CATEGORY]);
+        $categoryParts = $this->_explodeEscaped('/', $rowData[self::COL_CATEGORY]);
         array_pop($categoryParts);
-        $parent = $this->_implodeEscaped('/',$categoryParts);
+        $parent = $this->_implodeEscaped('/', $categoryParts);
 
-        if ($parent)
-        {
-            if (isset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$parent]))
-            {
+        if ($parent) {
+            if (isset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$parent])) {
                 return $this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$parent];
             } elseif (isset($this->_newCategory[$rowData[self::COL_ROOT]][$parent])) {
                 return $this->_newCategory[$rowData[self::COL_ROOT]][$parent];
             } else {
                 return false;
             }
-        } else {
+        } elseif (isset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]])) {
             return reset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]]);
+        } else {
+            return false;
         }
     }
 
@@ -905,9 +905,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             $root = $rowData[self::COL_ROOT];
             $category = $rowData[self::COL_CATEGORY];
 
+            //check if the root exists
+            if (! isset($this->_categoriesWithRoots[$root])) {
+                $this->addRowError(self::ERROR_INVALID_ROOT, $rowNum);
+                return false;
+            }
+
             //check if parent category exists
-            if ($this->_getParentCategory($rowData) === false)
-            {
+            if ($this->_getParentCategory($rowData) === false) {
 
                 $this->addRowError(self::ERROR_PARENT_NOT_FOUND, $rowNum);
                 return false;
@@ -926,14 +931,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                     $category = false;
                 }
             }
-
-            //check if the root exists
-            if (! isset($this->_categoriesWithRoots[$root]))
-            {
-                $this->addRowError(self::ERROR_INVALID_ROOT, $rowNum);
-                return false;
-            }
-
 
             // check simple attributes
             foreach ($this->_attributes as $attrCode => $attrParams) {
@@ -1308,14 +1305,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     protected function _initOnTabAttributes()
     {
         if (Mage::helper('core')->isModuleEnabled('OnTap_Merchandiser')) {
-            $this->_particularAttributes = array_merge($this->_particularAttributes, [
+            $this->_particularAttributes = array_merge($this->_particularAttributes, array( 
                 '_ontap_heroproducts',
                 '_ontap_attribute',
                 '_ontap_attribute_value',
                 '_ontap_attribute_logic',
                 '_ontap_ruled_only',
                 '_ontap_automatic_sort'
-            ]);
+            ));
         }
         return $this;
     }
@@ -1336,7 +1333,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
         $entityTable = Mage::getSingleton('core/resource')->getTableName('merchandiser_category_values');
         $categoryId = null;
-        $attributeIdsByCode = [];
+        $attributeIdsByCode = array();
 
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
             $onTapData = array();
@@ -1352,14 +1349,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                     $category = $this->getEntityByCategory($rowData[self::COL_ROOT], $rowData[self::COL_CATEGORY]);
                     $categoryId = (int) $category['entity_id'];
 
-                    $onTapData[$categoryId] = [
+                    $onTapData[$categoryId] = array(
                         'category_id' => $categoryId,
                         'heroproducts'     => '',
                         'attribute_codes'  => '',
                         'smart_attributes' => '',
                         'ruled_only'       => '',
                         'automatic_sort'   => ''
-                    ];
+                    );
                 }
 
                 //we have a non-SCOPE_DEFAULT row, we check if it has a stock_id, if not, skip it.
@@ -1373,21 +1370,21 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 }
 
                 //get the _ontab_* smart attribute values and map them to the new keys that are present in the database.
-                $smartAttributes = array_intersect_key($rowData, [
+                $smartAttributes = array_intersect_key($rowData, array(
                     '_ontap_attribute' => '',
                     '_ontap_attribute_value' => '',
                     '_ontap_attribute_logic' => '',
-                ]);
+                ));
 
                 //only add if we've found data
                 //todo check if we've got all values, there should be three, else it will throw an error here.
                 if ($smartAttributes) {
                     if (! isset($onTapData[$categoryId]['attribute_codes'])) {
-                        $onTapData[$categoryId]['attribute_codes'] = [];
-                        $onTapData[$categoryId]['smart_attributes'] = [];
+                        $onTapData[$categoryId]['attribute_codes'] = array();
+                        $onTapData[$categoryId]['smart_attributes'] = array();
                     }
 
-                    $smartAttributes = array_combine(['attribute', 'value', 'link'],  $smartAttributes);
+                    $smartAttributes = array_combine(array('attribute', 'value', 'link'),  $smartAttributes);
 
                     if (! isset($attributeIdsByCode[$smartAttributes['attribute']])) {
                         $attributeIdsByCode[$smartAttributes['attribute']] =
@@ -1406,7 +1403,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
                 if (isset($rowData['_ontap_heroproducts'])) {
                     if (! isset($onTapData[$categoryId]['heroproducts'])) {
-                        $onTapData[$categoryId]['heroproducts'] = [];
+                        $onTapData[$categoryId]['heroproducts'] = array();
                     }
                     $onTapData[$categoryId]['heroproducts'][] = $rowData['_ontap_heroproducts'];
                 }

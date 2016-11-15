@@ -7,7 +7,7 @@ Wrapper for Magento ImportExport functionality which imports data from arrays
 
 Facts
 -----
-- version: 0.6.4
+- version: 0.7.0
 - extension key: AvS_FastSimpleImport
 - extension on Magento Connect: n/a
 - Magento Connect 1.0 extension key: n/a
@@ -22,14 +22,14 @@ Description
 This module allows to import from arrays and thus using any import source, while the Magento module only imports from files. 
 ImportExport exists since Magento 1.5 CE / 1.10 EE, image import since 1.6 CE / 1.11 EE. Thus, this module needs at least 
 one of those versions.
-ImportExport has a special import format. See [specifications](http://www.integer-net.de/download/ImportExport_EN.pdf) about the expected format.
+ImportExport has a special import format. See [specifications](https://www.integer-net.com/importing-products-with-the-import-export-interface/) about the expected format.
 
 Main Features:
 
 - Fast Import using the built in Magento module ImportExport
 - Partial Indexing of only the imported products available
 - Unit tests for many test cases included
-- Importing of additional entities: Categories, Category-Product relations, attribute options (coming soon)
+- Importing of additional entities: Categories, Category-Product relations
 - Improved error messages stating which values are expected instead of a given value
 
 Please see our [**documentation**](http://avstudnitz.github.io/AvS_FastSimpleImport/) for a full list of features.
@@ -46,9 +46,10 @@ Compatibility
 Installation Instructions
 -------------------------
 1. Install the extension via GitHub, composer or a similar method.
-2. Clear the cache, logout from the admin panel and then login again.
-3. Read the [documentation](http://avstudnitz.github.io/AvS_FastSimpleImport/)
-4. Configure the extension under System -> Configuration -> Services -> FastSimpleImport.
+2. If you are using the Enterprise Edition then add ```<Enterprise_ImportExport/>``` to the ```<depends>``` node directly after ```<Mage_ImportExport/>```
+3. Clear the cache, logout from the admin panel and then login again.
+4. Read the [documentation](http://avstudnitz.github.io/AvS_FastSimpleImport/)
+5. Configure the extension at `System -> Configuration -> Services -> FastSimpleImport`.
 
 Uninstallation
 --------------
