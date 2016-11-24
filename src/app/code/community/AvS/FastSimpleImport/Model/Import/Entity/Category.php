@@ -94,6 +94,15 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         'available_sort_by'
     );
 
+    /**
+     * Attributes that 'use_config' is a valid option for.
+     *
+     * @var array
+     */
+    protected $_canUseConfigAttributes = array(
+        'default_sort_by',
+        'available_sort_by'
+    );
 
     /**
      * Validation failure message template definitions
@@ -920,7 +929,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             foreach ($this->_attributes as $attrCode => $attrParams) {
                 if (isset($rowData[$attrCode]) && strlen($rowData[$attrCode])) {
                     $this->isAttributeValid($attrCode, $attrParams, $rowData, $rowNum);
-                } elseif ($attrParams['is_required'] && !isset($this->_categoriesWithRoots[$root][$category])) {
+                } elseif ($attrParams['is_required'] &&
+                    !isset($this->_categoriesWithRoots[$root][$category]) &&
+                    !in_array($attrCode, $rowData['use_post_data_config'])
+                ) {
                     $this->addRowError(self::ERROR_VALUE_IS_REQUIRED, $rowNum, $attrCode);
                 }
             }
@@ -1197,6 +1209,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 }
             }
         }
+        $useConfig = array();
+        foreach ($this->_canUseConfigAttributes as $attrCode) {
+            if (array_key_exists($attrCode, $rowData) && 'use_config' == $rowData[$attrCode]) {
+                $rowData[$attrCode] = NULL;
+                $useConfig[]= $attrCode;
+            }
+        }
+        $rowData['use_post_data_config'] = $useConfig;
     }
 
     /**
