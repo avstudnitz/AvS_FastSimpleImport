@@ -172,7 +172,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
         }
         $this->_loadSkuSuperAttributeValues();
 
-//        Mage::log($this->_entityModel->getNextBunch(),null,'bunch.log');
         while ($bunch = $this->_entityModel->getNextBunch()) {
             $superAttributes = array(
                 'attributes' => array(),
@@ -251,7 +250,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
                     if (!isset($productSuperData['used_attributes'][$attrParams['id']][$optionId])) {
                         $productSuperData['used_attributes'][$attrParams['id']][$optionId] = false;
                     }
-                    
+
                     if (!empty($rowData['_super_attribute_price_corr'])) {
                         $rowScope = $this->_entityModel->getRowScope($rowData);
                         $rowStore = Mage_ImportExport_Model_Import_Entity_Product::SCOPE_STORE == $rowScope ? $this->_storeCodeToId[$rowData[Mage_ImportExport_Model_Import_Entity_Product::COL_STORE]] : 0;
@@ -267,8 +266,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
                 }
             }
 
-            Mage::log($superAttributes,null,'superAttrib.log');
-            // save last product super data
             $this->_processSuperData($productSuperData, $superAttributes);
 
             // remove old data if needed
