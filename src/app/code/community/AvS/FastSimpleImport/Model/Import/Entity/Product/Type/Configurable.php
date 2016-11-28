@@ -14,6 +14,26 @@
 class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
     extends Mage_ImportExport_Model_Import_Entity_Product_Type_Configurable
 {
+
+    /**
+     * All stores code-ID pairs.
+     *
+     * @var array
+     */
+    protected $_storeCodeToId = array();
+
+    /**
+     * Initialize stores hash.
+     *
+     * @return Mage_ImportExport_Model_Import_Entity_Product
+     */
+    protected function _initStores()
+    {
+        foreach (Mage::app()->getStores() as $store) {
+            $this->_storeCodeToId[$store->getCode()] = $store->getId();
+        }
+    }
+
     /**
      * Prepare attributes values for save: remove non-existent, remove empty values, remove static.
      *
@@ -134,6 +154,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
      */
     public function saveData()
     {
+        $this->_initStores();
         $connection      = $this->_entityModel->getConnection();
         $mainTable       = Mage::getSingleton('core/resource')->getTableName('catalog/product_super_attribute');
         $labelTable      = Mage::getSingleton('core/resource')->getTableName('catalog/product_super_attribute_label');
@@ -151,6 +172,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
         }
         $this->_loadSkuSuperAttributeValues();
 
+//        Mage::log($this->_entityModel->getNextBunch(),null,'bunch.log');
         while ($bunch = $this->_entityModel->getNextBunch()) {
             $superAttributes = array(
                 'attributes' => array(),
@@ -195,6 +217,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
                         $productSuperData['assoc_ids'][$oldSku[$rowData['_super_products_sku']]['entity_id']] = true;
                     }
                 }
+
                 if (empty($rowData['_super_attribute_code'])) {
                     continue;
                 }
@@ -228,17 +251,23 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
                     if (!isset($productSuperData['used_attributes'][$attrParams['id']][$optionId])) {
                         $productSuperData['used_attributes'][$attrParams['id']][$optionId] = false;
                     }
+                    
                     if (!empty($rowData['_super_attribute_price_corr'])) {
+                        $rowScope = $this->_entityModel->getRowScope($rowData);
+                        $rowStore = Mage_ImportExport_Model_Import_Entity_Product::SCOPE_STORE == $rowScope ? $this->_storeCodeToId[$rowData[Mage_ImportExport_Model_Import_Entity_Product::COL_STORE]] : 0;
+                        $rowWebsite = $rowStore > 0 ? Mage::getModel('core/store')->load($rowStore)->getWebsiteId() : 0;
                         $superAttributes['pricing'][] = array(
                             'product_super_attribute_id' => $productSuperAttrId,
                             'value_index'   => $optionId,
                             'is_percent'    => '%' == substr($rowData['_super_attribute_price_corr'], -1),
                             'pricing_value' => (float) rtrim($rowData['_super_attribute_price_corr'], '%'),
-                            'website_id'    => 0
+                            'website_id'    => $rowWebsite
                         );
                     }
                 }
             }
+
+            Mage::log($superAttributes,null,'superAttrib.log');
             // save last product super data
             $this->_processSuperData($productSuperData, $superAttributes);
 
