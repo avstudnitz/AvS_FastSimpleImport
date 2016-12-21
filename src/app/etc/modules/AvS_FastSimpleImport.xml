@@ -6,6 +6,7 @@
 			<codePool>community</codePool>
 			<depends>
 				<Mage_ImportExport/>
+				<Enterprise_ImportExport/>
 			</depends>
 		</AvS_FastSimpleImport>
 	</modules>
