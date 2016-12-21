@@ -192,6 +192,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     /** @var bool|string */
     protected $_symbolIgnoreFields = false;
 
+    /** @var bool */
+    protected $_allowRenameFiles = true;
+
     protected $_defaultAttributeSetId = 0;
 
     public function setIgnoreDuplicates($ignore)
@@ -215,6 +218,22 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         return $this;
     }
 
+
+    /**
+     * @param string $bValue
+     * @return $this
+     */
+    public function setAllowRenameFiles($bValue) {
+        $this->_allowRenameFiles = $bValue;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAllowRenameFiles() {
+        return $this->_allowRenameFiles;
+    }
 
     /**
      * @param string $value
@@ -670,6 +689,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             $this->_fileUploader->init();
             $this->_fileUploader->removeValidateCallback('catalog_product_image');
             $this->_fileUploader->setFilesDispersion(false);
+            $this->_fileUploader->setAllowRenameFiles($this->getAllowRenameFiles());
 
             $tmpDir     = Mage::getConfig()->getOptions()->getMediaDir() . '/import';
             $destDir    = Mage::getConfig()->getOptions()->getMediaDir() . '/catalog/category';

@@ -290,6 +290,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
         $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
         $entityAdapter->setSymbolIgnoreFields($this->getSymbolIgnoreFields());
+        $entityAdapter->setAllowRenameFiles($this->getAllowRenameFiles());
         $this->setEntityAdapter($entityAdapter);
         $validationResult = $this->validateSource($data);
         if ($this->getProcessedRowsCount() > 0) {
