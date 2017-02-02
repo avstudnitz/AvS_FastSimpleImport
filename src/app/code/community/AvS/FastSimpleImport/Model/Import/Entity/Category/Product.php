@@ -287,14 +287,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
             }
         }
 
-        if ($this->getBehavior() == Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE && count($categoryIds) > 0) {
-            $this->getConnection()->query(
-                $this->getConnection()->quoteInto(
-                    "DELETE FROM `{$this->_entityTable}` WHERE `category_id` IN (?)", $categoryIds
-                )
-            );
-        }
-
         if (count($skus) > 0) {
             /** @var Varien_Db_Statement_Pdo_Mysql $result */
             $result = $this->getConnection()->query(
@@ -305,6 +297,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category_Product extends Mage_Imp
             while ($row = $result->fetch()) {
                 $this->_skuEntityIds[$row['sku']] = (int)$row['entity_id'];
             }
+        }
+
+        if ($this->getBehavior() == Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE && count($this->_skuEntityIds) > 0) {
+            $this->getConnection()->query(
+                $this->getConnection()->quoteInto(
+                    "DELETE FROM `{$this->_entityTable}` WHERE `product_id` IN (?)", array_values($this->_skuEntityIds)
+                )
+            );
         }
     }
 
