@@ -14,6 +14,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      * Size of bunch - part of entities to save in one step.
      */
     const BUNCH_SIZE = 20;
+    protected $_useConfigAttributes = array('available_sort_by', 'default_sort_by', 'filter_price_range');
 
     /**
      * Data row scopes.
@@ -832,6 +833,21 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             return $rowData['name'];
         $categoryParts = $this->_explodeEscaped('/',$rowData[self::COL_CATEGORY]);
         return end($categoryParts);
+    }
+
+    protected function isAttributeUsingConfig($attrCode, $rowData)
+    {
+        if (!in_array($attrCode, $this->_useConfigAttributes)) {
+            return false;
+        }
+
+        $key = 'use_config_' . $attrCode;
+
+        if (!empty($rowData[$key])) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
