@@ -109,6 +109,27 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         'country_of_manufacture'
     );
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        //Fix for issue #50
+        Mage::getSingleton('catalog/product')->getResource()->unsetAttributes();
+
+        $this->setBehavior(Mage::getStoreConfig('fastsimpleimport/general/import_behavior'));
+        $this->setErrorLimit(intval(Mage::getStoreConfig('fastsimpleimport/general/error_limit')));
+        $this->setIgnoreDuplicates(Mage::getStoreConfigFlag('fastsimpleimport/general/ignore_duplicates'));
+        $this->setDropdownAttributes(array_filter(explode(',', Mage::getStoreConfig('fastsimpleimport/product/select_attributes'))));
+        $this->setMultiselectAttributes(array_filter(explode(',', Mage::getStoreConfig('fastsimpleimport/product/multiselect_attributes'))));
+        $this->setAllowRenameFiles(Mage::getStoreConfigFlag('fastsimpleimport/product/allow_rename_files'));
+        $this->setImageAttributes(array_filter(explode(',', Mage::getStoreConfig('fastsimpleimport/product/additional_image_attributes'))));
+        $this->setDisablePreprocessImageData(Mage::getStoreConfigFlag('fastsimpleimport/product/disable_preprocess_images'));
+        $this->setUnsetEmptyFields(Mage::getStoreConfigFlag('fastsimpleimport/general/clear_field_on_empty_string'));
+        $this->setSymbolEmptyFields(Mage::getStoreConfig('fastsimpleimport/general/symbol_for_clear_field'));
+        $this->setSymbolIgnoreFields(Mage::getStoreConfig('fastsimpleimport/general/symbol_for_ignore_field'));
+    }
+
+
     public function setIgnoreDuplicates($ignore)
     {
 	$this->_ignoreDuplicates = (boolean) $ignore;
@@ -254,7 +275,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             }
         }
 
-        return parent::validateData();
+        $this->setIsDryrun(true);
+        $result = parent::validateData();
+        $this->setIsDryrun(false);
+        return $result;
     }
 
     /**
