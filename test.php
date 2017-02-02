@@ -13,65 +13,43 @@ Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
 
 ini_set('display_errors', 1);
 ini_set('max_execution_time', 600);
+$data = array(
+    array(
+        'email' => 'customer@company.com',
+        '_website' => 'base',
+        '_store' => 'default', // The storeviews code
+        'group_id' => 1,
+        'firstname' => 'John',
+        'lastname' => 'Doe',
+        '_address_firstname' => 'John',
+        '_address_lastname' => 'Doe',
+        '_address_street' => 'Main Street 1',
+        '_address_postcode' => '12345',
+        '_address_city' => 'Springfield',
+        '_address_country_id' => 'US',
+        '_address_telephone' => '+1 2345 6789',
+        '_address_default_billing_' => 1,
+        '_address_default_shipping_' => 0,
+    ),
+    array(
+        'email' => null,
+        '_website' => null,
+        '_address_firstname' => 'John',
+        '_address_lastname' => 'Doe',
+        '_address_street' => 'Countryside 99',
+        '_address_postcode' => '98765',
+        '_address_city' => 'Cape Cod',
+        '_address_country_id' => 'US',
+        '_address_telephone' => '+1 9876 54321',
+        '_address_default_billing_' => 0,
+        '_address_default_shipping_' => 1,
+    ),
+);
 
-/*
-// Delete Products
-$data = array();
-for ($i = 1; $i <= 10; $i++) {
-
-    $data[] = array(
-        'sku' => $i,
-    );
-}
-
-$time = microtime(true);
-Mage::getModel('fastsimpleimport/import')
-    ->setPartialIndexing(true)
-    ->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_DELETE)
-    ->processProductImport($data);
-echo 'Elapsed time: ' . round(microtime(true) - $time, 2) . 's' . "\n";
-*/
-
-// Create/Update products
-$data = array();
-for ($i = 1; $i <= 10; $i++) {
-
-    $randomString = getUniqueCode(20);
-    $data[] = array(
-        'sku' => $i,
-        '_type' => 'simple',
-        '_attribute_set' => 'Default',
-        '_product_websites' => 'base',
-        '_category' => array(1, 3),
-        'name' => $randomString,
-        'price' => 0.99,
-        'special_price' => 0.90,
-        'cost' => 0.50,
-        'description' => 'Default',
-        'short_description' => 'Default',
-        'meta_title' => 'Default',
-        'meta_description' => 'Default',
-        'meta_keyword' => 'Default',
-        'weight' => 11,
-        'status' => 1,
-        'visibility' => 4,
-        'tax_class_id' => 2,
-        'qty' => 0,
-        'is_in_stock' => 0,
-        'enable_googlecheckout' => '1',
-        'gift_message_available' => '0',
-        'url_key' => strtolower($randomString),
-    );
-}
-
-$time = microtime(true);
-
+/** @var $import AvS_FastSimpleImport_Model_Import */
+$import = Mage::getModel('fastsimpleimport/import');
 try {
-    /** @var $import AvS_FastSimpleImport_Model_Import */
-    $import = Mage::getModel('fastsimpleimport/import');
-    $import->processProductImport($data);
+    $import->processCustomerImport($data);
 } catch (Exception $e) {
     print_r($import->getErrorMessages());
 }
-
-echo 'Elapsed time: ' . round(microtime(true) - $time, 2) . 's' . "\n";

@@ -611,9 +611,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                         $storeIds  = array(0);
 
                         if ('select' == $attrParams['type']) {
-                            if (isset($attrParams['options'][strtolower($attrValue)]))
+                            if (isset($attrParams['options'][Mage::helper('fastsimpleimport')->strtolower($attrValue)]))
                             {
-                                $attrValue = $attrParams['options'][strtolower($attrValue)];
+                                $attrValue = $attrParams['options'][Mage::helper('fastsimpleimport')->strtolower($attrValue)];
                             }
                         } elseif ('datetime' == $attribute->getBackendType() && strtotime($attrValue)) {
                             $attrValue = gmstrftime($strftimeFormat, strtotime($attrValue));
@@ -994,7 +994,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 break;
             case 'select':
             case 'multiselect':
-                $valid = isset($attrParams['options'][strtolower($rowData[$attrCode])]);
+                $valid = isset($attrParams['options'][Mage::helper('fastsimpleimport')->strtolower($rowData[$attrCode])]);
                 $message = 'Possible options are: ' . implode(', ', array_keys($attrParams['options'])) . '. Your input: ' . $rowData[$attrCode];
                 break;
             case 'int':

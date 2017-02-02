@@ -254,7 +254,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
                 if (isset($rowData[$attrCode]) && strlen($rowData[$attrCode])) {
                     $resultAttrs[$attrCode] =
                         ('select' == $attrParams['type'] || 'multiselect' == $attrParams['type'])
-                            ? $attrParams['options'][strtolower($rowData[$attrCode])]
+                            ? $attrParams['options'][Mage::helper('fastsimpleimport')->strtolower($rowData[$attrCode])]
                             : $rowData[$attrCode];
                 } elseif (array_key_exists($attrCode, $rowData)) {
                     $resultAttrs[$attrCode] = $rowData[$attrCode];
