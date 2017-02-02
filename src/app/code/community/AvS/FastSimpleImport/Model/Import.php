@@ -122,21 +122,31 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
                         
                     case AvS_FastSimpleImport_Model_System_Config_Source_Product_IndexingMode::INDEXING_MODE_ASYNC:
 
-                        $this->importSource();
+                        try {
+                            $this->importSource();
 
-                        // disable AsyncIndex for the time of creating new index events in order to avoid locked table
-                        $autoIndexOriginalConfigValue = Mage::getStoreConfigFlag('system/asyncindex/auto_index');
-                        if ($autoIndexOriginalConfigValue) {
-                            Mage::getResourceModel('core/setup', 'core_setup')->setConfigData('system/asyncindex/auto_index', 0);
-                            Mage::app()->getCacheInstance()->cleanType('config');
-                        }
+                            // disable AsyncIndex for the time of creating new index events in order to avoid locked table
+                            $autoIndexOriginalConfigValue = Mage::getStoreConfigFlag('system/asyncindex/auto_index');
+                            if ($autoIndexOriginalConfigValue) {
+                                Mage::getResourceModel('core/setup', 'core_setup')->setConfigData('system/asyncindex/auto_index', 0);
+                                Mage::app()->getCacheInstance()->cleanType('config');
+                            }
 
-                        $this->_createIndexEvents();
+                            $this->_createIndexEvents();
 
-                        // re-enable AsyncIndex
-                        if ($autoIndexOriginalConfigValue) {
-                            Mage::getResourceModel('core/setup', 'core_setup')->setConfigData('system/asyncindex/auto_index', 1);
-                            Mage::app()->getCacheInstance()->cleanType('config');
+                            // re-enable AsyncIndex
+                            if ($autoIndexOriginalConfigValue) {
+                                Mage::getResourceModel('core/setup', 'core_setup')->setConfigData('system/asyncindex/auto_index', 1);
+                                Mage::app()->getCacheInstance()->cleanType('config');
+                            }
+                        } catch (Exception $e) {
+                            Mage::logException($e);
+                            // re-enable AsyncIndex
+                            $autoIndexOriginalConfigValue = Mage::getStoreConfigFlag('system/asyncindex/auto_index');
+                            if ($autoIndexOriginalConfigValue) {
+                                Mage::getResourceModel('core/setup', 'core_setup')->setConfigData('system/asyncindex/auto_index', 1);
+                                Mage::app()->getCacheInstance()->cleanType('config');
+                            }
                         }
                         break;
                     
