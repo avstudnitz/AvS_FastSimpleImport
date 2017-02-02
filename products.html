@@ -263,7 +263,19 @@ try {
 } catch (Exception $e) {
     print_r($import->getErrorMessages());
 }</pre>
-</div> 
+</div>
+
+<h3>Download external Images</h3>
+You can now define the target filename of downloaded images, they can differ from the source url. Example:
+
+```
+'_media_image' => 'http://upload.wikimedia.org/wikipedia/meta/6/6d/Wikipedia_wordmark_1x.png',
+'_media_target_filename' => 'wikipedia.jpg',
+'image' => 'wikipedia.jpg',
+'small_image' => 'wikipedia.jpg',
+'thumbnail' => 'wikipedia.jpg',
+```
+
         
 <h3>Notes</h3>
 <ul>
