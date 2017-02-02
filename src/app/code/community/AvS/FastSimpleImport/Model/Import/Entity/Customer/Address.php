@@ -63,7 +63,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer_Address
                 foreach ($this->_attributes as $attrAlias => $attrParams) {
                     if (isset($rowData[$attrAlias]) && strlen($rowData[$attrAlias])) {
                         if ('select' == $attrParams['type']) {
-                            $value = $attrParams['options'][strtolower($rowData[$attrAlias])];
+                            $value = $attrParams['options'][Mage::helper('fastsimpleimport')->strtolower($rowData[$attrAlias])];
                         } elseif ('datetime' == $attrParams['type']) {
                             $value = gmstrftime($strftimeFormat, strtotime($rowData[$attrAlias]));
                         } else {
@@ -105,8 +105,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer_Address
                 }
                 // let's try to find region ID
                 if (!empty($rowData[$regionColName])) {
-                    $countryNormalized = strtolower($rowData[$countryColName]);
-                    $regionNormalized  = strtolower($rowData[$regionColName]);
+                    $countryNormalized = Mage::helper('fastsimpleimport')->strtolower($rowData[$countryColName]);
+                    $regionNormalized  = Mage::helper('fastsimpleimport')->strtolower($rowData[$regionColName]);
 
                     if (isset($this->_countryRegions[$countryNormalized][$regionNormalized])) {
                         $regionId = $this->_countryRegions[$countryNormalized][$regionNormalized];

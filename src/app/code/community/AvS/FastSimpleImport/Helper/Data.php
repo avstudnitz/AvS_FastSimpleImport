@@ -16,7 +16,7 @@ class AvS_FastSimpleImport_Helper_Data extends Mage_Core_Helper_Abstract
      * Returns str with all alphabetic characters converted to lowercase.
      * Uses the multibyte function variants if available.
      *
-     * @param $str the string being lowercased
+     * @param string $str the string being lowercased
      *
      * @return string str with all alphabetic characters converted to lowercase
      */
