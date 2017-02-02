@@ -38,6 +38,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
         '_bundle_option_type',
         '_bundle_option_title',
         '_bundle_option_store',
+        '_bundle_option_store_title',
         '_bundle_product_sku',
         '_bundle_product_position',
         '_bundle_product_is_default',
@@ -105,7 +106,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
         while ($bunch = $this->_entityModel->getNextBunch()) {
             $bundleOptions    = array();
             $bundleSelections = array();
-
+            $bundleTitles     = array();
             foreach ($bunch as $rowNum => $rowData) {
                 if (!$this->_entityModel->isRowAllowedToImport($rowData, $rowNum)) {
                     continue;
@@ -126,6 +127,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
 
                 if (empty($rowData['_bundle_option_title'])) {
                     continue;
+                } else {
+                    $bundleTitles[$rowData['_bundle_option_title']][Mage_Catalog_Model_Abstract::DEFAULT_STORE_ID] = $rowData['_bundle_option_title'];
+                }
+                if (!empty($rowData['_bundle_option_store']) && !empty($rowData['_bundle_option_store_title'])) {
+                    $optionStore = $rowData['_bundle_option_store'];
+                    $storeId = Mage::app()->getStore($optionStore)->getId();
+                    $bundleTitles[$rowData['_bundle_option_title']][$storeId] = $rowData['_bundle_option_store_title'];
                 }
                 if (isset($rowData['_bundle_option_type']) && !empty($rowData['_bundle_option_type'])) {
                     if (!in_array($rowData['_bundle_option_type'], $this->_bundleOptionTypes)) {
@@ -191,23 +199,26 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
                  * Insert option titles.
                  */
                 $optionId = $connection->lastInsertId();
+                $titleOptionId = $optionId;
                 $optionValues = array();
                 foreach ($bundleOptions as $productId => $options) {
                     foreach ($options as $title => $option) {
-                        $optionValues[] = array(
-                            'option_id' => $optionId++,
-                            'store_id'  => '0',
-                            'title'     => $title
-                        );
+                        $titles = $bundleTitles[$title];
+                        foreach ($titles as $storeId => $storeTitle) {
+                            $optionValues[] = array(
+                                'option_id' => $titleOptionId,
+                                'store_id'  => $storeId,
+                                'title'     => $storeTitle
+                            );
+                        }
+                        $titleOptionId++;
                     }
                 }
                 $connection->insertOnDuplicate($optionValueTable, $optionValues);
-                $optionId -= count($optionData);
-
                 if (count($bundleSelections)) {
                     $optionSelections = array();
                     $productRelations = array();
-
+                    $selectionOptionId = $optionId;
                     foreach ($bundleSelections as $productId => $selections) {
                         foreach ($selections as $title => $selection) {
                             foreach ($selection as &$sel) {
@@ -215,9 +226,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
                                     'parent_id' => $sel['parent_product_id'],
                                     'child_id'  => $sel['product_id']
                                 );
-                                $sel['option_id'] = $optionId;
+                                $sel['option_id'] = $selectionOptionId;
                             }
-                            $optionId++;
+                            $selectionOptionId++;
                             $optionSelections = array_merge($optionSelections, $selection);
                         }
                     }
@@ -348,10 +359,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
         $oldSkus = $this->_entityModel->getOldSku();
         return !isset($oldSkus[$sku]);
     }
-    
+
     /**
      * check if Mage_Bundle module is enabled
-     * 
+     *
      * @return boolean
      */
     public function isSuitable()
