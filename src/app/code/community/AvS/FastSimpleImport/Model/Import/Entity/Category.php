@@ -474,6 +474,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
         if (self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
             $rowData['name'] = $this->_getCategoryName($rowData);
+            if (! isset($rowData['url_key'])) $rowData['url_key'] = $rowData['name'];
             if (! isset($rowData['position'])) $rowData['position'] = 10000; // diglin - prevent warning message
         }
 
