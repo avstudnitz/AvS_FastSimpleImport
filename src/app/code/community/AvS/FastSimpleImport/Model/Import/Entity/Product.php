@@ -198,7 +198,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
      * @param string $value
      * @return $this
      */
-    public function setSymbolIgnoreFields($value) 
+    public function setSymbolIgnoreFields($value)
     {
         $this->_symbolIgnoreFields = $value;
         return $this;
@@ -497,7 +497,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                 throw new Exception('Got 404 while fetching image from url ' . $url);
             }
         } catch (Exception $e) {
-            Mage::throwException('Download of file ' . $url . ' failed: ' . $e->getMessage());
+            Mage::logException($e);
         }
     }
 
