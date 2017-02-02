@@ -60,34 +60,31 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
         parent::_initAttributes();
 
         /*
-         * Price type and Sku type does not live in an attribute set, so it is not picked up
+         * Price type does not live in an attribute set, so it is not picked up
          * by abstract _initAttributes method. We add it here manually.
          */
-
-        $typeAttributes = array('price_type', 'sku_type');
+        $attribute = Mage::getResourceModel('catalog/eav_attribute')->load('price_type', 'attribute_code');
         foreach ($this->_attributes as $attrSetName => $attributes) {
-            foreach ($typeAttributes as $attributeCode) {
-                $attribute = Mage::getResourceModel('catalog/eav_attribute')->load($attributeCode, 'attribute_code');
-                $this->_addAttributeParams(
-                    $attrSetName,
-                    array(
-                        'id' => $attribute->getId(),
-                        'code' => $attribute->getAttributeCode(),
-                        'for_configurable' => $attribute->getIsConfigurable(),
-                        'is_global' => $attribute->getIsGlobal(),
-                        'is_required' => $attribute->getIsRequired(),
-                        'is_unique' => $attribute->getIsUnique(),
-                        'frontend_label' => $attribute->getFrontendLabel(),
-                        'is_static' => $attribute->isStatic(),
-                        'apply_to' => $attribute->getApplyTo(),
-                        'type' => Mage_ImportExport_Model_Import::getAttributeType($attribute),
-                        'default_value' => strlen($attribute->getDefaultValue()) ? $attribute->getDefaultValue() : null,
-                        'options' => $this->_entityModel->getAttributeOptions($attribute, $this->_indexValueAttributes)
-                    )
-                );
-            }
-
+            $this->_addAttributeParams(
+                $attrSetName,
+                array(
+                    'id'               => $attribute->getId(),
+                    'code'             => $attribute->getAttributeCode(),
+                    'for_configurable' => $attribute->getIsConfigurable(),
+                    'is_global'        => $attribute->getIsGlobal(),
+                    'is_required'      => $attribute->getIsRequired(),
+                    'is_unique'        => $attribute->getIsUnique(),
+                    'frontend_label'   => $attribute->getFrontendLabel(),
+                    'is_static'        => $attribute->isStatic(),
+                    'apply_to'         => $attribute->getApplyTo(),
+                    'type'             => Mage_ImportExport_Model_Import::getAttributeType($attribute),
+                    'default_value'    => strlen($attribute->getDefaultValue()) ? $attribute->getDefaultValue() : null,
+                    'options'          => $this->_entityModel->getAttributeOptions($attribute, $this->_indexValueAttributes)
+                )
+            );
         }
+
+        return $this;
     }
 
     public function saveData()
