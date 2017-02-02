@@ -683,4 +683,24 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
         }
         return false;
     }
+
+    /**
+     * New customers data.
+     *
+     * @return array
+     */
+    public function getNewCustomers()
+    {
+        return $this->_newCustomers;
+    }
+
+    /**
+     * Existing customers getter.
+     *
+     * @return array
+     */
+    public function getOldCustomers()
+    {
+        return $this->_oldCustomers;
+    }
 }
