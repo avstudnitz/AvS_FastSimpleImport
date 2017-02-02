@@ -1163,11 +1163,12 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     protected function _getProcessedCategoryIds()
     {
         $categoryIds = array();
-        $source = $this->getSource();
+        $coreHelper = Mage::helper("core");
+        $source = $this->_getSource();
 
         $source->rewind();
         while ($source->valid()) {
-            $current = $source->current();
+            $current = $coreHelper->unEscapeCSVData($source->current());
             if (isset($this->_newCategory[$current[self::COL_ROOT]][$current[self::COL_CATEGORY]])) {
                 $categoryIds[] = $this->_newCategory[$current[self::COL_ROOT]][$current[self::COL_CATEGORY]];
             } elseif (isset($this->_categoriesWithRoots[$current[self::COL_ROOT]][$current[self::COL_CATEGORY]])) {
@@ -1210,6 +1211,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     protected function _saveValidatedBunches()
     {
+        $coreHelper = Mage::helper("core");
         $source = $this->_getSource();
         $bunchRows = array();
         $startNewBunch = false;
@@ -1234,7 +1236,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 if ($this->_errorsCount >= $this->_errorsLimit) { // errors limit check
                     return $this;
                 }
-                $rowData = $source->current();
+                $rowData = $coreHelper->unEscapeCSVData($source->current());
 
                 $this->_processedRowsCount++;
 
@@ -1291,7 +1293,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     protected function _initOnTabAttributes()
     {
         if (Mage::helper('core')->isModuleEnabled('OnTap_Merchandiser')) {
-            $this->_particularAttributes = array_merge($this->_particularAttributes, array( 
+            $this->_particularAttributes = array_merge($this->_particularAttributes, array(
                 '_ontap_heroproducts',
                 '_ontap_attribute',
                 '_ontap_attribute_value',
