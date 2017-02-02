@@ -285,7 +285,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
                 $options = $this->_getAttributeOptions($attribute);
 
-                if (!in_array(trim($rowData[$attributeCode]), $options, true)) {
+                /** @var AvS_FastSimpleImport_Helper_Data $helper */
+                $helper = Mage::helper('fastsimpleimport');
+                if (!in_array($helper->strtolower(trim($rowData[$attributeCode])), $options, true)) {
                     $this->_createAttributeOption($attribute, trim($rowData[$attributeCode]));
                 }
             }
@@ -318,7 +320,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
                 $options = $this->_getAttributeOptions($attribute);
 
-                if (!in_array(trim($rowData[$attributeCode]), $options, true)) {
+                /** @var AvS_FastSimpleImport_Helper_Data $helper */
+                $helper = Mage::helper('fastsimpleimport');
+                if (!in_array($helper->strtolower(trim($rowData[$attributeCode])), $options, true)) {
                     $this->_createAttributeOption($attribute, trim($rowData[$attributeCode]));
                 }
             }
@@ -346,7 +350,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
             $this->_attributeOptions[$attribute->getAttributeCode()] = array();
             foreach ($attributeOptions->getAllOptions(false) as $option) {
-                $this->_attributeOptions[$attribute->getAttributeCode()][$option['value']] = $option['label'];
+                $label = Mage::helper('fastsimpleimport')->strtolower($option['label']);
+                $this->_attributeOptions[$attribute->getAttributeCode()][$option['value']] = $label;
             }
         }
 
@@ -372,7 +377,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
         $attribute->save();
 
-        $this->_attributeOptions[$attribute->getAttributeCode()][] = $optionLabel;
+        $this->_attributeOptions[$attribute->getAttributeCode()][] = Mage::helper('fastsimpleimport')->strtolower($optionLabel);
         $this->_initTypeModels();
     }
 
@@ -961,7 +966,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             $attrId = $attribute->getId();
             $backModel = $attribute->getBackendModel();
             $attrTable = $attribute->getBackend()->getTable();
-            $storeIds = array(0);
+            $storeIds = array($rowStore);
 
             if (!is_null($attrValue)) {
                 if ('datetime' == $attribute->getBackendType() && strtotime($attrValue)) {
@@ -1056,6 +1061,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         $productLimit   = null;
         $productsQty    = null;
         $rowSku         = null;
+        $rowNum 	= -1;
 
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
             $entityRowsIn = array();
@@ -1071,7 +1077,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             $previousAttributeSet = null;
             $currentStoreId = Mage_Catalog_Model_Product::DEFAULT_STORE_ID;
 
-            foreach ($bunch as $rowNum => $rowData) {
+            foreach ($bunch as $rowData) {
+		$rowNum++;
                 $this->_filterRowData($rowData);
                 if (!$this->validateRow($rowData, $rowNum)) {
                     continue;
@@ -1123,7 +1130,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                     $categories[$rowSku][$categoryId] = true;
                 } elseif (!empty($categoryPath)) {
                     $categories[$rowSku][$this->_categories[$categoryPath]] = true;
-                } elseif (array_key_exists(self::COL_CATEGORY, $rowData)) {
+                } elseif (array_key_exists(self::COL_CATEGORY, $rowData) && $rowScope == self::SCOPE_DEFAULT) {
                     $categories[$rowSku] = array();
                 }
 
@@ -1679,7 +1686,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
         foreach ($mediaGalleryData as $productSku => $mediaGalleryRows) {
             $productId = $this->_newSku[$productSku]['entity_id'];
-            $insertedGalleryImgs = [];
+            $insertedGalleryImgs = array();
 
             if (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND != $this->getBehavior()) {
                 $this->_connection->delete(
@@ -1742,7 +1749,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         $registryVal = Mage::registry('fsi-media-store-id');
         if (!isset($registryVal[$storeCode])) {
             $allStores = Mage::app()->getStores(false, true);
-            $storeData = [];
+            $storeData = array();
             foreach ($allStores as $_storeCode => $_store) {
                 /** @var string $_storeCode */
                 /** @var Mage_Core_Model_Store $_store */
