@@ -1055,6 +1055,22 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                             ));
                         }
                     }
+
+                    if (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND != $this->getBehavior()) {
+                        /**
+                         * If the store based values are not provided for a particular store,
+                         * we default to the default scope values.
+                         * In this case, remove all the existing store based values stored in the table.
+                         **/
+                        $where = $this->_connection->quoteInto('store_id NOT IN (?)', array_keys($storeValues)) .
+                            $this->_connection->quoteInto(' AND attribute_id = ?', $attributeId) .
+                            $this->_connection->quoteInto(' AND entity_id = ?', $productId) .
+                            $this->_connection->quoteInto(' AND entity_type_id = ?', $this->_entityTypeId);
+
+                        $this->_connection->delete(
+                            $tableName, $where
+                        );
+                    }
                 }
             }
 
