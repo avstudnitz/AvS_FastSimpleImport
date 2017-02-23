@@ -1333,9 +1333,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                 }
             }
             if (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND != $this->getBehavior() && sizeof($delProductId)) {
-                print_r($categoriesData);
-                print_r($delProductId);
-                die();
                 $this->_connection->delete(
                     $tableName,
                     $this->_connection->quoteInto('product_id IN (?)', $delProductId)
