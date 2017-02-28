@@ -939,7 +939,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                     $valid = true; // Force validation in case of dry run with options of dropdown or multiselect which doesn't yet exist
                     break;
                 }
-                $valid = isset($attrParams['options'][strtolower($rowData[$attrCode])]);
+                $valid = isset($attrParams['options'][Mage::helper('fastsimpleimport')->strtolower($rowData[$attrCode])]);
                 $message = 'Possible options are: ' . implode(', ', array_keys($attrParams['options'])) . '. Your input: ' . $rowData[$attrCode];
                 break;
             case 'int':
@@ -1913,4 +1913,42 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         }
         return false;
     }
+
+    /**
+     * Returns attributes all values in label-value or value-value pairs form. Labels are lower-cased.
+     *
+     * @param Mage_Eav_Model_Entity_Attribute_Abstract $attribute
+     * @param array $indexValAttrs OPTIONAL Additional attributes' codes with index values.
+     * @return array
+     */
+    public function getAttributeOptions(Mage_Eav_Model_Entity_Attribute_Abstract $attribute, $indexValAttrs = array())
+    {
+        $options = array();
+
+        if ($attribute->usesSource()) {
+            // merge global entity index value attributes
+            $indexValAttrs = array_merge($indexValAttrs, $this->_indexValueAttributes);
+
+            // should attribute has index (option value) instead of a label?
+            $index = in_array($attribute->getAttributeCode(), $indexValAttrs) ? 'value' : 'label';
+
+            // only default (admin) store values used
+            $attribute->setStoreId(Mage_Catalog_Model_Abstract::DEFAULT_STORE_ID);
+
+            try {
+                foreach ($attribute->getSource()->getAllOptions(false) as $option) {
+                    $value = is_array($option['value']) ? $option['value'] : array($option);
+                    foreach ($value as $innerOption) {
+                        if (strlen($innerOption['value'])) { // skip ' -- Please Select -- ' option
+                            $options[Mage::helper('fastsimpleimport')->strtolower($innerOption[$index])] = $innerOption['value'];
+                        }
+                    }
+                }
+            } catch (Exception $e) {
+                // ignore exceptions connected with source models
+            }
+        }
+        return $options;
+    }
+
 }
