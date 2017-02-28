@@ -1200,12 +1200,12 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     protected function _getProcessedCategoryIds()
     {
         $categoryIds = array();
-        $coreHelper = Mage::helper("core");
+        $escapeHelper = Mage::helper("fastsimpleimport/escapeCsv");
         $source = $this->_getSource();
 
         $source->rewind();
         while ($source->valid()) {
-            $current = $coreHelper->unEscapeCSVData($source->current());
+            $current = $escapeHelper->unEscapeCSVData($source->current());
             if (isset($this->_newCategory[$current[self::COL_ROOT]][$current[self::COL_CATEGORY]])) {
                 $categoryIds[] = $this->_newCategory[$current[self::COL_ROOT]][$current[self::COL_CATEGORY]];
             } elseif (isset($this->_categoriesWithRoots[$current[self::COL_ROOT]][$current[self::COL_CATEGORY]])) {
@@ -1248,7 +1248,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     protected function _saveValidatedBunches()
     {
-        $coreHelper = Mage::helper("core");
+        $escapeHelper = Mage::helper("fastsimpleimport/escapeCsv");
         $source = $this->_getSource();
         $bunchRows = array();
         $startNewBunch = false;
@@ -1273,7 +1273,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 if ($this->_errorsCount >= $this->_errorsLimit) { // errors limit check
                     return $this;
                 }
-                $rowData = $coreHelper->unEscapeCSVData($source->current());
+                $rowData = $escapeHelper->unEscapeCSVData($source->current());
 
                 $this->_processedRowsCount++;
 
