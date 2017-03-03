@@ -106,7 +106,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         'enable_googlecheckout',
         'gift_message_available',
         'custom_design',
-        'country_of_manufacture'
+        'country_of_manufacture',
+        'base_price_unit',
+        'base_price_base_unit',
     );
 
     public function __construct()
