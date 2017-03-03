@@ -313,10 +313,12 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
 
                     $emailToLower = Mage::helper('fastsimpleimport')->strtolower($rowData[self::COL_EMAIL]);
                     if (isset($oldCustomersToLower[$emailToLower][$rowData[self::COL_WEBSITE]])) { // edit
+                        $insert = false;
                         $entityId = $oldCustomersToLower[$emailToLower][$rowData[self::COL_WEBSITE]];
                         $entityRow['entity_id'] = $entityId;
-                        $entityRowsUp[] = $entityRow;
+
                     } else { // create
+                        $insert = true;
                         $entityId                      = $nextEntityId++;
                         $entityRow['entity_id']        = $entityId;
                         $entityRow['entity_type_id']   = $this->_entityTypeId;
@@ -324,10 +326,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                         $entityRow['website_id']       = $this->_websiteCodeToId[$rowData[self::COL_WEBSITE]];
                         $entityRow['email']            = $rowData[self::COL_EMAIL];
                         $entityRow['is_active']        = 1;
-                        $entityRowsIn[]                = $entityRow;
 
                         $this->_newCustomers[$rowData[self::COL_EMAIL]][$rowData[self::COL_WEBSITE]] = $entityId;
                     }
+
                     // attribute values
                     foreach (array_intersect_key($rowData, $this->_attributes) as $attrCode => $value) {
                         if (!$this->_attributes[$attrCode]['is_static']) {
@@ -350,8 +352,17 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
 
                             // restore 'backend_model' to avoid default setting
                             $attribute->setBackendModel($backModel);
+                        } else {
+                            $entityRow[$attrCode] = $value;
                         }
                     }
+
+                    if ($insert === true) {
+                        $entityRowsIn[] = $entityRow;
+                    } else {
+                        $entityRowsUp[] = $entityRow;
+                    }
+
                     // password change/set
                     if (isset($rowData['password']) && strlen($rowData['password'])) {
                         $attributes[$passTable][$entityId][$passId] = $resource->hashPassword($rowData['password']);
