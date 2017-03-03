@@ -287,6 +287,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
         $passId         = $resource->getAttribute('password_hash')->getId();
         $passTable      = $resource->getAttribute('password_hash')->getBackend()->getTable();
 
+        $i = 0;
         while ($bunch = $this->_dataSourceModel->getNextBunch()) {
             $entityRowsIn = array();
             $entityRowsUp = array();
@@ -295,6 +296,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
             $oldCustomersToLower = array_change_key_case($this->_oldCustomers, CASE_LOWER);
 
             foreach ($bunch as $rowNum => $rowData) {
+                $rowNum = (int) ltrim($i.str_pad($rowNum, 2, 0, STR_PAD_LEFT), 0);
+
                 if (!$this->validateRow($rowData, $rowNum)) {
                     continue;
                 }
@@ -359,6 +362,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                 }
             }
             $this->_saveCustomerEntity($entityRowsIn, $entityRowsUp)->_saveCustomerAttributes($attributes);
+
+            $i++;
         }
         return $this;
     }
