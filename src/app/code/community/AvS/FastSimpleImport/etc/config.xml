@@ -53,6 +53,7 @@
                 <virtual>fastsimpleimport/import_entity_product_type_virtual</virtual>
                 <grouped>fastsimpleimport/import_entity_product_type_grouped</grouped>
                 <bundle>fastsimpleimport/import_entity_product_type_bundle</bundle>
+                <downloadable>fastsimpleimport/import_entity_product_type_downloadable</downloadable>
             </import_product_types>
         </importexport>
     </global>
