@@ -88,6 +88,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /** @var bool */
     protected $_ignoreDuplicates = false;
 
+    /** @var bool */
+    protected $_onlyExistingEntities = false;
+
     /** @var  string */
     protected $_mediaGalleryTableName;
 
@@ -132,14 +135,32 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
     public function setIgnoreDuplicates($ignore)
     {
-	$this->_ignoreDuplicates = (boolean) $ignore;
+	    $this->_ignoreDuplicates = (bool) $ignore;
+        return $this;
     }
 
 
     public function getIgnoreDuplicates()
     {
-	return $this->_ignoreDuplicates;
+        return $this->_ignoreDuplicates;
     }
+
+
+    /**
+     * @param bool $update
+     * @return $this
+     */
+    public function setOnlyExistingEntities($update)
+    {
+        $this->_onlyExistingEntities = (bool) $update;
+        return $this;
+    }
+
+    public function getOnlyExistingEntities()
+    {
+        return $this->_onlyExistingEntities;
+    }
+
 
     /**
      * Set the error limit when the importer will stop
@@ -828,10 +849,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
             /** @var $attribute Mage_Eav_Model_Entity_Attribute */
             $attribute = Mage::getSingleton('catalog/product')->getResource()->getAttribute($attributeCode);
-	    if ($attribute === false) {
+            if ($attribute === false) {
                 continue;
             }
-	    if (!($attribute->getBackend() instanceof Mage_Eav_Model_Entity_Attribute_Backend_Abstract)) {
+            if (!($attribute->getBackend() instanceof Mage_Eav_Model_Entity_Attribute_Backend_Abstract)) {
                 Mage::throwException('Attribute ' . $attributeCode . ' is no multiselect attribute.');
             }
             $attributes[$attributeCode] = $attribute;
@@ -1570,9 +1591,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         $this->_validatedRows[$rowNum] = true;
 
         if (isset($this->_newSku[$rowData[self::COL_SKU]])) {
-	    if($this->getIgnoreDuplicates()){
-		return true;
-	    }
+            if($this->getIgnoreDuplicates() || $this->getOnlyExistingEntities()){
+                return false;
+            }
             $this->addRowError(self::ERROR_DUPLICATE_SKU, $rowNum);
             return false;
         }
@@ -1603,10 +1624,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                         'attr_set_id'   => $this->_oldSku[$sku]['attr_set_id'],
                         'attr_set_code' => $this->_attrSetIdToName[$this->_oldSku[$sku]['attr_set_id']]
                     );
+                } elseif ($this->getOnlyExistingEntities()) {
+                    return false;
                 } else {
                     $this->addRowError(self::ERROR_TYPE_UNSUPPORTED, $rowNum);
                     $sku = false; // child rows of legacy products with unsupported types are orphans
                 }
+            } elseif($this->getOnlyExistingEntities()) {
+                return false;
             } else { // validate new product type and attribute set
                 if (!isset($rowData[self::COL_TYPE])
                     || !isset($this->_productTypeModels[$rowData[self::COL_TYPE]])
