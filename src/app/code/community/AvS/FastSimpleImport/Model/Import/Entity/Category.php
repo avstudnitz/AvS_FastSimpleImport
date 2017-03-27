@@ -266,7 +266,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
         /* @var $categoryResource Mage_Catalog_Model_Resource_Category */
         $categoryResource = Mage::getModel('catalog/category')->getResource();
-        $this->_entityTable   = $categoryResource->getEntityTable();
+        if ($categoryResource instanceof Mage_Eav_Model_Entity_Abstract) {
+
+            $this->_entityTable   = $categoryResource->getEntityTable();
+        } else {
+            $this->_entityTable   = $categoryResource->getMainTable();
+
+        }
 
     }
 
