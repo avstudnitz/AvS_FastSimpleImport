@@ -538,7 +538,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         while ($this->_getSource()->valid()) {
 
             $rowData = $this->_getSource()->current();
-            if (isset($rowData['downloadable_links_file'])) {
+            if (isset($rowData['downloadable_links_file']) && !empty($rowData['downloadable_links_file'])) {
                 if (strpos($rowData['downloadable_links_file'], 'http' ) === 0 && strpos($rowData['downloadable_links_file'], '://') !== false) {
 
                     $targetFilename = basename(parse_url($rowData['downloadable_links_file'], PHP_URL_PATH));
