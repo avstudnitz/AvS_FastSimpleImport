@@ -1411,6 +1411,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
                 /** @var $stockItem Mage_CatalogInventory_Model_Stock_Item */
                 $stockItem = Mage::getModel('cataloginventory/stock_item');
+                $stockItem->setStockId($row['stock_id']);
                 $stockItem->loadByProduct($row['product_id']);
                 $existStockData = $stockItem->getData();
 
