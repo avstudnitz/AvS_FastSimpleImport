@@ -196,7 +196,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                 if (self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
                     $wishlist = array();
 
-                    $emailToLower = strtolower($rowData[self::COL_EMAIL]);
+                    $emailToLower = Mage::helper('fastsimpleimport')->strtolower($rowData[self::COL_EMAIL]);
                     if (isset($oldCustomersToLower[$emailToLower][$rowData[self::COL_WEBSITE]])) {
                         $wishlist['customer_id'] = $oldCustomersToLower[$emailToLower][$rowData[self::COL_WEBSITE]];
                     } elseif (isset($newCustomersToLower[$emailToLower][$rowData[self::COL_WEBSITE]])) {
@@ -311,7 +311,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                         'updated_at' => now()
                     );
 
-                    $emailToLower = strtolower($rowData[self::COL_EMAIL]);
+                    $emailToLower = Mage::helper('fastsimpleimport')->strtolower($rowData[self::COL_EMAIL]);
                     if (isset($oldCustomersToLower[$emailToLower][$rowData[self::COL_WEBSITE]])) { // edit
                         $entityId = $oldCustomersToLower[$emailToLower][$rowData[self::COL_WEBSITE]];
                         $entityRow['entity_id'] = $entityId;
@@ -337,8 +337,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                             $attrParams = $this->_attributes[$attrCode];
 
                             if ('select' == $attrParams['type']) {
-                                if (isset($attrParams['options'][strtolower($value)])) {
-                                    $value = $attrParams['options'][strtolower($value)];
+                                if (isset($attrParams['options'][Mage::helper('fastsimpleimport')->strtolower($value)])) {
+                                    $value = $attrParams['options'][Mage::helper('fastsimpleimport')->strtolower($value)];
                                 }
                             } elseif ('datetime' == $attrParams['type']) {
                                 $value = gmstrftime($strftimeFormat, strtotime($value));
@@ -412,7 +412,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                 $message = 'Decimal value expected. Your Input: '.$rowData[$attrCode];
                 break;
             case 'select':
-                $valid = isset($attrParams['options'][strtolower($rowData[$attrCode])]);
+                $valid = isset($attrParams['options'][Mage::helper('fastsimpleimport')->strtolower($rowData[$attrCode])]);
                 $message = 'Possible options are: ' . implode(', ', array_keys($attrParams['options'])) . '. Your input: ' . $rowData[$attrCode];
                 break;
             case 'int':
@@ -485,7 +485,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
                 $this->addRowError(self::ERROR_EMAIL_SITE_NOT_FOUND, $rowNum);
             }
         } elseif (self::SCOPE_DEFAULT == $rowScope) { // row is SCOPE_DEFAULT = new customer block begins
-            $email   = strtolower($rowData[self::COL_EMAIL]);
+            $email   = Mage::helper('fastsimpleimport')->strtolower($rowData[self::COL_EMAIL]);
             $website = $rowData[self::COL_WEBSITE];
 
             if (!Zend_Validate::is($email, 'EmailAddress')) {
@@ -682,5 +682,25 @@ class AvS_FastSimpleImport_Model_Import_Entity_Customer extends Mage_ImportExpor
             return $this->_newCustomers[$email];
         }
         return false;
+    }
+
+    /**
+     * New customers data.
+     *
+     * @return array
+     */
+    public function getNewCustomers()
+    {
+        return $this->_newCustomers;
+    }
+
+    /**
+     * Existing customers getter.
+     *
+     * @return array
+     */
+    public function getOldCustomers()
+    {
+        return $this->_oldCustomers;
     }
 }

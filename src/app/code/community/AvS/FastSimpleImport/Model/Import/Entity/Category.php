@@ -14,6 +14,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      * Size of bunch - part of entities to save in one step.
      */
     const BUNCH_SIZE = 20;
+    protected $_useConfigAttributes = array('available_sort_by', 'default_sort_by', 'filter_price_range');
 
     /**
      * Data row scopes.
@@ -305,7 +306,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         return $this->_categoriesWithRoots;
     }
 
-
     protected function _explodeEscaped($delimiter = '/', $string)
     {
         $exploded = explode($delimiter, $string);
@@ -502,9 +502,32 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
         if (self::SCOPE_DEFAULT == $this->getRowScope($rowData)) {
             $rowData['name'] = $this->_getCategoryName($rowData);
+            $rowData['position'] = $this->_getCategoryPosition($rowData);
         }
 
         return $rowData;
+    }
+
+    /**
+     * Populate position to prevent warning
+     * try to use existing value to prevent reordering during update
+     *
+     * @param $rowData
+     * @return int
+     */
+    protected function _getCategoryPosition($rowData)
+    {
+        if (isset($rowData['position'])) {
+            return $rowData['position'];
+        }
+
+        $position = 10000;
+        if (isset($rowData['_root']) && isset($rowData['_category'])
+            && isset($this->_categoriesWithRoots[$rowData['_root']][$rowData['_category']])
+        ) {
+            $position = $this->_categoriesWithRoots[$rowData['_root']][$rowData['_category']]['position'];
+        }
+        return $position;
     }
 
 
@@ -653,9 +676,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                         $storeIds  = array(0);
 
                         if ('select' == $attrParams['type']) {
-                            if (isset($attrParams['options'][strtolower($attrValue)]))
+                            if (isset($attrParams['options'][Mage::helper('fastsimpleimport')->strtolower($attrValue)]))
                             {
-                                $attrValue = $attrParams['options'][strtolower($attrValue)];
+                                $attrValue = $attrParams['options'][Mage::helper('fastsimpleimport')->strtolower($attrValue)];
                             }
                         } elseif ('datetime' == $attribute->getBackendType() && strtotime($attrValue)) {
                             $attrValue = gmstrftime($strftimeFormat, strtotime($attrValue));
@@ -876,6 +899,21 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         return end($categoryParts);
     }
 
+    protected function isAttributeUsingConfig($attrCode, $rowData)
+    {
+        if (!in_array($attrCode, $this->_useConfigAttributes)) {
+            return false;
+        }
+
+        $key = 'use_config_' . $attrCode;
+
+        if (!empty($rowData[$key])) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Validate data row.
      *
@@ -962,6 +1000,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             foreach ($this->_attributes as $attrCode => $attrParams) {
                 if (isset($rowData[$attrCode]) && strlen($rowData[$attrCode])) {
                     $this->isAttributeValid($attrCode, $attrParams, $rowData, $rowNum);
+                } elseif ($attrParams['is_required'] && in_array($attrCode, $this->_indexValueAttributes)) {
+                    // empty value is allowed for these "required attributes" using the tickbox
+                    continue;
                 } elseif ($attrParams['is_required'] && !isset($this->_categoriesWithRoots[$root][$category])) {
                     $this->addRowError(self::ERROR_VALUE_IS_REQUIRED, $rowNum, $attrCode);
                 }
@@ -1033,7 +1074,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 break;
             case 'select':
             case 'multiselect':
-                $valid = isset($attrParams['options'][strtolower($rowData[$attrCode])]);
+                $valid = isset($attrParams['options'][Mage::helper('fastsimpleimport')->strtolower($rowData[$attrCode])]);
                 $message = 'Possible options are: ' . implode(', ', array_keys($attrParams['options'])) . '. Your input: ' . $rowData[$attrCode];
                 break;
             case 'int':
@@ -1202,11 +1243,12 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     protected function _getProcessedCategoryIds()
     {
         $categoryIds = array();
-        $source = $this->getSource();
+        $coreHelper = Mage::helper("core");
+        $source = $this->_getSource();
 
         $source->rewind();
         while ($source->valid()) {
-            $current = $source->current();
+            $current = $coreHelper->unEscapeCSVData($source->current());
             if (isset($this->_newCategory[$current[self::COL_ROOT]][$current[self::COL_CATEGORY]])) {
                 $categoryIds[] = $this->_newCategory[$current[self::COL_ROOT]][$current[self::COL_CATEGORY]];
             } elseif (isset($this->_categoriesWithRoots[$current[self::COL_ROOT]][$current[self::COL_CATEGORY]])) {
@@ -1249,6 +1291,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
      */
     protected function _saveValidatedBunches()
     {
+        $coreHelper = Mage::helper("core");
         $source = $this->_getSource();
         $bunchRows = array();
         $startNewBunch = false;
@@ -1273,7 +1316,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 if ($this->_errorsCount >= $this->_errorsLimit) { // errors limit check
                     return $this;
                 }
-                $rowData = $source->current();
+                $rowData = $coreHelper->unEscapeCSVData($source->current());
 
                 $this->_processedRowsCount++;
 
@@ -1459,5 +1502,25 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             }
         }
         return $this;
+    }
+
+    /**
+     * New categories data.
+     *
+     * @return array
+     */
+    public function getNewCategory()
+    {
+        return $this->_newCategory;
+    }
+
+    /**
+     * Existing categories getter.
+     *
+     * @return array
+     */
+    public function getOldCategory()
+    {
+        return $this->getCategoriesWithRoots();
     }
 }

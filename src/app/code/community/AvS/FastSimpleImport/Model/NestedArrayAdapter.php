@@ -58,7 +58,7 @@ class AvS_FastSimpleImport_Model_NestedArrayAdapter extends AvS_FastSimpleImport
 
                         $originalLineHasStoreScope = isset($line['_store']);
                         if ($originalLineHasStoreScope) {
-                            $newLines[$newLineNumber]['_store'] = $line['_store'];
+                            $newLines[$newLineNumber]['_store'] = $line['_store'][$newLineNumber];
                         }
                     }
                     $newLines[$newLineNumber++][$fieldName] = $singleFieldValue;

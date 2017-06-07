@@ -30,7 +30,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Grouped
                 if (isset($rowData[$attrCode]) && strlen($rowData[$attrCode])) {
                     $resultAttrs[$attrCode] =
                         ('select' == $attrParams['type'] || 'multiselect' == $attrParams['type'])
-                            ? $attrParams['options'][strtolower($rowData[$attrCode])]
+                            ? $attrParams['options'][Mage::helper('fastsimpleimport')->strtolower($rowData[$attrCode])]
                             : $rowData[$attrCode];
                 } elseif (array_key_exists($attrCode, $rowData)) {
                     $resultAttrs[$attrCode] = $rowData[$attrCode];
@@ -183,6 +183,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Grouped
                     $productData = $newSku[$rowData[Mage_ImportExport_Model_Import_Entity_Product::COL_SKU]];
                 } else {
                     $colAttrSet = Mage_ImportExport_Model_Import_Entity_Product::COL_ATTR_SET;
+                    $productData = $newSku[$rowData[Mage_ImportExport_Model_Import_Entity_Product::COL_SKU]];
                     $rowData[$colAttrSet] = $productData['attr_set_code'];
                     $rowData[Mage_ImportExport_Model_Import_Entity_Product::COL_TYPE] = $productData['type_id'];
                 }
