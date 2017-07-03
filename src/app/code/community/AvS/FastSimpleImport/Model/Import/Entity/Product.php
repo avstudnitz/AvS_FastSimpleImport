@@ -76,6 +76,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /** @var bool */
     protected $_disablePreprocessImageData = false;
 
+    /** @var bool */
+    protected $_disablePreprocessDownloadableLinksData = false;
+
     /** @var null|bool */
     protected $_unsetEmptyFields = false;
 
@@ -93,7 +96,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
     /** @var  string */
     protected $_mediaValueTableName;
-
+    /** @var  string */
+    protected $_downloadableLinksTableName;
+    
     /**
      * Attributes with index (not label) value.
      *
@@ -185,6 +190,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         return $this->_disablePreprocessImageData;
     }
 
+    /**
+     * @return boolean
+     */
+    public function getDisablePreprocessDownloadableLinksData()
+    {
+        return $this->_disablePreprocessDownloadableLinksData;
+    }
 
     /**
      * @param boolean $disablePreprocessImageData Disable preprossess image data
@@ -197,6 +209,15 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         return $this;
     }
 
+    /**
+     * @param boolean $disablePreprocessDownloadableLinksData Disable preprossess downloadable links file data
+     * @return $this
+     */
+    public function setDisablePreprocessDownloadableLinksData($disablePreprocessDownloadableLinksData)
+    {
+        $this->_disablePreprocessDownloadableLinksData = (boolean) $disablePreprocessDownloadableLinksData;
+        return $this;
+    }
 
     /**
      * @param boolean $value Unset empty fields
@@ -269,6 +290,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         if (!$this->_dataValidated) {
             $this->_createAttributeOptions();
             $this->_preprocessImageData();
+            $this->_preprocessDownloadableLinksData();
 
             if (!$this->getAllowRenameFiles()) {
                 $this->_getUploader()->setAllowRenameFiles(false);
@@ -535,6 +557,98 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             }
         } catch (Exception $e) {
             Mage::logException($e);
+        }
+    }
+
+    /**
+     * Check field "downloadable_link_file" for http links to images; download them
+     *
+     * @return void
+     */
+    protected function _preprocessDownloadableLinksData()
+    {
+        if ($this->getDisablePreprocessDownloadableLinksData()) {
+            return;
+        }
+
+        $this->_getSource()->rewind();
+        while ($this->_getSource()->valid()) {
+
+            $rowData = $this->_getSource()->current();
+            if (isset($rowData['downloadable_links_file']) && !empty($rowData['downloadable_links_file'])) {
+                if (strpos($rowData['downloadable_links_file'], 'http' ) === 0 && strpos($rowData['downloadable_links_file'], '://') !== false) {
+
+                    $targetFilename = basename(parse_url($rowData['downloadable_links_file'], PHP_URL_PATH));
+
+                    if (!is_file($this->_getUploader()->getTmpDir() . DS . $targetFilename)) {
+                        $this->_copyExternalDownloadableFile($rowData['downloadable_links_file'], $targetFilename);
+                    }
+                    $this->_getSource()->setValue('downloadable_links_file', '/' . $targetFilename);
+                } else {
+                    $targetFilename = basename(parse_url($rowData['downloadable_links_file'], PHP_URL_PATH));
+
+                    if (!is_file($this->_getUploader()->getTmpDir() . DS . $targetFilename)) {
+                        $this->_getSource()->setValue('downloadable_links_file', '/' . $targetFilename);
+                    }
+                }
+            }
+
+            $this->_getSource()->next();
+        }
+    }
+
+    /**
+     * Download given file to ImportExport Tmp Dir (usually media/import)
+     *
+     * @param string $url            Url
+     * @param string $targetFilename Target filename
+     * @return void
+     * @throws Exception
+     */
+    protected function _copyExternalDownloadableFile($url, $targetFilename)
+    {
+        try {
+            $dir = $this->_getUploader()->getTmpDir();
+            if (!is_dir($dir)) {
+                mkdir($dir);
+            }
+
+            $tmpTargetPath = $dir . DS . $targetFilename;
+
+            // check if path for target file exists
+            $tmpTargetDir = dirname($tmpTargetPath);
+            if (!file_exists($tmpTargetDir)) {
+                @mkdir($tmpTargetDir, 0777, true);
+            }
+
+            // check if path for target file is not a file
+            if (!is_dir($tmpTargetDir)) {
+                throw new Exception(sprintf('Tmp target ist %s is not a directory', $tmpTargetDir));
+            }
+
+            $fileHandle = fopen($tmpTargetPath, 'w+');
+            if (false === $fileHandle) {
+                throw new Exception(sprintf('Unable to fopen \'%s\' to write file.', $tmpTargetPath));
+            }
+
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+            curl_setopt($ch, CURLOPT_FILE, $fileHandle);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            fclose($fileHandle);
+
+            if (404 == $httpCode) {
+                if (is_file($tmpTargetPath)) {
+                    unlink($tmpTargetPath);
+                }
+
+                throw new Exception('Got 404 while fetching file from url ' . $url);
+            }
+        } catch (Exception $e) {
+            Mage::throwException('Download of file ' . $url . ' failed: ' . $e->getMessage());
         }
     }
 
@@ -1127,6 +1241,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             $tierPrices   = array();
             $groupPrices  = array();
             $mediaGallery = array();
+            $downloadableData = array();
             $uploadedGalleryFiles = array();
             $previousType = null;
             $previousAttributeSet = null;
@@ -1261,6 +1376,23 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
                     $mediaGallery[$rowSku][] = $mediaImageData;
                 }
+
+                // 4. Downloadable files phase
+                if (!empty($rowData['downloadable_links_file']) &&
+                    !empty($rowData['downloadable_links_title']) &&
+                    !empty($rowData['downloadable_links_nod']) &&
+                    $rowData['_type'] === 'downloadable') {
+
+                    $downloadableLinkData = array(
+                        'title'                 => $rowData['downloadable_links_title'],
+                        'number_of_downloads'   => $rowData['downloadable_links_nod'],
+                        'file'                  => $rowData['downloadable_links_file'],
+                        'store_id'              => Mage_Catalog_Model_Abstract::DEFAULT_STORE_ID
+                    );
+
+                    $downloadableData[$rowSku][] = $downloadableLinkData;
+                }
+
                 // 6. Attributes phase
                 $rowStore     = self::SCOPE_STORE == $rowScope ? $this->_storeCodeToId[$rowData[self::COL_STORE]] : 0;
                 $productType  = isset($rowData[self::COL_TYPE]) ? $rowData[self::COL_TYPE] : null;
@@ -1300,6 +1432,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                 ->_saveProductGroupPrices($groupPrices)
                 ->_saveProductAttributes($attributes);
             $this->_saveMediaGallery($mediaGallery);
+            $this->_saveDownloadableLinks($downloadableData);
         }
         if (method_exists($this,'_fixUrlKeys')) { // > EE 1.13.1.0
             $this->_fixUrlKeys();
@@ -1478,6 +1611,22 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         return $this->_fileUploader;
     }
 
+    /**
+     * @param $filePath
+     * @return bool
+     */
+    protected function moveDownloadableFile($fileName)
+    {
+        $filePath = $this->_getUploader()->getTmpDir() . $fileName;
+        $destDir = Mage::getConfig()->getOptions()->getMediaDir() . '/downloadable/files/links' . $fileName;
+
+        $sourceFile = realpath($filePath);
+        if ($sourceFile !== false) {
+            return copy($sourceFile, $destDir);
+        } else {
+            return false;
+        }
+    }
 
     /**
      * @param array $rowData
@@ -1843,6 +1992,71 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     }
 
     /**
+     * Save product downloadable links
+     *
+     * @param array $downloadableData
+     * @return Mage_ImportExport_Model_Import_Entity_Product
+     */
+    protected function _saveDownloadableLinks(array $downloadableData)
+    {
+        if (empty($downloadableData)) {
+            return $this;
+        }
+
+        $downloadableLinkTableName = $this->_getDownloadableLinksTableName();
+        $downloadableLinkTitleTableName = $this->_getDownloadableLinksTitleTableName();
+
+        foreach ($downloadableData as $productSku => $downloadableLink) {
+            $productId = $this->_newSku[$productSku]['entity_id'];
+            $insertedDownloadableLinks = [];
+
+            if (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND != $this->getBehavior()) {
+                $this->_connection->delete(
+                    $downloadableLinkTableName,
+                    $this->_connection->quoteInto('product_id IN (?)', $productId)
+                );
+            }
+
+            foreach ($downloadableLink as $insertValue) {
+                $alreadyImported = $this->_connection->fetchOne($this->_connection->select()
+                    ->from($downloadableLinkTableName, array('link_file'))
+                    ->where('product_id IN (?)', $productId)
+                    ->where('link_file = (?)', $insertValue['file']));
+
+                if (!in_array($insertValue['file'], $insertedDownloadableLinks) && !$alreadyImported) {
+                    $valueArr = array(
+                        'product_id' => $productId,
+                        'link_file' => $insertValue['file'],
+                        'link_type' => 'file',
+                        'number_of_downloads' => $insertValue['number_of_downloads'],
+                    );
+
+                    $this->_connection
+                        ->insertOnDuplicate($downloadableLinkTableName, $valueArr, array('product_id'));
+
+                    $linkId = $this->_connection->fetchOne('SELECT MAX(`link_id`) FROM ' . $downloadableLinkTableName);
+
+                    $valueArr = array(
+                        'store_id'  => $insertValue['store_id'],
+                        'title'     => $insertValue['title'],
+                        'link_id'   => $linkId,
+                    );
+
+                    $this->_connection
+                        ->insertOnDuplicate($downloadableLinkTitleTableName, $valueArr, array('link_id'));
+
+                    $this->moveDownloadableFile($insertValue['file']);
+                    $insertedDownloadableLinks[] = $insertValue['file'];
+
+
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * @param string $storeCode Store Code
      * @returns int
      */
@@ -1898,6 +2112,39 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         return $mediaValueTableName;
     }
 
+    /**
+     * @return string
+     */
+    protected function _getDownloadableLinksTableName()
+    {
+        if (isset($this->_downloadableLinksTableName)) {
+            return $this->_downloadableLinksTableName;
+        }
+
+        $downloadableLinksTableName = Mage::getModel('importexport/import_proxy_product_resource')
+            ->getTable('downloadable/link');
+
+        $this->_downloadableLinksTableName = $downloadableLinksTableName;
+
+        return $downloadableLinksTableName;
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getDownloadableLinksTitleTableName()
+    {
+        if (isset($this->_downloadableLinksTitleTableName)) {
+            return $this->_downloadableLinksTitleTableName;
+        }
+
+        $downloadableLinksTitleTableName = Mage::getModel('importexport/import_proxy_product_resource')
+            ->getTable('downloadable/link_title');
+
+        $this->_downloadableLinksTitleTableName = $downloadableLinksTitleTableName;
+
+        return $downloadableLinksTitleTableName;
+    }
 
     /**
      * @param $sku
