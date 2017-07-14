@@ -1459,13 +1459,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
             foreach ($categoriesData as $delSku => $categories) {
                 $productId      = $this->_newSku[$delSku]['entity_id'];
-                $delProductId[] = $productId;
 
                 foreach ($categories as $categoryId => $position) {
+                    $delProductId[$productId] = $productId;
                     $categoriesIn[] = array('product_id' => $productId, 'category_id' => $categoryId, 'position' => (int) $position);
                 }
             }
-            if (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND != $this->getBehavior()) {
+            if (Mage_ImportExport_Model_Import::BEHAVIOR_APPEND != $this->getBehavior() && sizeof($delProductId)) {
                 $this->_connection->delete(
                     $tableName,
                     $this->_connection->quoteInto('product_id IN (?)', $delProductId)

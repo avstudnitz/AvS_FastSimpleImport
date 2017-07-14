@@ -75,7 +75,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Bundle
                         'code' => $attribute->getAttributeCode(),
                         'for_configurable' => $attribute->getIsConfigurable(),
                         'is_global' => $attribute->getIsGlobal(),
-                        'is_required' => $attribute->getIsRequired(),
+                        'is_required' => false,
                         'is_unique' => $attribute->getIsUnique(),
                         'frontend_label' => $attribute->getFrontendLabel(),
                         'is_static' => $attribute->isStatic(),
