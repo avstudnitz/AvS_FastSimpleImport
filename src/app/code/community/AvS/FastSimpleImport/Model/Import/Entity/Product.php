@@ -1612,17 +1612,26 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     }
 
     /**
-     * @param $filePath
+     * @param $fileName
      * @return bool
      */
     protected function moveDownloadableFile($fileName)
     {
-        $filePath = $this->_getUploader()->getTmpDir() . $fileName;
-        $destDir = Mage::getConfig()->getOptions()->getMediaDir() . '/downloadable/files/links' . $fileName;
-
+        $filePath      = $this->_getUploader()->getTmpDir() . $fileName;
+        $basePath      = Mage::getModel('downloadable/link')->getBasePath();
+        $destDirectory = dirname(Mage::helper('downloadable/file')->getFilePath($basePath, $fileName));
+        // make sure that the destination directory exists!
+        $ioObject = new Varien_Io_File();
+        try {
+            $ioObject->open(array('path' => $destDirectory));
+        } catch (Exception $e) {
+            $ioObject->mkdir($destDirectory, 0777, true);
+            $ioObject->open(array('path' => $destDirectory));
+        }
+        $destFile   = $basePath . DS . $fileName;
         $sourceFile = realpath($filePath);
         if ($sourceFile !== false) {
-            return copy($sourceFile, $destDir);
+            return copy($sourceFile, $destFile);
         } else {
             return false;
         }
