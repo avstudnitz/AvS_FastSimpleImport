@@ -117,7 +117,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     /**
      * Downloadable files uploader
      *
-     * @var Mage_ImportExport_Model_Import_Uploader
+     * @var AvS_FastSimpleImport_Model_Import_Uploader_Downloadable
      */
     protected $_downloadableUploader;
 
