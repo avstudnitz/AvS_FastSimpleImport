@@ -1599,8 +1599,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             $this->_fileUploader->init();
             $this->_fileUploader->removeValidateCallback('catalog_product_image');
 
-            $tmpDir     = Mage::getConfig()->getOptions()->getMediaDir() . '/import';
-            $destDir    = Mage::getConfig()->getOptions()->getMediaDir() . '/catalog/product';
+            $tmpDir     = Mage::getConfig()->getOptions()->getMediaDir() . DS . 'import';
+            $destDir    = Mage::getConfig()->getOptions()->getMediaDir() . DS . 'catalog' . DS . 'product';
             if (!is_writable($destDir)) {
                 @mkdir($destDir, 0777, true);
             }
@@ -1630,7 +1630,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             $this->_downloadableUploader = Mage::getModel('fastsimpleimport/import_uploader_downloadable', null);
             $this->_downloadableUploader->init();
 
-            $tmpDir  = Mage::getConfig()->getOptions()->getMediaDir() . '/import';
+            $tmpDir  = Mage::getConfig()->getOptions()->getMediaDir() . DS . 'import';
             $destDir = Mage::getModel('downloadable/link')->getBasePath();
             if ( ! is_writable($destDir)) {
                 @mkdir($destDir, 0777, true);
