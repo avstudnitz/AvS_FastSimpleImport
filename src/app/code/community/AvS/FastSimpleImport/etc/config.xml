@@ -49,6 +49,7 @@
 
             <import_product_types>
                 <simple>fastsimpleimport/import_entity_product_type_simple</simple>
+                <downloadable>fastsimpleimport/import_entity_product_type_downloadable</downloadable>
                 <configurable>fastsimpleimport/import_entity_product_type_configurable</configurable>
                 <virtual>fastsimpleimport/import_entity_product_type_virtual</virtual>
                 <grouped>fastsimpleimport/import_entity_product_type_grouped</grouped>

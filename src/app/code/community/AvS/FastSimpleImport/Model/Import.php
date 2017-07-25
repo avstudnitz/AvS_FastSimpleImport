@@ -25,7 +25,9 @@
  * @method AvS_FastSimpleImport_Model_Import setAllowRenameFiles(boolean $value)
  * @method boolean getAllowRenameFiles()
  * @method AvS_FastSimpleImport_Model_Import setDisablePreprocessImageData(boolean $value)
+ * @method AvS_FastSimpleImport_Model_Import setDisablePreprocessDownloadableLinksData(boolean $value)
  * @method boolean getDisablePreprocessImageData()
+ * @method boolean getDisablePreprocessDownloadableLinksData()
  * @method AvS_FastSimpleImport_Model_Import setUnsetEmptyFields(bool $value)
  * @method string getUnsetEmptyFields()
  * @method AvS_FastSimpleImport_Model_Import setSymbolEmptyFields(string $value)
@@ -51,6 +53,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $this->setAllowRenameFiles(Mage::getStoreConfigFlag('fastsimpleimport/product/allow_rename_files'));
         $this->setImageAttributes(array_filter(explode(',', Mage::getStoreConfig('fastsimpleimport/product/additional_image_attributes'))));
         $this->setDisablePreprocessImageData(Mage::getStoreConfigFlag('fastsimpleimport/product/disable_preprocess_images'));
+        $this->setDisablePreprocessDownloadableLinksData(Mage::getStoreConfigFlag('fastsimpleimport/product/disable_preprocess_downloadablelinks'));
         $this->setUnsetEmptyFields(Mage::getStoreConfigFlag('fastsimpleimport/general/clear_field_on_empty_string'));
         $this->setSymbolEmptyFields(Mage::getStoreConfig('fastsimpleimport/general/symbol_for_clear_field'));
         $this->setSymbolIgnoreFields(Mage::getStoreConfig('fastsimpleimport/general/symbol_for_ignore_field'));
@@ -157,6 +160,7 @@ class AvS_FastSimpleImport_Model_Import extends Mage_ImportExport_Model_Import
         $entityAdapter->setImageAttributes($this->getImageAttributes());
         $entityAdapter->setAllowRenameFiles($this->getAllowRenameFiles());
         $entityAdapter->setDisablePreprocessImageData($this->getDisablePreprocessImageData());
+	$entityAdapter->setDisablePreprocessDownloadableLinksData($this->getDisablePreprocessDownloadableLinksData());
         $entityAdapter->setUnsetEmptyFields($this->getUnsetEmptyFields());
         $entityAdapter->setSymbolEmptyFields($this->getSymbolEmptyFields());
         $entityAdapter->setSymbolIgnoreFields($this->getSymbolIgnoreFields());

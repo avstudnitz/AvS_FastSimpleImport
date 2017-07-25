@@ -60,7 +60,7 @@ for ($i = 1; $i <= 10; $i++) {
         'is_in_stock' => 0,
         'enable_googlecheckout' => '1',
         'gift_message_available' => '0',
-        'url_key' => strtolower($randomString),
+        'url_key' => Mage::helper('fastsimpleimport')->strtolower($randomString),
     );
 }
 
