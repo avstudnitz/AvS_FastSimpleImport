@@ -7,12 +7,9 @@ Wrapper for Magento ImportExport functionality which imports data from arrays
 
 Facts
 -----
-- version: 0.7.0
+- version: 0.8.2
 - extension key: AvS_FastSimpleImport
-- extension on Magento Connect: n/a
-- Magento Connect 1.0 extension key: n/a
-- Magento Connect 2.0 extension key: n/a
-- Composer name: avstudnitz/fast-simple-import (included in http://packages.firegento.com/)
+- Composer name: avstudnitz/fast-simple-import (included in http://packages.firegento.com/ and Packagist)
 - [Extension on GitHub](https://github.com/avstudnitz/AvS_FastSimpleImport)
 - [Direct download link](https://github.com/avstudnitz/AvS_FastSimpleImport/tarball/master)
 - [Documentation](http://avstudnitz.github.io/AvS_FastSimpleImport/)
@@ -72,6 +69,10 @@ http://www.integer-net.de/agentur/andreas-von-studnitz/
 Paul Hachmang
 http://www.h-o.nl/
 [@paales](https://twitter.com/paales)
+
+Simon Sprankel
+http://simonsprankel.de/
+[@SimonSprankel](https://twitter.com/SimonSprankel)
 
 
 License
