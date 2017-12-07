@@ -24,6 +24,11 @@
                     <import_entity_product>AvS_FastSimpleImport_Model_Import_Entity_Product</import_entity_product>
                 </rewrite>
             </importexport>
+            <enterprise_importexport>
+                <rewrite>
+                    <import_entity_product>AvS_FastSimpleImport_Model_Import_Entity_Product</import_entity_product>
+                </rewrite>
+            </enterprise_importexport>
         </models>
 
         <helpers>
