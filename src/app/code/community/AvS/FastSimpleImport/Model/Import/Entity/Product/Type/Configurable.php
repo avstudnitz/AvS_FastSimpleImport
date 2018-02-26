@@ -352,4 +352,18 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
         }
         return $this;
     }
+    
+    /**
+     * Fix bug with "_super_attribute_price_corr" field.
+     * When it has negative number (e.g. "-3"), the getEscapedCSVData() function
+     * adds whitespace (e.g. "-3" converts to " -3") and as a result, this function returns false.
+     * So I added trim() function, which removes whitespaces.
+     *
+     * @param string $value
+     * @return int
+     */
+    protected function _isPriceCorr($value)
+    {
+        return parent::_isPriceCorr(trim($value));
+    }
 }
