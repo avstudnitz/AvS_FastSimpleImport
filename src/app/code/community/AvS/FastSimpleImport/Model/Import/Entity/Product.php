@@ -398,6 +398,9 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     {
         if (!isset($this->_attributeOptions[$attribute->getAttributeCode()])) {
             if (in_array($attribute->getFrontendInput(), array('select', 'multiselect'))) {
+                // only default (admin) store option values used
+                $attribute->setStoreId(Mage_Catalog_Model_Abstract::DEFAULT_STORE_ID);
+
                 /** @var $attributeOptions Mage_Eav_Model_Entity_Attribute_Source_Table */
                 $attributeOptions = Mage::getModel('eav/entity_attribute_source_table');
                 $attributeOptions->setAttribute($attribute);
