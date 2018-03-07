@@ -1895,7 +1895,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         $this->_isTierPriceValid($rowData, $rowNum);
         $this->_isGroupPriceValid($rowData, $rowNum);
         $this->_isSuperProductsSkuValid($rowData, $rowNum);
-        if (version_compare(Mage::getVersion(), '1.9.3.8', 'ge')) {
+        if (method_exists($this, '_isProductSkuValid')) {
             $this->_isProductSkuValid($rowData, $rowNum);
         }
 
