@@ -984,7 +984,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         if (! is_array($attributeCodes)) {
             return;
         }
-        $this->_imagesArrayKeys = $this->_imageAttributes = array_merge($this->_imagesArrayKeys, $attributeCodes);
+        $this->_imagesArrayKeys = $this->_imageAttributes = array_unique(array_merge($this->_imagesArrayKeys, $attributeCodes));
     }
 
     /**
