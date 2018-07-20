@@ -1160,7 +1160,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                 if ('multiselect' == $attribute->getFrontendInput()) {
                     if (!isset($attributes[$attrTable][$rowSku][$attrId][$storeId])) {
                         $attributes[$attrTable][$rowSku][$attrId][$storeId] = '';
-                    } else {
+                    } elseif ($attrValue !== null) {
                         $attributes[$attrTable][$rowSku][$attrId][$storeId] .= ',';
                     }
                     $attributes[$attrTable][$rowSku][$attrId][$storeId] .= $attrValue;
