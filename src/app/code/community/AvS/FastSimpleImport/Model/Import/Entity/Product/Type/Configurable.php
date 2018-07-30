@@ -243,6 +243,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product_Type_Configurable
                         'use_default' => 1,
                         'value'       => $attrParams['frontend_label']
                     );
+                } elseif (isset($superAttributes['attributes'][$productId][$attrParams['id']]['product_super_attribute_id'])) {
+                    $productSuperAttrId = $superAttributes['attributes'][$productId][$attrParams['id']]['product_super_attribute_id'];
                 }
                 if (isset($rowData['_super_attribute_option']) && strlen($rowData['_super_attribute_option'])) {
                     $optionId = $attrParams['options'][Mage::helper('fastsimpleimport')->strtolower($rowData['_super_attribute_option'])];
