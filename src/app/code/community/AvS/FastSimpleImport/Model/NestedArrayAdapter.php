@@ -57,7 +57,7 @@ class AvS_FastSimpleImport_Model_NestedArrayAdapter extends AvS_FastSimpleImport
                         $newLines[$newLineNumber]['_attribute_set'] = null;
 
                         $originalLineHasStoreScope = isset($line['_store']);
-                        if ($originalLineHasStoreScope) {
+                        if ($originalLineHasStoreScope && is_array($line['_store'])) {
                             $newLines[$newLineNumber]['_store'] = $line['_store'][$newLineNumber];
                         }
                     }
