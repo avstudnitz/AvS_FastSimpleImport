@@ -2070,10 +2070,10 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                         'number_of_downloads' => $insertValue['number_of_downloads'],
                     );
 
-                    if ($insertValue['file']) {
+                    if (array_key_exists('file', $insertValue)) {
                         $valueArr['link_file'] = $insertValue['file'];
                         $valueArr['link_type'] = 'file';
-                    } elseif ($insertValue['url']) {
+                    } elseif (array_key_exists('url', $insertValue)) {
                         $valueArr['link_url'] = $insertValue['url'];
                         $valueArr['link_type'] = 'url';
                     }
