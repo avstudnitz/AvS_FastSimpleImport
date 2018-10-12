@@ -98,7 +98,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     protected $_mediaValueTableName;
     /** @var  string */
     protected $_downloadableLinksTableName;
-    
+
     /**
      * Attributes with index (not label) value.
      *
@@ -1394,18 +1394,26 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                     $mediaGallery[$rowSku][] = $mediaImageData;
                 }
 
-                // 4. Downloadable files phase
-                if (!empty($rowData['downloadable_links_file']) &&
-                    !empty($rowData['downloadable_links_title']) &&
+                // 4. Downloadable links phase
+                if (!empty($rowData['downloadable_links_title']) &&
                     !empty($rowData['downloadable_links_nod']) &&
                     $rowData['_type'] === 'downloadable') {
 
-                    $downloadableLinkData = array(
+                    $downloadableLinkData = [
                         'title'                 => $rowData['downloadable_links_title'],
                         'number_of_downloads'   => $rowData['downloadable_links_nod'],
-                        'file'                  => $rowData['downloadable_links_file'],
                         'store_id'              => Mage_Catalog_Model_Abstract::DEFAULT_STORE_ID
-                    );
+                    ];
+
+                    // downloadable files
+                    if (!empty($rowData['downloadable_links_file'])) {
+                       $downloadableLinkData['file'] = $rowData['downloadable_links_file'];
+                       $downloadableLinkData['link_type'] = 'file';
+                    // downloadable urls
+                    } elseif (!empty($rowData['downloadable_links_url'])) {
+                       $downloadableLinkData['url'] = $rowData['downloadable_links_url'];
+                       $downloadableLinkData['link_type'] = 'url';
+                    }
 
                     $downloadableData[$rowSku][] = $downloadableLinkData;
                 }
@@ -1561,6 +1569,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
 
                 /** @var $stockItem Mage_CatalogInventory_Model_Stock_Item */
                 $stockItem = Mage::getModel('cataloginventory/stock_item');
+                $stockItem->setStockId($row['stock_id']);
                 $stockItem->loadByProduct($row['product_id']);
                 $existStockData = $stockItem->getData();
 
@@ -2047,18 +2056,28 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             }
 
             foreach ($downloadableLink as $insertValue) {
-                $alreadyImported = $this->_connection->fetchOne($this->_connection->select()
-                    ->from($downloadableLinkTableName, array('link_file'))
-                    ->where('product_id IN (?)', $productId)
-                    ->where('link_file = (?)', $insertValue['file']));
 
-                if (!in_array($insertValue['file'], $insertedDownloadableLinks) && !$alreadyImported) {
+                $linkType = $insertValue['link_type'];
+                $fieldToSelect = 'link_' . $linkType;
+
+                $alreadyImported = $this->_connection->fetchOne($this->_connection->select()
+                    ->from($downloadableLinkTableName, array($fieldToSelect))
+                    ->where('product_id IN (?)', $productId)
+                    ->where("$fieldToSelect = (?)", $insertValue[$linkType]));
+
+                if (!in_array($insertValue[$linkType], $insertedDownloadableLinks) && !$alreadyImported) {
                     $valueArr = array(
                         'product_id' => $productId,
-                        'link_file' => $insertValue['file'],
-                        'link_type' => 'file',
                         'number_of_downloads' => $insertValue['number_of_downloads'],
                     );
+
+                    if (array_key_exists('file', $insertValue)) {
+                        $valueArr['link_file'] = $insertValue['file'];
+                        $valueArr['link_type'] = 'file';
+                    } elseif (array_key_exists('url', $insertValue)) {
+                        $valueArr['link_url'] = $insertValue['url'];
+                        $valueArr['link_type'] = 'url';
+                    }
 
                     $this->_connection
                         ->insertOnDuplicate($downloadableLinkTableName, $valueArr, array('product_id'));
@@ -2074,10 +2093,12 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                     $this->_connection
                         ->insertOnDuplicate($downloadableLinkTitleTableName, $valueArr, array('link_id'));
 
-                    $this->moveDownloadableFile($insertValue['file']);
-                    $insertedDownloadableLinks[] = $insertValue['file'];
-
-
+                    if ($linkType == 'file') {
+                        $this->moveDownloadableFile($insertValue[$fieldToSelect]);
+                    }
+                    if (array_key_exists($fieldToSelect, $insertValue)) {
+                        $insertedDownloadableLinks[] = $insertValue[$fieldToSelect];
+                    }
                 }
             }
         }
