@@ -114,6 +114,13 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         'country_of_manufacture'
     );
 
+    /**
+     * Downloadable files uploader
+     *
+     * @var AvS_FastSimpleImport_Model_Import_Uploader_Downloadable
+     */
+    protected $_downloadableUploader;
+
     public function __construct()
     {
         parent::__construct();
@@ -1618,8 +1625,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
             $this->_fileUploader->init();
             $this->_fileUploader->removeValidateCallback('catalog_product_image');
 
-            $tmpDir     = Mage::getConfig()->getOptions()->getMediaDir() . '/import';
-            $destDir    = Mage::getConfig()->getOptions()->getMediaDir() . '/catalog/product';
+            $tmpDir     = Mage::getConfig()->getOptions()->getMediaDir() . DS . 'import';
+            $destDir    = Mage::getConfig()->getOptions()->getMediaDir() . DS . 'catalog' . DS . 'product';
             if (!is_writable($destDir)) {
                 @mkdir($destDir, 0777, true);
             }
@@ -1637,30 +1644,44 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
         return $this->_fileUploader;
     }
 
+    /** Returns an object for upload downloadable files
+     *
+     * @return AvS_FastSimpleImport_Model_Import_Uploader_Downloadable
+     */
+    protected function _getDownloadableUploader()
+    {
+        if (is_null($this->_downloadableUploader)) {
+            // make sure to pass null as a constructor argument, so that no upload file is set!
+            $this->_downloadableUploader = Mage::getModel('fastsimpleimport/import_uploader_downloadable', null);
+            $this->_downloadableUploader->init();
+             $tmpDir  = Mage::getConfig()->getOptions()->getMediaDir() . DS . 'import';
+            $destDir = Mage::getModel('downloadable/link')->getBasePath();
+            if ( ! is_writable($destDir)) {
+                @mkdir($destDir, 0777, true);
+            }
+            if ( ! file_exists($tmpDir)) {
+                @mkdir($tmpDir, 0777, true);
+            }
+            if ( ! $this->_downloadableUploader->setTmpDir($tmpDir)) {
+
+                Mage::throwException("File directory '{$tmpDir}' is not readable.");
+            }
+            if ( ! $this->_downloadableUploader->setDestDir($destDir)) {
+                Mage::throwException("File directory '{$destDir}' is not writable.");
+            }
+        }
+         return $this->_downloadableUploader;
+    }
+
     /**
      * @param $fileName
-     * @return bool
+     *
+     * @return string
      */
-    protected function moveDownloadableFile($fileName)
+    protected function _moveDownloadableFile($fileName)
     {
-        $filePath      = $this->_getUploader()->getTmpDir() . $fileName;
-        $basePath      = Mage::getModel('downloadable/link')->getBasePath();
-        $destDirectory = dirname(Mage::helper('downloadable/file')->getFilePath($basePath, $fileName));
-        // make sure that the destination directory exists!
-        $ioObject = new Varien_Io_File();
-        try {
-            $ioObject->open(array('path' => $destDirectory));
-        } catch (Exception $e) {
-            $ioObject->mkdir($destDirectory, 0777, true);
-            $ioObject->open(array('path' => $destDirectory));
-        }
-        $destFile   = $basePath . DS . $fileName;
-        $sourceFile = realpath($filePath);
-        if ($sourceFile !== false) {
-            return copy($sourceFile, $destFile);
-        } else {
-            return false;
-        }
+        $res = $this->_getDownloadableUploader()->move($fileName);
+         return $res['file'];
     }
 
     /**
@@ -2066,6 +2087,15 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                     ->where("$fieldToSelect = (?)", $insertValue[$linkType]));
 
                 if (!in_array($insertValue[$linkType], $insertedDownloadableLinks) && !$alreadyImported) {
+
+                    if (array_key_exists($fieldToSelect, $insertValue)) {
+                        $insertedDownloadableLinks[] = $insertValue[$fieldToSelect];
+                    }
+
+                    if ($linkType == 'file') {
+                        $this->_moveDownloadableFile($insertValue[$fieldToSelect]);
+                    }
+
                     $valueArr = array(
                         'product_id' => $productId,
                         'number_of_downloads' => $insertValue['number_of_downloads'],
@@ -2079,8 +2109,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                         $valueArr['link_type'] = 'url';
                     }
 
-                    $this->_connection
-                        ->insertOnDuplicate($downloadableLinkTableName, $valueArr, array('product_id'));
+                    $this->_connection->insertOnDuplicate($downloadableLinkTableName, $valueArr, array('product_id'));
 
                     $linkId = $this->_connection->fetchOne('SELECT MAX(`link_id`) FROM ' . $downloadableLinkTableName);
 
@@ -2090,15 +2119,8 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
                         'link_id'   => $linkId,
                     );
 
-                    $this->_connection
-                        ->insertOnDuplicate($downloadableLinkTitleTableName, $valueArr, array('link_id'));
+                    $this->_connection->insertOnDuplicate($downloadableLinkTitleTableName, $valueArr, array('link_id'));
 
-                    if ($linkType == 'file') {
-                        $this->moveDownloadableFile($insertValue[$fieldToSelect]);
-                    }
-                    if (array_key_exists($fieldToSelect, $insertValue)) {
-                        $insertedDownloadableLinks[] = $insertValue[$fieldToSelect];
-                    }
                 }
             }
         }
