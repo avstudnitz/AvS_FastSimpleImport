@@ -33,6 +33,19 @@ class AvS_FastSimpleImport_Test_Model_Category_MainTest extends EcomDev_PHPUnit_
         $this->assertNotNull($baseCategory);
         $this->assertEquals(count($values), $baseCategory->getChildrenCount());
 
+        // Assert positions
+        /** @var Mage_Catalog_Model_Category $categoryModel */
+        $categoryModel = Mage::getModel('catalog/category');
+        $topLevel = $categoryModel->loadByAttribute('name', 'Test2');
+        $firstChild = $categoryModel->loadByAttribute('name', 'TestTest');
+        $secondChild = $categoryModel->loadByAttribute(
+            'name',
+            'Test4 / WithSlash'
+        );
+
+        $this->assertEquals(1, $topLevel->getPosition());
+        $this->assertEquals(1, $firstChild->getPosition());
+        $this->assertEquals(2, $secondChild->getPosition());
     }
 
     /**
