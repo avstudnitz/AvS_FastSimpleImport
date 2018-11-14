@@ -194,6 +194,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
 
     protected $_defaultAttributeSetId = 0;
 
+    /**
+     * @var Mage_Catalog_Model_Resource_Category
+     */
+    protected $_categoryResource;
+
     public function setIgnoreDuplicates($ignore)
     {
         $this->_ignoreDuplicates = (boolean) $ignore;
@@ -256,6 +261,11 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
     {
         parent::__construct();
 
+        /* @var $categoryResource Mage_Catalog_Model_Resource_Category */
+        $categoryResource = Mage::getModel('catalog/category')->getResource();
+        $this->_categoryResource = $categoryResource;
+        $this->_entityTable = $categoryResource->getEntityTable();
+
         $this
             ->_initOnTabAttributes()
             ->_initWebsites()
@@ -263,11 +273,6 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
             ->_initCategories()
             ->_initAttributes()
             ->_initAttributeSetId();
-
-        /* @var $categoryResource Mage_Catalog_Model_Resource_Category */
-        $categoryResource = Mage::getModel('catalog/category')->getResource();
-        $this->_entityTable   = $categoryResource->getEntityTable();
-
     }
 
     /**
@@ -375,11 +380,14 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                 }
                 $index = $this->_implodeEscaped('/', $path);
 
-                $this->_categoriesWithRoots[$rootCategoryName][$index] = array(
-                    'entity_id' => $category->getId(),
-                    'path' => $category->getPath(),
-                    'level' => $category->getLevel(),
-                    'position' => $category->getPosition()
+                $this->_categoriesWithRoots[$rootCategoryName][$index] = new Varien_Object(
+                    array(
+                        'entity_id'           => $category->getId(),
+                        'path'                => $category->getPath(),
+                        'level'               => $category->getLevel(),
+                        'position'            => $category->getPosition(),
+                        'next_child_position' => $this->_getCategoryNextChildPosition($category->getPath())
+                    )
                 );
 
                 //allow importing by ids.
@@ -392,6 +400,26 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
         }
 
         return $this;
+    }
+
+    /**
+     * Get the position of a category's next child using the path of the category
+     *
+     * @param string $path
+     *
+     * @return int|string
+     */
+    protected function _getCategoryNextChildPosition($path)
+    {
+        static $method;
+        if (is_null($method)) {
+            $class = new ReflectionClass('Mage_Catalog_Model_Resource_Category');
+            $method = $class->getMethod('_getMaxPosition');
+            $method->setAccessible(true);
+        }
+
+        $position = $method->invoke($this->_categoryResource, $path);
+        return $position + 1;
     }
 
     /**
@@ -570,16 +598,24 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                         'level'       => $parentCategory['level'] + 1,
                         'created_at'  => empty($rowData['created_at']) ? now()
                                 : gmstrftime($strftimeFormat, strtotime($rowData['created_at'])),
-                        'updated_at'  => now(),
-                        'position'    => $rowData['position']
+                        'updated_at'  => now()
                     );
 
                     if (isset($this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]]))
                     { //edit
-
                         $entityId = $this->_categoriesWithRoots[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]]['entity_id'];
+                        $path = $parentCategory['path'] .'/'.$entityId;
+                        $position = $this->_categoriesWithRoots[$rowData[self::COL_ROOT]][self::COL_CATEGORY]['position'];
+                        if ($path !== $this->_categoriesWithRoots[$rowData[self::COL_ROOT]][self::COL_CATEGORY]['path'] && empty($rowData['position'])) {
+                            // category moved to a new parent
+                            $position = $parentCategory['next_child_position'];
+                            $parentCategory['next_child_position'] += 1;
+                            $this->_categoriesWithRoots[$rowData[self::COL_ROOT]][self::COL_CATEGORY]['path'] = $path;
+                        }
+
                         $entityRow['entity_id']        = $entityId;
                         $entityRow['path']             = $parentCategory['path'] .'/'.$entityId;
+                        $entityRow['position']         = !empty($rowData['position']) ? $rowData['position'] : $position;
                         $entityRowsUp[]                = $entityRow;
                         $rowData['entity_id']          = $entityId;
                     } else
@@ -589,14 +625,21 @@ class AvS_FastSimpleImport_Model_Import_Entity_Category extends Mage_ImportExpor
                         $entityRow['path']             = $parentCategory['path'] .'/'.$entityId;
                         $entityRow['entity_type_id']   = $this->_entityTypeId;
                         $entityRow['attribute_set_id'] = $this->_defaultAttributeSetId;
+                        $entityRow['position']         = !empty($rowData['position']) ? $rowData['position'] : $parentCategory['next_child_position'];
                         $entityRowsIn[]                = $entityRow;
 
-                        $this->_newCategory[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]] = array(
-                            'entity_id' => $entityId,
-                            'path' => $entityRow['path'],
-                            'level' => $entityRow['level']
+                        $this->_newCategory[$rowData[self::COL_ROOT]][$rowData[self::COL_CATEGORY]] = new Varien_Object(
+                            array(
+                                'entity_id'           => $entityId,
+                                'path'                => $entityRow['path'],
+                                'level'               => $entityRow['level'],
+                                'next_child_position' => 1
+                            )
                         );
 
+                        if (empty($rowData['position'])) {
+                            $parentCategory['next_child_position'] += 1;
+                        }
                     }
                 }
 
