@@ -1613,7 +1613,7 @@ class AvS_FastSimpleImport_Model_Import_Entity_Product extends AvS_FastSimpleImp
     protected function _getUploader()
     {
         if (is_null($this->_fileUploader)) {
-            $this->_fileUploader    = new Mage_ImportExport_Model_Import_Uploader();
+            $this->_fileUploader = Mage::getModel("importexport/import_uploader", null);
 
             $this->_fileUploader->init();
             $this->_fileUploader->removeValidateCallback('catalog_product_image');
